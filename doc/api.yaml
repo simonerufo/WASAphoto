@@ -1,273 +1,509 @@
-openapi: 3.0.0
-servers:
-  - url: "http://localhost:3000"
+openapi: 3.0.3
 info:
-  title: Fantastic Coffee (decaffeinated)
-  description: Fantastic Coffee (decaffeinated), the skeleton project for Web and Software architecture course
-  version: 1.0.0
+  title: WASAphoto API
+  description: |-
+    This OpenAPI document describes WASAphoto functions
+  version: "1"
+tags:
+  - name: login
+  - name: action
+  - name: stream
+  
 paths:
-  /status:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    get:
-      tags: ["General"]
-      operationId: getStatusMessage
-      summary: Get status message for the user about issues / updates
-      description: |-
-        The response contains a status message meant for the user. It might
-        contains information about current technical issues, update messages
-        or general information.
-      responses:
-        "200":
-          description: Status message available
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StatusInfo"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /:
-    get:
-      tags: ["Group 1"]
-      operationId: index
-      summary: Get an index
-      description: |-
-        This is an example of an index API description
-      responses:
-        "200":
-          description: Successful
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  /context:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
+  /session:
     post:
-      tags: ["Group 1"]
-      operationId: getContext
-      summary: Another API example
+      tags: ["login"]
+      summary: Logs in the user
       description: |-
-        Example description 2
-      responses:
-        "200":
-          description: Request ok
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  /authenticated:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    get:
-      tags: ["Group 2"]
-      operationId: getAuthenticatedExample
-      summary: Get an endpoint with authentication
-      description: |-
-        Get an endpoint with auth
-      security:
-        - LegacyAuth: []
-        - AppToken: []
-      responses:
-        "200":
-          description: Logout successful
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /pictures/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
-    get:
-      tags: ["Cat pictures"]
-      operationId: getCatFromPicture
-      summary: Example of a parameter in URL
-      description: |-
-        Example of a parameter in URL
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Student picture found
-          content:
-            image/png:
-              schema:
-                type: string
-                format: binary
-              example: Picture binary file
-        "404":
-          description: Student picture not found
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-
-  /autofeeder/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
-    put:
-      tags: ["Autofeeder"]
-      operationId: createCatAutofeeder
-      summary: Example of PUT operation
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Auto feed enabled
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-    delete:
-      tags: ["Autofeeder"]
-      operationId: deleteCatAutofeeder
-      summary: Example of DELETE operation
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Auto feed disabled
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /session/login:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    post:
-      tags: ["Session management"]
-      operationId: login
-      summary: Log-in into system
-      description: |-
-        Perform a log-in action using username and password credentials.
-        Returns a token which can be used in authenticated requests.
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier and the username are returned.
+      operationId: doLogin
       requestBody:
+        description: User details
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
               type: object
               properties:
-                userid:
+                name:
                   type: string
-                  pattern: '^[a-zA-Z0-9]+$'
+                  example: Mar.ia
+                  pattern: 'ˆ.*?$'
                   minLength: 3
-                  maxLength: 255
-                password:
-                  type: string
-                  pattern: '^.*?$'
-                  minLength: 8
-                  maxLength: 255
+                  maxLength: 16
+        required: true
+      responses:
+        '201':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UserID"
+              example: {"user_id": 17}
+  /profiles/{uid}/username:
+    parameters:
+      - name: uid
+        in: path
+        description: the user id of the user that wanted to change his username
+        schema: { $ref: "#/components/schemas/UserID" }
+        required: true
+    put:
+      tags: ["action"]
+      operationId: setMyUserName
+      summary: update the username
+      description: setting the username to user with this uid 
+      requestBody:
+        content:
+          application/json:
+              schema: { $ref: "#/components/schemas/Username" }
       responses:
         "200":
-          description: Login successful
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "403":
-          description: Login failed
-          headers:
-            X-Message:
-              description: Error message
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+          description: username updated successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserID" }
+              example: { "user_id": 15}
+  /profiles/{uid}/photos:
+    parameters:
+      - name: uid
+        in: path
+        description: id of user that wants to upload a photo
+        schema: { $ref: "#/components/schemas/UserID"}
+        required: true
+    post:
+      tags: ["action"]
+      operationId: uploadPhoto
+      summary: user uploading a photo on his profile
+      description: user uploading a photo on his profile
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/UserPhoto"}
+      responses:
+       "201":
+        description: Photo successfully uploaded on profile
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/PhotoID"}
+            example: {pid: 185}
+    delete:
+      tags: ["action"]
+      operationId: deletePhoto
+      summary: user deleting a photo
+      description: remove a photo from user profile
+      responses:
+        "200":
+          description: photo successfully deleted
+          content:
+            application/json: 
+              schema: {$ref: "#/components/schemas/PhotoID"}
+              example: {pid: 185}
+  /profiles/{current_uid}/followed/{target_uid}:
+    parameters:
+      - name: current_uid
+        in: path
+        description: user's id that wants to follow/unfollow another user
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+      - name: target_uid
+        in: path
+        description: user's id that is going to be followed/unfollowed
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+    put:
+      tags: ["action"]
+      operationId: followUser
+      summary: add new user to followed list
+      description: todo
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/User"}
+      responses:
+        "200":
+          description: user successfully added to followed list
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Followed"}
+              example: {username: Marco, user_id: 128}
+    delete:
+      tags: ["action"]
+      operationId: unfollowUser
+      summary: "unfollow a user"
+      description: removing from the followed list a user
+      responses:
+       "204":
+          description: user successfully unfollowed
+  /profiles/{current_uid}/banned/{target_uid}:
+    parameters:
+      - name: current_uid
+        in: path
+        description: user's id that wants to ban/unban another user
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+      - name: target_uid
+        in: path
+        description: user's id that is going to be banned/unbanned
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+    put:
+      tags: ["action"]
+      operationId: banUser
+      summary: ban a user
+      description: add the target_uid user to user's current_uid banned list
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/User"}
+      responses:
+        "200":
+          description: user successfully added to ban list
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Banned"}
+              example: {username: lollo, user_id: 67}
+    delete:
+      tags: ["action"]
+      operationId: unbanUser
+      summary: "unban a user"
+      description: remove the target_uid user from user's current_uid banned list
+      responses:
+        "204":
+          description: user successfully unbanned
+  /profiles/{uid}/profile:
+    parameters:
+      - name: uid
+        in: path
+        description: user's id profile to be shown
+        schema: {$ref: "#/components/schemas/Username"}
+        required: true
+    get:
+      tags: ["action"]
+      operationId: getUserProfile
+      summary: getting the user profile
+      description: get the user profile from corresponding user id
+      responses:
+        "200":
+          description: user profile successfully get
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Profile"}
+              example: {username: Giova, profile_picture: img_path,
+                        photos: profile_posts, followers: 500, following: 30}
+        "404":
+          description: user not found
+  /profiles/{uid}/stream:
+    parameters:
+      - name: uid
+        in: path
+        description: "user id that wants to get the stream"
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+    get:
+      tags: ["stream"]
+      operationId: getMyStream
+      summary: "stream of posts from users followed by user"
+      description: getting posts from all users followed by user
+      responses:
+        "200":
+          description: stream successfully retrieved
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Stream"}
+              example: {user_post: posts from user}
+  /profiles/{current_uid}/stream/{target_photoid}/like:
+    parameters:
+      - name: current_uid
+        in: path
+        description: user id's that wants to like/unlike or comment/uncomment a post
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+      - name: target_photoid
+        in: path
+        description: photo id's that is receiving a like/comment or deleting it
+        schema: {$ref: "#/components/schemas/PhotoID"}
+        required: true
+    put:
+      tags: ["action"]
+      operationId: likePhoto
+      summary: like a photo
+      description: user with current_id adds to Liked list photo id with target_id
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Stream"}
+      responses:
+        "200":
+          description: user successfully liked a photo
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Liked"}
+              example: {photo_id: 298}
+    delete:
+      tags: ["action"]
+      operationId: unlikePhoto
+      summary: remove like from photo
+      description: user with current_id removes from Liked list photo id with target_id
+      responses:
+        "200":
+          description: user successfully removed a like from photo 
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Liked"}
+              example: {photo_id: 298}
+  /profiles/{current_uid}/stream/{target_photoid}/comment:
+    parameters:
+      - name: current_uid
+        in: path
+        description: user id's that wants to comment/uncomment a post
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+      - name: target_photoid
+        in: path
+        description: photo id's that is receiving a comment or deleting it
+        schema: {$ref: "#/components/schemas/PhotoID"}
+        required: true
+    post:
+      tags: ["action"]
+      operationId: commentPhoto
+      summary: comment a photo
+      description: user with current_id adds to Comments list of user with target_id    
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/UserPhoto"}
+      responses:
+        "200":
+          description: user successfully commented post
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Comment"}
+              example: {comment_id: 7, comment_text: "good panorama!"}
 
-
+    delete:
+      tags: ["action"]
+      operationId: uncommentPhoto
+      summary: remove a comment from photo
+      description: user with current_id removes from user's comment list with target_id
+      responses:
+        "200":
+          description: user successfully removed a comment from photo 
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CommentID"}
+              example: {comment_id: 7}
+          
+#COMPONENTS
 components:
   schemas:
-    StatusInfo:
-      title: Status Info
+
+    CommentID:
+      title: Comment ID 
+      description: id of a comment
       type: object
       properties:
-        status:
+        id:
+          type: integer
+          example: 58
+        
+    CommentText:
+      title: Comment Text
+      description: a string representing a text under a post
+      type: object
+      properties:
+        text:
           type: string
-          enum:
-            - info
-            - warning
-            - critical
-            - ""
-        title: { type: string }
-        message: { type: string }
-        url: { type: string }
+          example: hey,nice photo
+          pattern: ".,-_:;*()#@'!?=/&%$£"
+          maxLength: 100
+          minLength: 0
+      
+    Comment:
+      title: Comment
+      description: "text added from users to posts"
+      type: object
+      properties:
+        comment_id:
+          $ref: "#/components/schemas/CommentID"
+        comment_text:
+          $ref: "#/components/schemas/CommentText"
+        
+        
+      
+    Liked:
+      title: Liked list
+      description: list of all liked photos
+      type: object
+      properties:
+        photo_id:
+          type: array
+          items: {$ref: "#/components/schemas/PhotoID"}
+          minItems: 0
+          maxItems: 10000000
+      
+    Photos:
+      title: User photos
+      description: an array of user's photos
+      type: object
+      properties:
+        user_post:
+          type: array
+          items: {$ref: "#/components/schemas/UserPhoto"}
+          minItems: 0
+          maxItems: 10000000
+    
+    PhotoID:
+      title: photo id
+      description: "photo identificator"
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 45
+      
+    Followed:
+      title: Followed list
+      description: list of users' names and IDs followed by user
+      type: object
+      properties:
+        user:
+          type: array
+          items: 
+            oneOf:
+              - {$ref: "#/components/schemas/Username"}
+              - {$ref: "#/components/schemas/UserID"}
+          minItems: 0
+          maxItems: 10000000
+      
+    Banned:
+      title: Ban list
+      description: list of users' names and IDs banned by user
+      type: object
+      properties:
+        user:
+          type: array
+          items:
+            oneOf:
+              - {$ref: "#/components/schemas/Username"}
+              - {$ref: "#/components/schemas/UserID"}
+          minItems: 0
+          maxItems: 10000000
+    
+    UserPhoto:
+      title: User photo
+      description: photo uploaded by the user
+      properties:
+        username: {$ref: "#/components/schemas/Username"}
+        pid: {$ref: "#/components/schemas/PhotoID"}
+        photo_path:
+          title: photo path
+          description: "describes the path of a photo"
+          type : string
+          pattern: "_/"
+          example: "path/images/photo.png"
+          minLength: 1
+          maxLength: 100
+        likes_number:
+          title: likes number
+          description: "number of likes received from users"
+          type: integer
+          example: 500
+        comments_number:
+          title: comments number
+          description: "number of comments received from users"
+          type: integer
+          example: 5
+        comments_list:
+          title: comments list
+          description: array of Comment
+          type: array
+          items: {$ref: "#/components/schemas/Comment"}
+          minItems: 0
+          maxItems: 10000000
+        time:
+          title: time
+          description: pubblication time
+          type: string
+          example: "2001-01-23"
+          format: date
+          pattern: "YYYY-MM-DD"
+          minLength: 0
+          maxLength: 10
+          
+      
+    Stream:
+        title: Stream
+        description: array of User photos
+        type: object
+        properties:
+          user_post:
+            type: array
+            items: {$ref: "#/components/schemas/UserPhoto"}
+            minItems: 0
+            maxItems: 10000000
+          
+    UserID:
+      title: User ID
+      description: "this is the user id"
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+          readOnly: true
+      
+    Username:
+      title: Username
+      description: "this is the user's name"
+      type: object
+      properties:
+        username:
+          type: string
+          example: "Simone"
+          pattern: 'ˆ.*?$'
+          minLength: 3
+          maxLength: 16
+      
+    User:
+      title: User
+      description: "all informations about User"
+      type: object
+      properties:
+        uid:
+          $ref: "#/components/schemas/UserID"
+        username:
+          $ref: "#/components/schemas/Username"
+        follow_list:
+          $ref: "#/components/schemas/Followed"
+        ban_list:
+          $ref: "#/components/schemas/Banned"
+        liked_list:
+          $ref: "#/components/schemas/Liked"
+          
+    Profile:
+      title: Profile
+      description: "User profile"
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        profile_picture:
+          $ref: "#/components/schemas/UserPhoto"
+        photos:
+          $ref: "#/components/schemas/Photos"
+        followers:
+          title: followers
+          description: users number followed by user
+          type: integer
+          example: 400
+        following:
+          title: following
+          description: users number following the user
+          type: integer
+          example: 700
+    
+        
+      
 
-  responses:
-    Unauthorized:
-      description: The access token is missing or it's expired
-    BadRequest:
-      description: The request was not compliant with the documentation (eg. missing fields, etc)
-    InternalServerError:
-      description: The server encountered an internal error. Further info in server logs
-
-  securitySchemes:
-    LegacyAuth:
-      type: apiKey
-      in: header
-      name: X-App-Token
-      description: |-
-        App session token value. This value is sent by the server in the login
-        and session refresh APIs.
-
-  parameters:
-    XAppVersion:
-      schema:
-        type: string
-        pattern: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-        minLength: 1
-        maxLength: 10
-      name: X-App-Version
-      in: header
-      required: true
-      description: App human readable version ("semantic version" format)
-      allowEmptyValue: false
-    XAppBuild:
-      schema: { type: integer }
-      name: X-App-Build
-      in: header
-      required: true
-      description: App build number
-      allowEmptyValue: false
-    XAppLanguage:
-      schema:
-        type: string
-        pattern: '^[a-z]{2}([-_][A-Z]{2})?$'
-        minLength: 2
-        maxLength: 5
-      name: X-App-Language
-      in: header
-      required: true
-      description: App language in ISO 639-1 format
-      allowEmptyValue: false
-    XAppPlatform:
-      schema:
-        type: string
-        enum: [ios, android]
-      name: X-App-Platform
-      in: header
-      required: true
-      description: App operating system / platform
-      allowEmptyValue: false
-    cat:
-      schema:
-        type: string
-        pattern: '^[a-zA-Z]+$'
-        minLength: 3
-        maxLength: 10
-      name: cat
-      in: path
-      required: true
-      description: Cat
-      allowEmptyValue: false
+        
