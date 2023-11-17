@@ -8,7 +8,10 @@ tags:
   - name: login
   - name: action
   - name: stream
-  
+
+security:
+  - bearerAuth: []
+
 paths:
   /session:
     post:
@@ -296,6 +299,11 @@ paths:
           
 #COMPONENTS
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
 
     CommentID:
