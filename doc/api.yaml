@@ -45,7 +45,7 @@ paths:
               schema: 
                 $ref: "#/components/schemas/UserID"
               example: {"user_id": 17}
-  /profiles/{uid}:
+  /profiles/{uid}/username:
     parameters:
       - name: uid
         in: path
@@ -144,7 +144,7 @@ paths:
       responses:
        "204":
           description: user successfully unfollowed
-  /profiles/{current_uid}/banned/{target_uid}:
+  /profiles/{current_uid}/bans/{target_uid}:
     parameters:
       - name: current_uid
         in: path
@@ -221,7 +221,7 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Stream"}
               example: {user_post: posts from user}
-  /profiles/{current_uid}/like/{target_photoid}:
+  /profiles/{current_uid}/likes/{target_photoid}:
     parameters:
       - name: current_uid
         in: path
@@ -261,7 +261,7 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Liked"}
               example: {photo_id: 298}
-  /profiles/{current_uid}/comment/{target_photoid}:
+  /profiles/{current_uid}/comments/{target_photoid}:
     parameters:
       - name: current_uid
         in: path
