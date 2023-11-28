@@ -332,7 +332,7 @@ components:
           type: string
           description: a string representing a text under a post
           example: hey,nice photo
-          pattern: "^[^\/\\]{1,64}$"
+          pattern: '^[^\/\\]{1,64}$'
           maxLength: 100
           minLength: 1
       
