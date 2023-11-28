@@ -91,8 +91,8 @@ var FOLLOW_TABLE = `CREATE TABLE IF NOT EXISTS Follow(
 	-banned_id: identificator of user that's going to be banned by another user
 */
 var BAN_TABLE = `CREATE TABLE IF NOT EXISTS Ban(
-	banning_id ,
-	banned_id ,
+	banning_id INTEGER NOT NULL,
+	banned_id INTEGER NOT NULL,
 	PRIMARY KEY(banning_id,banned_id)
 	FOREIGN KEY(banning_id) REFERENCES User(user_id)
 	ON DELETE CASCADE,
