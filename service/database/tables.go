@@ -7,9 +7,9 @@ package database
 */
 
 var USER_TABLE = `CREATE TABLE IF NOT EXISTS User(
-	user_id INTEGER NOT NULL UNIQUE,
+	user_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	username STRING NOT NULL UNIQUE,
-	PRIMARY KEY(user_id)"
+	UNIQUE (user_id) ON CONFLICT REPLACE
 );`
 
 // POST
@@ -25,7 +25,7 @@ var POST_TABLE = `CREATE TABLE IF NOT EXISTS Post(
 	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY(post_id,user_id),
 	FOREIGN KEY (user_id) REFERENCES User(user_id)
-	ON DELETE CASCADE
+		ON DELETE CASCADE
 );`
 
 //COMMENT
@@ -46,9 +46,9 @@ var COMMENT_TABLE = `CREATE TABLE IF NOT EXISTS Comment(
 	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY(comment_id,post_id,owner_id)
 	FOREIGN KEY(post_id,owner_id) REFERENCES Post(user_id,post_id)
-	ON DELETE CASCADE,
+		ON DELETE CASCADE,
 	FOREIGN KEY(user_id) REFERENCES User(user_id)
-	ON DELETE CASCADE
+		ON DELETE CASCADE
 );`
 
 //LIKE
@@ -64,9 +64,9 @@ var LIKE_TABLE = `CREATE TABLE IF NOT EXISTS Like(
 	post_id INTEGER NOT NULL,
 	PRIMARY KEY(post_id,owner_id,user_id),
 	FOREIGN KEY(post_id,owner_id) REFERENCES Post(post_id,user_id)
-	ON DELETE CASCADE,
+		ON DELETE CASCADE,
 	FOREIGN KEY(user_id) REFERENCES Post(user_id)
-	ON DELETE CASCADE,
+		ON DELETE CASCADE
 );`
 
 //FOLLOW
@@ -80,9 +80,9 @@ var FOLLOW_TABLE = `CREATE TABLE IF NOT EXISTS Follow(
 	followed_id INTEGER NOT NULL,
 	PRIMARY KEY(following_id,followed_id),
 	FOREIGN KEY(following_id) REFERENCES User(user_id)
-	ON DELETE CASCADE,
+		ON DELETE CASCADE,
 	FOREIGN KEY(followed_id) REFERENCES User(user_id)
-	ON DELETE CASCADE
+		ON DELETE CASCADE
 );`
 
 //BAN
@@ -95,7 +95,7 @@ var BAN_TABLE = `CREATE TABLE IF NOT EXISTS Ban(
 	banned_id INTEGER NOT NULL,
 	PRIMARY KEY(banning_id,banned_id)
 	FOREIGN KEY(banning_id) REFERENCES User(user_id)
-	ON DELETE CASCADE,
+		ON DELETE CASCADE,
 	FOREIGN KEY(banned_id) REFERENCES User(user_id)
-	ON DELETE CASCADE
+		ON DELETE CASCADE
 );`

@@ -3,12 +3,12 @@ package database
 import "time"
 
 type User struct {
-	UserID   int    `json:"user_id`
+	UserID   int    `json:"user_id"`
 	Username string `json:"username"`
 }
 
 type Post struct {
-	PostID      int       `json:post_id`
+	PostID      int       `json:"post_id"`
 	User        User      `json:"user"`
 	ImageURL    string    `json:"imageURL"`
 	LikesNum    int       `json:"likesNum"`
