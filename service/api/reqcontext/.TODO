@@ -1,0 +1,19 @@
+OPERATIONS:
+    -doLogin #done
+    -setMyUsername #done
+    -uploadPhoto
+    -deletePhoto
+    -followUser
+    -unfollowUser
+    -banUser
+    -unbanUser
+    -getUserProfile
+    -getMyStream
+    -likePhoto
+    -unlikePhoto
+    -commentPhoto
+    -uncommentPhoto
+Add propic to user (not required)
+Comment every function
+Implement Auth
+fix -doLogin

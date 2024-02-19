@@ -12,6 +12,17 @@ var USER_TABLE = `CREATE TABLE IF NOT EXISTS User(
 	UNIQUE (user_id) ON CONFLICT REPLACE
 );`
 
+/*
+// adding some entries in user table
+var INSERT_USERS = `INSERT INTO User(username)
+					VALUES 
+					("simone"),
+					("gigi"),
+					("diana"),
+					("daniele"),
+					("andrea");`
+*/
+
 // POST
 /*
 	-id: identificator for post

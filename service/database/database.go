@@ -41,12 +41,17 @@ type AppDatabase interface {
 	//GetName() (string, error)
 	//SetName(name string) error
 
-	//insert user in db
-	InsertUser(user User) (User, error)
-	//search user in db
-	SearchUsername(username string) (bool, error)
-	//get user from db
-	GetUser(username string) (User, error)
+	//insert user in user table
+	InsertUser(username string) error
+	//search user from user table
+	SearchUsername(username string) bool
+	//get user from user table
+	GetUserByName(username string) (User, error)
+	GetUserByID(id int) (User, error)
+	//update username in user table
+	UpdateName(user User) error
+	//add user follow relation
+	FollowUser(following_id int, followed_id int) error
 
 	Ping() error
 }
@@ -109,6 +114,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			return nil, fmt.Errorf("error creating database structure (BAN): %w", err)
 		}
 	}
+
 	return &appdbimpl{
 		c: db,
 	}, nil

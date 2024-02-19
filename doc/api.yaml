@@ -28,26 +28,19 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: Maria
-                  pattern: 'ˆ.*?$'
-                  minLength: 3
-                  maxLength: 16
+               $ref: "#/components/schemas/Username"
         required: true
       responses:
-        '201':
+        '200':
           description: User log-in action successful
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/UserID"
+                $ref: "#/components/schemas/User"
               example: {"user_id": 17}
-  /profiles/{uid}/username:
+  /profiles/{user_id}/username:
     parameters:
-      - name: uid
+      - name: user_id
         in: path
         description: the user id of the user that wanted to change his username
         schema: { $ref: "#/components/schemas/UserID" }
@@ -68,9 +61,9 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/UserID" }
               example: { "user_id": 15}
-  /profiles/{uid}/{photo_id}:
+  /profiles/{user_id}/{photo_id}:
     parameters:
-      - name: uid
+      - name: user_id
         in: path
         description: id of user that wants to upload a photo
         schema: { $ref: "#/components/schemas/UserID"}
@@ -108,9 +101,9 @@ paths:
             application/json: 
               schema: {$ref: "#/components/schemas/PhotoID"}
               example: {pid: 185}
-  /profiles/{current_uid}/followed/{target_uid}:
+  /profiles/{user_id}/followed/{target_uid}:
     parameters:
-      - name: current_uid
+      - name: user_id
         in: path
         description: user's id that wants to follow/unfollow another user
         schema: {$ref: "#/components/schemas/UserID"}
@@ -144,9 +137,9 @@ paths:
       responses:
        "204":
           description: user successfully unfollowed
-  /profiles/{current_uid}/bans/{target_uid}:
+  /profiles/{user_id}/bans/{target_uid}:
     parameters:
-      - name: current_uid
+      - name: user_id
         in: path
         description: user's id that wants to ban/unban another user
         schema: {$ref: "#/components/schemas/UserID"}
@@ -180,9 +173,9 @@ paths:
       responses:
         "204":
           description: user successfully unbanned
-  /profiles/{uid}/profile:
+  /profiles/{user_id}/profile:
     parameters:
-      - name: uid
+      - name: user_id
         in: path
         description: user's id profile to be shown
         schema: {$ref: "#/components/schemas/Username"}
@@ -202,9 +195,9 @@ paths:
                         photos: profile_posts, followers: 500, following: 30}
         "404":
           description: user not found
-  /profiles/{uid}/stream:
+  /profiles/{user_id}/stream:
     parameters:
-      - name: uid
+      - name: user_id
         in: path
         description: "user id that wants to get the stream"
         schema: {$ref: "#/components/schemas/UserID"}
@@ -221,9 +214,9 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Stream"}
               example: {user_post: posts from user}
-  /profiles/{current_uid}/likes/{target_photoid}:
+  /profiles/{user_id}/likes/{target_photoid}:
     parameters:
-      - name: current_uid
+      - name: user_id
         in: path
         description: user id's that wants to like/unlike or comment/uncomment a post
         schema: {$ref: "#/components/schemas/UserID"}
@@ -261,9 +254,9 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Liked"}
               example: {photo_id: 298}
-  /profiles/{current_uid}/comments/{target_photoid}:
+  /profiles/{user_id}/comments/{target_photoid}:
     parameters:
-      - name: current_uid
+      - name: user_id
         in: path
         description: user id's that wants to comment/uncomment a post
         schema: {$ref: "#/components/schemas/UserID"}
@@ -476,7 +469,7 @@ components:
           description: "user identificator number"
           type: integer
           example: 1
-          readOnly: true
+#          readOnly: true
       
     Username:
       title: Username
@@ -500,12 +493,12 @@ components:
           $ref: "#/components/schemas/UserID"
         username:
           $ref: "#/components/schemas/Username"
-        follow_list:
-          $ref: "#/components/schemas/Followed"
-        ban_list:
-          $ref: "#/components/schemas/Banned"
-        liked_list:
-          $ref: "#/components/schemas/Liked"
+#        follow_list:
+#          $ref: "#/components/schemas/Followed"
+#        ban_list:
+#          $ref: "#/components/schemas/Banned"
+#        liked_list:
+#          $ref: "#/components/schemas/Liked"
           
     Profile:
       title: Profile
