@@ -52,6 +52,8 @@ type AppDatabase interface {
 	UpdateName(user User) error
 	//add user follow relation
 	FollowUser(following_id int, followed_id int) error
+	//checks if a user banned another user
+	GetBan(banning_id int, banned_id int) (bool, error)
 
 	Ping() error
 }
