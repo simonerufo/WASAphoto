@@ -410,7 +410,7 @@ components:
       title: User photo
       description: photo uploaded by the user
       properties:
-        username: {$ref: "#/components/schemas/Username"}
+        user_id: {$ref: "#/components/schemas/UserID"}
         pid: {$ref: "#/components/schemas/PhotoID"}
         photo_path:
           title: photo path
@@ -420,6 +420,13 @@ components:
           example: "path/images/photo.png"
           minLength: 1
           maxLength: 100
+        caption:
+          description: "description of a photo"
+          type: string
+          pattern: '^[^\/\\]{1,64}$'
+          example: "look at me!"
+          minLength: 0
+          maxLength: 50
         likes_number:
           title: likes number
           description: "number of likes received from users"

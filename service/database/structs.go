@@ -24,3 +24,17 @@ type Comment struct {
 	Text      string    `json:"text"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+type Photo struct {
+	UserID    int       `json:"user_id"`
+	PhotoID   int       `json:"pid"`
+	Path      string    `json:"photo_path"`
+	Caption   string    `json:"caption"`
+	Timestamp time.Time `json:"time"`
+}
+type Profile struct {
+	User User `json:"user"`
+	//Photos    []Photo `json:"photos"`
+	Followers int `json:"followers"`
+	Following int `json:"following"`
+}

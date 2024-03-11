@@ -54,6 +54,8 @@ type AppDatabase interface {
 	FollowUser(following_id int, followed_id int) error
 	//checks if a user banned another user
 	GetBan(banning_id int, banned_id int) (bool, error)
+	//getting from db user profile
+	GetUserProfile(user_id int) (Profile, error)
 
 	Ping() error
 }
@@ -87,9 +89,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		//POST_TABLE
-		_, err = db.Exec(POST_TABLE)
+		_, err = db.Exec(PHOTO_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (POST): %w", err)
+			return nil, fmt.Errorf("error creating database structure (PHOTO): %w", err)
 		}
 
 		//LIKE_TABLE

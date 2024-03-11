@@ -23,10 +23,7 @@ func (user User) isNameValid() bool {
 // checks if the username is valid
 func validUsername(username string) bool {
 	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile
-	if !rex.MatchString(username) {
-		return false
-	}
-	return true
+	return rex.MatchString(username)
 }
 
 // check if user is authorized

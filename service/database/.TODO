@@ -1,2 +1,1 @@
-- ID'S with autoincrement(sql) instead of incrementing algorithm
-- create a local project db with the sqlite extension
+-aggiungere photos allo user profile

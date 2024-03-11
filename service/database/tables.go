@@ -15,7 +15,7 @@ var USER_TABLE = `CREATE TABLE IF NOT EXISTS User(
 /*
 // adding some entries in user table
 var INSERT_USERS = `INSERT INTO User(username)
-					VALUES 
+					VALUES
 					("simone"),
 					("gigi"),
 					("diana"),
@@ -23,18 +23,19 @@ var INSERT_USERS = `INSERT INTO User(username)
 					("andrea");`
 */
 
-// POST
+// PHOTO
 /*
 	-id: identificator for post
 	-user_id: identificator for user that owns the post
 	-timestamp: current timestamp assigned to post whenever it's created
 */
 
-var POST_TABLE = `CREATE TABLE IF NOT EXISTS Post(
-	post_id INTEGER NOT NULL,
+var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
+	photo_id INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
+	caption STRING NOT NULL,
 	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY(post_id,user_id),
+	PRIMARY KEY(photo_id,user_id),
 	FOREIGN KEY (user_id) REFERENCES User(user_id)
 		ON DELETE CASCADE
 );`

@@ -10,6 +10,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 	rt.router.PUT("/profiles/:user_id/username", rt.wrap(rt.setMyUsername))
 	rt.router.PUT("/profiles/:user_id/followed/:target_id", rt.wrap(rt.followUser))
+	rt.router.GET("/profiles/:user_id/profile", rt.wrap(rt.getProfile))
 	//rt.router.GET("/", rt.getHelloWorld)
 	//rt.router.GET("/context", rt.wrap(rt.getContextReply))
 	// Special routes

@@ -1,6 +1,6 @@
 package database
 
-// GetName is an example that shows you how to query data
+// GetBan checks if a user (banning id) banned another user (banned id)
 func (db *appdbimpl) GetBan(banning_id int, banned_id int) (bool, error) {
 	var isBanned int
 	err := db.c.QueryRow("SELECT EXISTS (SELECT 1 FROM Ban WHERE banning_id = ? AND banned_id = ?)",
@@ -9,10 +9,8 @@ func (db *appdbimpl) GetBan(banning_id int, banned_id int) (bool, error) {
 		return false, err
 	}
 
-	if isBanned == 1 {
-		return true, err
-	} else {
+	if isBanned == 0 {
 		return false, err
 	}
-
+	return true, err
 }
