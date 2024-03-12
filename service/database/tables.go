@@ -25,10 +25,8 @@ var INSERT_USERS = `INSERT INTO User(username)
 
 // PHOTO
 /*
-	-id: identificator for post
-	-user_id: identificator for user that owns the post
-	-timestamp: current timestamp assigned to post whenever it's created
-*/
+
+ */
 
 var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
 	photo_id INTEGER NOT NULL,

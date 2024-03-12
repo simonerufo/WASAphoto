@@ -3,17 +3,18 @@ OPERATIONS:
     -setMyUsername #done
     -uploadPhoto
     -deletePhoto
-    -followUser
+    -followUser #DONE
     -unfollowUser
     -banUser
     -unbanUser
-    -getUserProfile
+    -getUserProfile #DONE
     -getMyStream
     -likePhoto
     -unlikePhoto
     -commentPhoto
     -uncommentPhoto
 Add propic to user (not required)
+CONTROLLARE GLI ERRORS
 Comment every function
 Implement Auth
 fix -doLogin

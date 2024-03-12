@@ -10,6 +10,7 @@ type User struct {
 type Post struct {
 	PostID      int       `json:"post_id"`
 	User        User      `json:"user"`
+	Caption     string    `json:"caption"`
 	ImageURL    string    `json:"imageURL"`
 	LikesNum    int       `json:"likesNum"`
 	CommentsNum int       `json:"commentsNum"`
