@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,7 +17,14 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	isAuth(w, r, user_id)
+	profile, err := rt.db.GetStream(user_id)
+	if err != nil {
+		http.Error(w, "Profile not found", http.StatusBadGateway)
+	}
 
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(profile)
+	fmt.Printf("Posts")
 	//get da db dei post degli user che seguo e che non mi hanno bannato(? se mi hanno bannato mi si toglie il follow??)
 	//faccio poi l'encode in json del file
 }
