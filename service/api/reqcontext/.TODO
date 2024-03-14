@@ -8,7 +8,7 @@ OPERATIONS:
     -banUser
     -unbanUser
     -getUserProfile #DONE
-    -getMyStream
+    -getMyStream #da testare quando sarà possibile uppare i post
     -likePhoto
     -unlikePhoto
     -commentPhoto
