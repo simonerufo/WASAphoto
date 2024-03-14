@@ -1,6 +1,6 @@
 package database
 
-func (db *appdbimpl) getStream(user_id int) ([]Post, error) {
+func (db *appdbimpl) GetStream(user_id int) ([]Post, error) {
 	var posts []Post
 	GETPostsFollowed := `SELECT Photo.*
 						 FROM Photo

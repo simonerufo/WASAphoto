@@ -56,6 +56,8 @@ type AppDatabase interface {
 	GetBan(banning_id int, banned_id int) (bool, error)
 	//getting from db user profile
 	GetUserProfile(user_id int) (Profile, error)
+	//retrieving the user stream
+	GetStream(user_id int) ([]Post, error)
 
 	Ping() error
 }
