@@ -26,16 +26,28 @@ var INSERT_USERS = `INSERT INTO User(username)
 // PHOTO
 /*
 
- */
+
 
 var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
 	photo_id INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	caption STRING NOT NULL,
+	photo BLOB NOT NULL,
 	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY(photo_id,user_id),
 	FOREIGN KEY (user_id) REFERENCES User(user_id)
 		ON DELETE CASCADE
+);`
+*/
+var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
+    photo_id INT AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    caption STRING NOT NULL,
+    photo BLOB NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(photo_id),
+    UNIQUE(photo_id, user_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );`
 
 //COMMENT
@@ -48,7 +60,7 @@ var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
 	-timestamp: current timestamp assigned to comment whenever it's created
 */
 var COMMENT_TABLE = `CREATE TABLE IF NOT EXISTS Comment(
-	comment_id INTEGER NOT NULL,
+	comment_id INTEGER AUTO_INCREMENT,
 	post_id INTEGER NOT NULL,
 	owner_id INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,

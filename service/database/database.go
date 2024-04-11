@@ -52,13 +52,36 @@ type AppDatabase interface {
 	UpdateName(user User) error
 	//add user follow relation
 	FollowUser(following_id int, followed_id int) error
+	//remove a user follow relation
+	UnfollowUser(following_id int, followed_id int) error
 	//checks if a user banned another user
 	GetBan(banning_id int, banned_id int) (bool, error)
+	//remove a user ban relation
+	UnbanUser(banning_id int, banned_id int) error
+	//checks if a user followed another user
+	GetFollow(following_id int, followed_id int) (bool, error)
+	//ban a user adding him in db
+	BanUser(banning_id int, banned_id int) error
 	//getting from db user profile
 	GetUserProfile(user_id int) (Profile, error)
 	//retrieving the user stream
 	GetStream(user_id int) ([]Post, error)
-
+	//uploading a photo(post) into db
+	InsertPhoto(user_id int, caption string, photo []byte) error
+	//checks if a photo exists in db
+	CheckPhoto(user_id int, photo_id int) (bool, error)
+	//deletes a photo from db
+	DeletePhoto(user_id int, photo_id int) error
+	//insert an entry into like table
+	InsertLike(user_id int, owner_id int, post_id int) error
+	//delete an entry from like table
+	DeleteLike(user_id int, owner_id int, post_id int) error
+	//insert an entry into comment table
+	InsertComment(user_id int, owner_id int, photo_id int, text string) error
+	//check if a comment exists in comment table
+	CheckComment(user_id int, photo_id int, comment_id int) (bool, error)
+	//delete a comment from comments table
+	DeleteComment(user_id int, photo_id int, comment_id int) error
 	Ping() error
 }
 

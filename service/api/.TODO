@@ -1,12 +1,12 @@
 OPERATIONS:
     -doLogin #done
     -setMyUsername #done
-    -uploadPhoto
-    -deletePhoto
+    -uploadPhoto #da test
+    -deletePhoto #TEST
     -followUser #DONE
-    -unfollowUser
-    -banUser
-    -unbanUser
+    -unfollowUser #da testare
+    -banUser #da test
+    -unbanUser #da test
     -getUserProfile #DONE
     -getMyStream #da testare quando sarà possibile uppare i post
     -likePhoto

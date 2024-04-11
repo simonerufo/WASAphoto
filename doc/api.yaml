@@ -73,22 +73,22 @@ paths:
         description: id of photo that's going to be uploaded
         schema: { $ref: "#/components/schemas/UserID"}
         required: true
-    post:
-      tags: ["action"]
-      operationId: uploadPhoto
-      summary: user uploading a photo on his profile
-      description: user uploading a photo on his profile
-      requestBody:
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/UserPhoto"}
-      responses:
-       "201":
-        description: Photo successfully uploaded on profile
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/PhotoID"}
-            example: {pid: 185}
+#    post:
+#      tags: ["action"]
+#      operationId: uploadPhoto
+#      summary: user uploading a photo on his profile
+#      description: user uploading a photo on his profile
+#      requestBody:
+#        content:
+#          application/json:
+#            schema: {$ref: "#/components/schemas/UserPhoto"}
+#      responses:
+#       "201":
+#        description: Photo successfully uploaded on profile
+#        content:
+#          application/json:
+#            schema: {$ref: "#/components/schemas/PhotoID"}
+#            example: {pid: 185}
     delete:
       tags: ["action"]
       operationId: deletePhoto
@@ -195,6 +195,29 @@ paths:
                         photos: profile_posts, followers: 500, following: 30}
         "404":
           description: user not found
+    post:
+      tags: ["action"]
+      operationId: uploadPhoto
+      summary: user uploading a photo on his profile
+      description: user uploading a photo on his profile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema: 
+              description: photo and caption of the post
+              type: object
+              properties:
+                image: {$ref : "#/components/schemas/Image"}
+                caption: {$ref : "#/components/schemas/Caption"}
+
+      responses:
+          "201":
+            description: Photo successfully uploaded on profile
+            content:
+              application/json:
+                schema: {$ref: "#/components/schemas/PhotoID"}
+                example: {pid: 185}
+
   /profiles/{user_id}/stream:
     parameters:
       - name: user_id
@@ -254,16 +277,16 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Liked"}
               example: {photo_id: 298}
-  /profiles/{user_id}/comments/{target_photoid}:
+  /profiles/{target_id}/comments/{target_photoid}:
     parameters:
       - name: user_id
         in: path
-        description: user id's that wants to comment/uncomment a post
+        description: user id's that is going to receive a comment
         schema: {$ref: "#/components/schemas/UserID"}
         required: true
       - name: target_photoid
         in: path
-        description: photo id's that is receiving a comment or deleting it
+        description: photo id's that is receiving a comment
         schema: {$ref: "#/components/schemas/PhotoID"}
         required: true
     post:
@@ -274,7 +297,7 @@ paths:
       requestBody:
         content:
           application/json:
-            schema: {$ref: "#/components/schemas/UserPhoto"}
+            schema: {$ref: "#/components/schemas/Comment"}
       responses:
         "200":
           description: user successfully commented post
@@ -412,38 +435,34 @@ components:
       properties:
         user_id: {$ref: "#/components/schemas/UserID"}
         pid: {$ref: "#/components/schemas/PhotoID"}
-        photo_path:
-          title: photo path
-          description: "describes the path of a photo"
-          type : string
-          pattern: '^\/(?:[\w]+\/)*[\w]+\.[a-zA-Z]{2,}$'
-          example: "path/images/photo.png"
-          minLength: 1
-          maxLength: 100
-        caption:
-          description: "description of a photo"
-          type: string
-          pattern: '^[^\/\\]{1,64}$'
-          example: "look at me!"
-          minLength: 0
-          maxLength: 50
-        likes_number:
-          title: likes number
-          description: "number of likes received from users"
-          type: integer
-          example: 500
-        comments_number:
-          title: comments number
-          description: "number of comments received from users"
-          type: integer
-          example: 5
-        comments_list:
-          title: comments list
-          description: array of Comment
-          type: array
-          items: {$ref: "#/components/schemas/Comment"}
-          minItems: 0
-          maxItems: 10000000
+        photo: {$ref: "#/components/schemas/Image"}
+#          title: photo path
+#          description: "describes the path of a photo"
+#          type : string
+#          pattern: '^\/(?:[\w]+\/)*[\w]+\.[a-zA-Z]{2,}$'
+#          example: "path/images/photo.png"
+#          minLength: 1
+#          maxLength: 100
+          
+        caption: {$ref: "#/components/schemas/Caption"}
+          
+#        likes_number:
+#          title: likes number
+#          description: "number of likes received from users"
+#          type: integer
+#          example: 500
+#        comments_number:
+#          title: comments number
+#          description: "number of comments received from users"
+#          type: integer
+#          example: 5
+#        comments_list:
+#          title: comments list
+#          description: array of Comment
+#          type: array
+#          items: {$ref: "#/components/schemas/Comment"}
+#          minItems: 0
+#          maxItems: 10000000
         time:
           title: time
           description: pubblication time
@@ -454,7 +473,21 @@ components:
           minLength: 19
           maxLength: 19
           
-      
+    Image: 
+          title: photo
+          description: base 64 image.
+          type: string
+          format: byte
+          minLength: 0
+          maxLength: 1000000000
+           
+    Caption:
+          description: "description of a photo"
+          type: string
+          pattern: '^[^\/\\]{1,64}$'
+          example: "look at me!"
+          minLength: 0
+          maxLength: 50
     Stream:
         title: Stream
         description: array of User photos
