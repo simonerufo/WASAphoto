@@ -520,7 +520,7 @@ components:
           type: string
           description: "name of the user"
           example: "Simone"
-          pattern: '^[a-z0-9]{3,13}$'
+          pattern: '^[a-z][a-z0-9]*$'
           minLength: 3
           maxLength: 16
       
