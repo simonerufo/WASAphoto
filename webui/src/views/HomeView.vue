@@ -21,8 +21,9 @@ export default {
 		},
 	},
 	mounted() {
-		this.refresh();
+		//this.refresh();
 		this.currentUsername = localStorage["username"];
+		console.log(localStorage["id"]);
 	}
 }
 </script>

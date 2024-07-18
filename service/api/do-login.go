@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -49,8 +48,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		//assign the token from database
 		token = userDB.UserID
 		//printing the response
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "user %s successfully logged\n", userData.Username)
+		//w.WriteHeader(http.StatusOK)
+		//fmt.Fprintf(w, "user %s successfully logged\n", userData.Username)
 
 	} else {
 
@@ -67,16 +66,20 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		//assign the token from database
 		token = userDB.UserID
 		//printing the response
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "user %s successfully created\n", userData.Username)
+		//w.WriteHeader(http.StatusOK)
+		//fmt.Fprintf(w, "user %s successfully created\n", userData.Username)
 
 	}
+
 	bearer := strconv.Itoa(token)
 	//authorizing the user
 	r.Header.Set("Authorization", bearer)
-	fmt.Printf("auth %s\n", r.Header.Get("Authorization"))
 
-	//data received successfully
-	fmt.Printf("data received: ID(token):%d , username: %s\n", token, userData.Username)
-
+	//send to client the response
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(token)
+	if err != nil {
+		http.Error(w, "error while encoding token", http.StatusInternalServerError)
+	}
 }

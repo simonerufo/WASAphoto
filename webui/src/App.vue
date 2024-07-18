@@ -30,8 +30,8 @@ export default {}
 						</li>
 						<li class="nav-item">
 							<RouterLink to="/link1" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#layout"/></svg>
-								Menu item 1
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#star"/></svg>
+								Profile
 							</RouterLink>
 						</li>
 						<li class="nav-item">
