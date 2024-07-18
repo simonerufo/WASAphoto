@@ -36,7 +36,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserID"
               example: {"user_id": 17}
   /profiles/{user_id}/username:
     parameters:
