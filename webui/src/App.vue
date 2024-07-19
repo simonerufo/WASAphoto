@@ -2,13 +2,28 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-export default {}
+export default {
+	data: function(){
+		return{
+			logged: null,
+			link: null,
+			username: null,
+		}
+	},
+	watch:{
+		$route (to, from){
+			this.logged = localStorage["id"]; // Check if user is logged, if yes render the navbar
+			this.username = localStorage["username"];
+			this.link = "/profiles/"+this.username;
+		}
+	},	
+}
 </script>
 
 <template>
 
 	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAphoto</a>
+		<!--<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAphoto</a> -->
 		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -29,9 +44,9 @@ export default {}
 							</RouterLink>
 						</li>
 						<li class="nav-item">
-							<RouterLink to="/link1" class="nav-link">
+							<RouterLink :to="link" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#star"/></svg>
-								Profile
+								Profile:
 							</RouterLink>
 						</li>
 						<li class="nav-item">
@@ -41,7 +56,7 @@ export default {}
 							</RouterLink>
 						</li>
 					</ul>
-
+					<!--
 					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
 						<span>Secondary menu</span>
 					</h6>
@@ -53,6 +68,7 @@ export default {}
 							</RouterLink>
 						</li>
 					</ul>
+					-->
 				</div>
 			</nav>
 

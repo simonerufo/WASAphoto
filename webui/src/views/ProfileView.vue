@@ -1,104 +1,126 @@
 <script>
-import UploadPhoto from '../components/UploadPhoto.vue';
 export default {
-    components: {
-    },
-    data() {
-        return {}
-    },
-    methods: {},
+  data() {
+    return {
 
-    mounted() {
-        
-    },
+      user: null,
+      username: 'jhonnyjhonnyjhon',   
+      isFollowing: false,
+      isBanned: false,
+      postsCount: 120,
+      followersCount: 3000,
+      followingCount: 180,
+
+      isOwner: false,
+      isInputEnabled: false,
+
+      posts: [
+        { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
+        { id: 2, image: '../public/marco1.jpg', caption: 'Caption 2' },
+      ],
+    }
+  },
+
+  methods: {
+	async editProfile(){
+
+		},
+
+  },
 }
-
 </script>
 
 
 <template>
-	<LoadingSpinner :loading=isLoading />
-    <ErrorMsg v-if="errorMsg" :msg="errorMsg" @close-error="errorMsg = ''"></ErrorMsg>
-    <UploadPhoto v-if="isEditingPropic" :photoType="'proPic'" @exit-upload-form="isEditingPropic = false"
-        @refresh-data="updateProfile" @error-occurred="(value) => { errorMsg = value }" />
-    <div class="top-profile-container">
-        <div class="top-profile-picture" @mouseover="showEditPropic = isOwner" @mouseleave="showEditPropic = false">
-            <div class="edit-propic" v-if="showEditPropic">
-                <button class="reset-propic-button">
-                    <font-awesome-icon icon="fa-solid fa-xmark" size="lg" color="#fff" @click="resetProfilePic" />
-                </button>
-                <button class="edit-propic-button" @click="isEditingPropic = true">
-                    <font-awesome-icon icon="fa-regular fa-pen-to-square" size="lg" color="#fff" />
-                </button>
+    <div class="container profile-page">
+      <!-- Profile Header -->
+      <div class="row profile-header mt-4">
+        <div class="col-md-8">
+          <div class="profile-details">
+            <div class="form-group">
+              <input type="text" id="username" :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}" :placeholder="username" v-model="inputValue" :disabled="!isInputEnabled">
             </div>
-            <img :src="`data:image/jpg;base64,${proPic64}`">
+            <button class="btn btn-outline-primary follow-btn" v-if="!isFollowing">Follow</button>
+            <button class="btn btn-outline-secondary follow-btn" v-else>Unfollow</button>
+            <button class="btn btn-outline-primary ban-btn" v-if="!isBanned">Ban</button>
+            <button class="btn btn-outline-secondary ban-btn" v-else>Unban</button>
+            <div class="stats mt-3">
+              <span class="mr-3">  posts:  <strong> {{ postsCount }} </strong></span>
+              <span class="mr-3">  followers:  <strong> {{ followersCount }} </strong></span>
+              <span class="mr-3">  following:  <strong> {{ followingCount }} </strong></span>
+            </div>
+            </div>
+          </div>
         </div>
-        <div class="top-body-profile-container">
-            <div class="profile-options-button-container">
-                <button class="profile-options-button" @click="showOptions = true" @focusout="closeOptions">
-                    <font-awesome-icon icon="fa-solid fa-ellipsis" />
-                </button>
-                <div v-if="showOptions && isOwner" class="profile-options-menu">
-                    <div class="options-menu">
-                        <div class="options-menu-item" @click="getBans">
-                            <span>Bans list</span>
-                        </div>
-                        <div class="options-menu-item" @click="deleteProfile">
-                            <span>Delete profile</span>
-                        </div>
-                        <div class="options-menu-item" @click="doLogout">
-                            <span>Logout</span>
-                        </div>
-                    </div>
-                </div>
-                <div v-else-if="showOptions" class="profile-options-menu">
-                    <div class="options-menu-item" @click="banUser">
-                        <span>Ban this user</span>
-                    </div>
-                </div>
+      </div>
+      
+      <!-- Tabs -->
+      <div class="tab-content" id="profileTabsContent">
+        <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
+          <!-- Posts Grid -->
+          <div class="row mt-4">
+            <div v-for="post in posts" :key="post.id" class="col-md-4 mb-4">
+              <img :src="post.image" class="img-fluid" :alt="post.caption">
             </div>
-            <input :readonly="!isOwner" v-model="username" class="top-body-profile-username" @focusin="editingUsername"
-                @focusout="saveChangeUsername" @input="checkUsername" maxlength="13" spellcheck="false">
-            <div class="top-body-profile-bio-container">
-                <span class="top-body-profile-bio-text-counter">{{ textCounter }}/100</span>
-                <span class="top-body-profile-bio-label">Bio</span>
-                <textarea :readonly="!isOwner" @focusin="editingBio" @focusout="saveChangeBio" @input="countChar"
-                    v-model="bio" class="top-body-profile-bio-text" spellcheck="false" maxlength="100" rows="2"></textarea>
-            </div>
-            <div class="top-body-profile-stats-container">
-                <div class="profile-stats" @click="goToPost">
-                    <span class="profile-stats-text">posts</span>
-                    <span class="profile-stats-number">{{ postsCount }}</span>
-                </div>
-                <div class="profile-stats" @click="getFollowers">
-                    <span class="profile-stats-text">followers</span>
-                    <span class="profile-stats-number">{{ followersCount }}</span>
-                </div>
-                <div class="profile-stats" @click="getFollowings">
-                    <span class="profile-stats-text">followings</span>
-                    <span class="profile-stats-number">{{ followingsCount }}</span>
-                </div>
-            </div>
-            <div class="top-body-profile-actions" v-if="!isOwner">
-                <button class="profile-actions-button follow-button" @click="follow()"> {{ followTextButton }} </button>
-            </div>
+          </div>
         </div>
-    </div>
+      </div>
+  </template>
 
-    <ProfilesList v-if="showList" :dataGetter="dataGetter" :textHeader="textHeader" :typeList="typeList"
-        @exit-list="freeLists" />
-        <div v-if="showPost" class="post-view" @click.self="exitPost">
-            <Post :postData="postViewData" @update-like="updateLike" @delete-post="deletePost" @error-occurred="(value) => { errorMsg = value }" />
-        </div>
+<style scoped>
+.profile-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
 
-    <div class="posts-container">
-        <span v-if="(posts.length === 0)" class="posts-grid-nopost-text"> There are no posts yet </span>
-        <div class="posts-grid-container" v-if="posts.length > 0">
-            <div v-for="post in posts" :key="post.postID" class="posts-grid-post" @click="openPost(post)">
-                <img :src="`data:image/jpg;base64,${post.image}`" loading="lazy" class="posts-grid-post-image"
-                    :id="post.postID">
-            </div>
-        </div>
+.profile-header {
+  display: flex;
+  align-items: center;
+}
 
-    </div>
-</template>
+
+.profile-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 10px;
+}
+
+.profile-name-unselected {
+  font-size: 20px;
+  font-weight: bold;
+  border: 2px solid red;
+  align-items: top;
+  background-color: #3CBC8D;
+  color: white;
+}
+
+.profile-name-unselected::placeholder {
+  opacity:1
+}
+
+.profile-name-selected {
+  font-size: 20px;
+  font-weight: bold;
+  border: 2px solid green;
+  align-items: top;
+  background-color: #3CBC8D;
+  color: white;
+}
+
+.profile-name-selected::placeholder {
+  opacity:1
+}
+
+.follow-btn {
+  
+}
+
+.stats {
+  font-size: 16px;
+}
+
+</style>
