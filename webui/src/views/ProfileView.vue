@@ -3,7 +3,6 @@ export default {
   data() {
     return {
 
-      user: null,
       username: 'jhonnyjhonnyjhon',   
       isFollowing: false,
       isBanned: false,
