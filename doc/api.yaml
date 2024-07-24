@@ -177,7 +177,7 @@ paths:
     parameters:
       - name: user_id
         in: path
-        description: user's id profile to be shown
+        description: user id's profile to be shown
         schema: {$ref: "#/components/schemas/Username"}
         required: true
     get:

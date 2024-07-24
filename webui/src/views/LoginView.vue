@@ -1,4 +1,5 @@
 <script>
+import { Auth } from '../services/axios';
 export default {
 	data: function() {
 		return {
@@ -15,20 +16,20 @@ export default {
                 let response = await this.$axios.post('/session', {
                    "username": this.username,
                 });
-				this.id = response.data;
+                
+				this.id = parseInt(response.data);
 				localStorage.id = this.id;
 				localStorage.username = this.username;
-                    
+                this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.id;
                 this.$router.push("/home");
                 
            } catch (e) {
                 console.log(e)
-                //document.getElementsByTagName("input")[0].style.outline = "auto";
-                //document.getElementsByTagName("input")[0].style.outlineColor = "red";
             };
         }
 	},
 	mounted() {
+        localStorage.clear();
 	}
 }
 </script>

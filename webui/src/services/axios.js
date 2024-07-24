@@ -5,4 +5,21 @@ const instance = axios.create({
 	timeout: 1000 * 5
 });
 
+function getId(){
+    return localStorage["id"]
+}
+
+function getUsername(){
+    return localStorage["username"]
+}
+const Auth = () => {
+	instance.defaults.headers.common['Authorization'] = 'Bearer ' + getId()
+}
+export {
+	Auth,
+	getId,
+	getUsername,
+	instance as axios
+} 
+
 export default instance;

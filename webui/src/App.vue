@@ -14,12 +14,12 @@ export default {
 		$route (to, from){
 			this.logged = localStorage["id"]; // Check if user is logged, if yes render the navbar
 			this.username = localStorage["username"];
-			this.link = "/profiles/" + this.username;
+			this.link = "/profiles/" + this.logged + "/profile";
 		}
 	},
 	mounted() {
 
-		this.link = "/profiles/" + localStorage["username"];
+		this.link = "/profiles/" + localStorage["id"];
 	}
 	
 }	

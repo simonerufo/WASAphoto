@@ -3,17 +3,21 @@ export default {
   data() {
     return {
 
-      username: 'jhonnyjhonnyjhon',   
+      user:null,
+      username: null,
+      id: this.$route.params.user_id,
       isFollowing: false,
       isBanned: false,
-      postsCount: 120,
-      followersCount: 3000,
-      followingCount: 180,
+      postsCount: 0,
+      followersCount: null,
+      followingCount: null,
 
       isOwner: false,
-      isInputEnabled: false,
+      isInputEnabled: true,
 
       posts: [
+        { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
+        { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
         { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
         { id: 2, image: '../public/marco1.jpg', caption: 'Caption 2' },
       ],
@@ -21,11 +25,28 @@ export default {
   },
 
   methods: {
+  async getUser(){
+    var path = `/profiles/${this.id}/profile`;
+    try{
+      var response = await this.$axios.get(path);
+      if (response.status == 200) {
+        this.user = response.data.user;
+        this.username = response.data.user.username;
+        this.followersCount = response.data.followers;
+        this.followingCount = response.data.following;
+      }
+    } catch(e){
+      console.log(e.response.data);
+    }
+  },
 	async editProfile(){
 
 		},
 
   },
+  mounted(){
+    this.getUser(); 
+  }
 }
 </script>
 

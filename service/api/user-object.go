@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	
 )
 
 type User struct {
@@ -26,6 +27,7 @@ func validUsername(username string) bool {
 	return rex.MatchString(username)
 }
 
+
 // check if user is authorized
 func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 	//getting the Authorization Header from the http request and cast it to int
@@ -41,3 +43,19 @@ func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 	}
 	return true
 }
+/*
+func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
+	auth := strings.Split(r.Header.Get("Authorization"), " ")
+	
+	if len(auth) <= 1 {
+		return 0, nil
+	}
+	uid, err := strconv.Atoi(auth[1])
+	fmt.Printf("auth:%d\n",uid)
+	if err != nil || (len(id) > 0 && uid != id[0]) {
+		http.Error(w, "Unauthorized token", http.StatusUnauthorized)
+		return 0, err
+	}
+	return uid, nil
+}
+*/
