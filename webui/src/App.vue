@@ -49,7 +49,7 @@ export default {
 						<li class="nav-item">
 							<RouterLink :to="link" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#star"/></svg>
-								Profile:
+								Profile: {{ username }}
 							</RouterLink>
 						</li>
 						<li class="nav-item">

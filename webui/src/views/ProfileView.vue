@@ -1,3 +1,4 @@
+
 <script>
 export default {
   data() {
@@ -11,7 +12,8 @@ export default {
       postsCount: 0,
       followersCount: null,
       followingCount: null,
-      isInputEnabled: true, 
+      isInputEnabled: false,
+
       posts: [
         { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
         { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
@@ -39,44 +41,56 @@ export default {
     },
 
     enableInput() {
-      console.log('Input enabled');
+      console.log('enableInput called');
       this.isInputEnabled = true; 
+      console.log('isInputEnabled:', this.isInputEnabled);
     },
 
     onBlur() {
+      console.log('onBlur called');
       if (this.isInputEnabled) {
         console.log('Input blurred, saving...');
         this.editProfile(); 
+      } else {
+        console.log('isInputEnabled is false, not saving.');
       }
     },
 
     onEnter() {
+      console.log('onEnter called');
       if (this.isInputEnabled) {
         console.log('Enter pressed, saving...');
         this.editProfile(); 
+      } else {
+        console.log('isInputEnabled is false, not saving.');
       }
     },
 
     async editProfile() {
+      console.log('editProfile called');
       if (!this.isInputEnabled) return; 
 
       this.loading = true;
       this.errormsg = null;
-      var path = `/profiles/${this.id}/profile`;
+      var path = `/profiles/${this.id}/username`;
       try {
         let response = await this.$axios.put(path, {
           username: this.inputValue, // Send the updated username
         });
         if (response.status === 200) {
           this.username = this.inputValue; // Update local username
+          localStorage.username = this.username;
           this.user.username = this.inputValue; // Update user object
+          console.log('Profile updated successfully');
         }
       } catch (e) {
         this.errormsg = 'Failed to update profile: ' + e.toString();
         this.inputValue = this.username; // Revert changes on error
+        console.error(this.errormsg);
       } finally {
         this.loading = false;
         this.isInputEnabled = false; // Disable input after saving
+        console.log('isInputEnabled set to false after saving');
       }
     },
   },
@@ -100,7 +114,6 @@ export default {
                    id="username"
                    :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}"
                    v-model="inputValue"
-                   :disabled="!isInputEnabled"
                    @click="enableInput"
                    @blur="onBlur"
                    @keydown.enter="onEnter">

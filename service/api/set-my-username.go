@@ -46,8 +46,8 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	//checking the authorization
-	token := userDB.UserID
-	isAuth(w, r, token)
+	Auth(w,r);
+	
 	//checking if new username is valid or no
 	if !validUsername(userData.Username) {
 		http.Error(w, "invalid username", http.StatusBadRequest)

@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	
+	"strings"
+	"fmt"
 )
 
 type User struct {
@@ -27,7 +28,7 @@ func validUsername(username string) bool {
 	return rex.MatchString(username)
 }
 
-
+/*
 // check if user is authorized
 func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 	//getting the Authorization Header from the http request and cast it to int
@@ -43,7 +44,7 @@ func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 	}
 	return true
 }
-/*
+*/
 func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
 	auth := strings.Split(r.Header.Get("Authorization"), " ")
 	
@@ -58,4 +59,27 @@ func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
 	}
 	return uid, nil
 }
-*/
+
+
+
+func Auth(w http.ResponseWriter, r *http.Request) (int, error) {
+	// Retrieving the Authorization header
+	authHeader := r.Header.Get("Authorization")
+
+	// Expecting format "Bearer <token>"
+	const bearerPrefix = "Bearer "
+	if !strings.HasPrefix(authHeader, bearerPrefix) {
+		http.Error(w, "Invalid Authorization header format", http.StatusBadRequest)
+		return 0, http.ErrAbortHandler
+	}
+
+	// Extract token part
+	tokenStr := strings.TrimPrefix(authHeader, bearerPrefix)
+	userID, err := strconv.Atoi(tokenStr)
+	if err != nil {
+		http.Error(w, "Invalid Auth token", http.StatusBadRequest)
+		return 0, err
+	}
+
+	return userID, nil
+}
