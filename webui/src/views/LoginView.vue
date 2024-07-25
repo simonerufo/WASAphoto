@@ -35,20 +35,75 @@ export default {
 </script>
 
 <template>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h2 class="h2">Login</h2>
-		</div>
-            
-                <div class="form-group">
-                    <label for="username">Username: </label>
-                    <input type="text" class="form-control" id="username"  placeholder="Enter username" v-model="username">
-                </div>
-                <br>
-                <button type="submit" class="btn btn-primary" @click="login">Login</button>
-	</div>
-</template>
+    <div>
+      <div class="login-container">
+        <h2>Login</h2>
+        <div class="form-group">
+          <label for="username">Username: </label>
+          <input type="text" class="form-control" id="username" placeholder="Enter username" v-model="username">
+        </div>
+        <button type="submit" class="btn btn-primary" @click="login">Login</button>
+      </div>
+    </div>
+  </template>
+  
 
-<style>
-</style>
+  <style scoped>
+  /* Form container styling */
+  .login-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin-top: 100px;
+  }
+  
+  /* Header styling */
+  .login-container h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  /* Form group styling */
+  .login-container .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .login-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Input styling */
+  .login-container input.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+  }
+  
+  /* Button styling */
+  .login-container button.btn-primary {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s; /* Smooth transition on hover */
+  }
+  
+  /* Button hover effect */
+  .login-container button.btn-primary:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  </style>
+  

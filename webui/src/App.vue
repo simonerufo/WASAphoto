@@ -1,3 +1,4 @@
+<!--
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 </script>
@@ -12,7 +13,7 @@ export default {
 	},
 	watch:{
 		$route (to, from){
-			this.logged = localStorage["id"]; // Check if user is logged, if yes render the navbar
+			this.logged = localStorage["id"];
 			this.username = localStorage["username"];
 			this.link = "/profiles/" + this.logged + "/profile";
 		}
@@ -24,7 +25,38 @@ export default {
 	
 }	
 </script>
+-->
+<script>
+import { RouterLink, RouterView } from 'vue-router'
 
+export default {
+  data() {
+    return {
+      logged: null,
+      link: "",
+      username: ""
+    }
+  },
+  watch: {
+    $route(to, from) {
+      this.updateUserData()
+    }
+  },
+  mounted() {
+    this.updateUserData()
+  },
+  methods: {
+    updateUserData() {
+      this.logged = localStorage.getItem("id")
+      this.username = localStorage.getItem("username")
+      if (this.logged) {
+        this.link = `/profiles/${this.logged}/profile`
+      }
+    }
+  }
+}
+</script>
+<!--
 <template>
 	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
 		 <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAphoto</a> 
@@ -55,7 +87,7 @@ export default {
 						<li class="nav-item">
 							<RouterLink to="/link2" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
-								Menu item 2
+								Logout
 							</RouterLink>
 						</li>
 					</ul>
@@ -68,6 +100,50 @@ export default {
 		</div>
 	</div>
 </template>
-
+-->
+<template>
+	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+	  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">WASAphoto</a> 
+	  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	</header>
+	<div class="container-fluid">
+	  <div class="row">
+		<nav id="sidebarMenu" v-if="logged" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+		  <div class="position-sticky pt-3 sidebar-sticky">
+			<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+			  <span>General</span>
+			</h6>
+			<ul class="nav flex-column">
+			  <li class="nav-item">
+				<RouterLink to="/home" class="nav-link">
+				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
+				  Home
+				</RouterLink>
+			  </li>
+			  <li class="nav-item">
+				<RouterLink :to="link" class="nav-link">
+				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#star"/></svg>
+				  Profile: {{ username }}
+				</RouterLink>
+			  </li>
+			  <li class="nav-item">
+				<RouterLink to="/link2" class="nav-link">
+				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
+				  Logout
+				</RouterLink>
+			  </li>
+			</ul>
+		  </div>
+		</nav>
+  
+		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+		  <RouterView />
+		</main>
+	  </div>
+	</div>
+  </template>
+	
 <style>
 </style>
