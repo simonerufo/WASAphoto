@@ -62,8 +62,10 @@ type AppDatabase interface {
 	GetFollow(following_id int, followed_id int) (bool, error)
 	//ban a user adding him in db
 	BanUser(banning_id int, banned_id int) error
-	//getting from db user profile
+	//getting from db user profile using id
 	GetUserProfile(user_id int) (Profile, error)
+	//getting from db user profile using username
+	GetUserProfileByUsername(username string) (Profile, error)
 	//retrieving the user stream
 	GetStream(user_id int) ([]Post, error)
 	//uploading a photo(post) into db

@@ -196,9 +196,6 @@ export default {
   opacity:1
 }
 
-.follow-btn {
-  
-}
 
 .stats {
   font-size: 16px;

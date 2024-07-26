@@ -576,10 +576,6 @@ components:
       properties:
         user:
           $ref: "#/components/schemas/User"
-        profile_picture:
-          $ref: "#/components/schemas/UserPhoto"
-        photos:
-          $ref: "#/components/schemas/Photos"
         followers:
           title: followers
           description: users number followed by user
@@ -590,6 +586,12 @@ components:
           description: users number following the user
           type: integer
           example: 700
+        photoCount:
+          type: integer
+          description: The number of photos posted by the user
+          example: 12
+          minimum: 0
+          readOnly: true
     
         
       

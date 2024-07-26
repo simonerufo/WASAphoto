@@ -73,6 +73,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	//Verifying the user authorization
 	userID,err := Auth(w,r)
 	if err != nil{
+		fmt.Printf("AUTH")
 		http.Error(w, "User not authorized", http.StatusUnauthorized)
 		return
 	}
@@ -80,6 +81,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	// Retrieving the id of the profile that is going to be shown
 	profileID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
+		fmt.Printf("ID")
 		http.Error(w, "Invalid user id", http.StatusBadRequest)
 		return
 	}
@@ -87,6 +89,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	// Checking if the user searched has banned the current user
 	ban, err := rt.db.GetBan(profileID, userID)
 	if err != nil {
+		fmt.Printf("BAN")
 		http.Error(w, "Error checking the ban", http.StatusBadGateway)
 		return
 	}
@@ -99,6 +102,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	// Retrieving the profile from the database
 	profile, err := rt.db.GetUserProfile(profileID)
 	if err != nil {
+		fmt.Printf("DB")
 		http.Error(w, "Error while getting user profile", http.StatusBadGateway)
 		return
 	}
@@ -107,10 +111,11 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {
+		fmt.Printf("ENCODE")
 		http.Error(w, "Error while encoding user profile", http.StatusInternalServerError)
 	}
 }
-
+/*
 func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	
 
@@ -126,7 +131,7 @@ func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	userProfile, err := rt.db.GetUserByName(username)
+	userProfile, err := rt.db.GetUserProfileByUsername(username)
 	if err != nil {
 		http.Error(w, "Error fetching user profile", http.StatusInternalServerError)
 		return
@@ -142,3 +147,37 @@ func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, 
 	}
 	fmt.Printf("USER: %s\n",userProfile.Username)
 }
+*/
+
+func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Extract the username from the query parameters
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
+	// Fetch the user profile by username
+	userProfile, err := rt.db.GetUserProfileByUsername(username)
+	if err != nil {
+		fmt.Printf("Error fetching user profile for username %s: %v\n", username, err)
+		http.Error(w, "Error fetching user profile", http.StatusInternalServerError)
+		return
+	}
+
+	// Check if the user profile is empty
+	if userProfile.User.UserID == 0 {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	// Set response headers and encode the response
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(userProfile); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("USER: %s\n", username)
+}
+
