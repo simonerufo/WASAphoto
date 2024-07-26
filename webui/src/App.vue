@@ -28,6 +28,7 @@ export default {
 -->
 <script>
 import { RouterLink, RouterView } from 'vue-router'
+import axios from "./services/axios.js"
 
 export default {
   data() {
@@ -52,7 +53,12 @@ export default {
       if (this.logged) {
         this.link = `/profiles/${this.logged}/profile`
       }
-    }
+    },
+	logout() {
+			localStorage.removeItem("id");
+			localStorage.removeItem("username");
+			this.$router.push("/");
+		}
   }
 }
 </script>
@@ -129,10 +135,10 @@ export default {
 				</RouterLink>
 			  </li>
 			  <li class="nav-item">
-				<RouterLink to="/link2" class="nav-link">
-				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
-				  Logout
-				</RouterLink>
+              <div class="nav-link logout-button" role="button" @click="logout" style="color: red;">
+                <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
+                Logout
+              </div>
 			  </li>
 			</ul>
 		  </div>
