@@ -65,10 +65,10 @@ func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
 func Auth(w http.ResponseWriter, r *http.Request) (int, error) {
 	// Retrieving the Authorization header
 	authHeader := r.Header.Get("Authorization")
-
 	// Expecting format "Bearer <token>"
 	const bearerPrefix = "Bearer "
 	if !strings.HasPrefix(authHeader, bearerPrefix) {
+		fmt.Printf("Invalid Authorization header format. Expected prefix: '%s'\n", bearerPrefix)
 		http.Error(w, "Invalid Authorization header format", http.StatusBadRequest)
 		return 0, http.ErrAbortHandler
 	}

@@ -135,6 +135,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	bearerToken := "Bearer " + strconv.Itoa(token)
 	w.Header().Set("Authorization", bearerToken)
 
+	
+
 	// Send response to client
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

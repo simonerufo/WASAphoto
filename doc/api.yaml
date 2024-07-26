@@ -45,6 +45,7 @@ paths:
         description: the user id of the user that wanted to change his username
         schema: { $ref: "#/components/schemas/UserID" }
         required: true
+          
     put:
       tags: ["action"]
       operationId: setMyUserName
@@ -61,6 +62,34 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/UserID" }
               example: { "user_id": 15}
+    get:
+      summary: Get user profile by username
+      description: Retrieve the profile of a user by their username.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/Username"}
+          description: The user ID of the user making the request
+        - name: username
+          in: query
+          required: true
+          schema: { $ref: "#/components/schemas/Username"}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile"}
+        '400':
+          description: Bad request (e.g., missing or invalid parameters)
+        '404':
+          description: Profile not found
+        '500':
+          description: Internal server error
+
+
+
   /profiles/{user_id}/{photo_id}:
     parameters:
       - name: user_id

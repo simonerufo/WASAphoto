@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	
 
 	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
@@ -71,27 +70,12 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 
 
 func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// Retrieving the id of user that is searching the profile from the Authorization header
-	authHeader := r.Header.Get("Authorization")
-	fmt.Printf("Authorization Header: %s\n", authHeader)
-
-	userID, err := strconv.Atoi(r.Header.Get("Authorization"))
-	// Expecting format "Bearer <token>"
-    const bearerPrefix = "Bearer "
-    if !strings.HasPrefix(authHeader, bearerPrefix) {
-        http.Error(w, "Invalid Authorization header format", http.StatusBadRequest)
-        return
-    }
-
-    // Extract token part
-    tokenStr := strings.TrimPrefix(authHeader, bearerPrefix)
-    userID, err = strconv.Atoi(tokenStr)
-	if err != nil {
-		http.Error(w, "Invalid Auth token", http.StatusBadRequest)
+	//Verifying the user authorization
+	userID,err := Auth(w,r)
+	if err != nil{
+		http.Error(w, "User not authorized", http.StatusUnauthorized)
 		return
 	}
-
-	
 
 	// Retrieving the id of the profile that is going to be shown
 	profileID, err := strconv.Atoi(ps.ByName("user_id"))
@@ -125,4 +109,36 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	if err != nil {
 		http.Error(w, "Error while encoding user profile", http.StatusInternalServerError)
 	}
+}
+
+func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	
+
+	userID := ps.ByName("user_id")
+	if userID == "" {
+		http.Error(w, "User ID is required", http.StatusBadRequest)
+		return
+	}
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
+	userProfile, err := rt.db.GetUserByName(username)
+	if err != nil {
+		http.Error(w, "Error fetching user profile", http.StatusInternalServerError)
+		return
+	}
+	if userProfile.Username == "" {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(userProfile); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+	}
+	fmt.Printf("USER: %s\n",userProfile.Username)
 }

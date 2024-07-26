@@ -1,30 +1,67 @@
 <script>
+import axios from "../services/axios.js"
 export default {
-	data: function() {
-		return {
-			errormsg: null,
-			loading: false,
-			currentUsername: null,
-		}
-	},
-	methods: {
-		async refresh() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get("/");
-				this.some_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
-		},
-	},
-	mounted() {
-		//this.refresh();
-		this.currentUsername = localStorage["username"];
-		console.log(localStorage["id"]);
-	}
+  data() {
+    return {
+      errormsg: null,
+      loading: false,
+      currentUsername: null,
+      searchUsername: null,
+      searched: null,
+    };
+  },
+  methods: {
+    async refresh() {
+      this.loading = true;
+      this.errormsg = null;
+      try {
+        let response = await axios.get("/");
+        this.some_data = response.data;
+      } catch (e) {
+        this.errormsg = e.toString();
+      }
+      this.loading = false;
+    },
+    
+    async searchUsers() {
+      this.loading = true;
+      this.errormsg = null;
+      try {
+        if (!this.searchUsername) {
+          throw new Error("Please enter a username.");
+        }
+
+        const userID = localStorage.getItem('id');
+        if (!userID) {
+          throw new Error("User ID not found in local storage");
+        }
+
+        const path = `/profiles/${userID}/username`;
+		console.log(`Making API call to: ${path}`);
+        // Make the API call
+        let response = await axios.get(path, {
+          params: { username: this.searchUsername }
+        });
+
+        if (response.status === 200) {
+          // Update the searched result
+          this.searched = response.data;
+        } else {
+          // Handle non-200 responses
+		  console.log("A");
+          this.errormsg = `Unexpected response status: ${response.status}`;
+        }
+      } catch (e) {
+        // Handle errors from the API or other sources
+		console.log("A");
+        this.errormsg = e.response && e.response.data ? e.response.data : e.toString();
+      }
+      this.loading = false;
+    }
+  },
+  mounted() {
+    this.currentUsername = localStorage.getItem('username');
+  }
 }
 </script>
 
@@ -56,9 +93,25 @@ export default {
 -->
 <template>
 	<div class="stream-page">
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 		<h2>{{ currentUsername }}'s Stream</h2>
 	  </div>
+	  
+	  <div>
+		<input v-model="searchUsername" placeholder="Enter username" />
+		<button @click="searchUsers">Search</button>
+	  </div>
+	  
+	  <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+	  
+	  <div v-if="searched">
+		<h2>User Profile</h2>
+		<p><strong>Username:</strong> {{ searched.username }}</p>
+	  </div>
+	  
+	  <div v-if="loading">Loading...</div>
+	</div>
+  </template>
 <!--  
 	  <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 	  <div v-else>
@@ -89,8 +142,6 @@ export default {
 	</div>
 	<Modal v-if="selectedPost" @close="toggleModal(null)" :photo="selectedPost"></Modal>
 -->	
-	</div>
-</template>
 
 <style>
 </style>
