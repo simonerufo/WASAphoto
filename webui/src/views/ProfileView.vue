@@ -1,6 +1,15 @@
-
 <script>
+import axios from '../services/axios';
+import Modal from '../components/PostModal.vue';
+//import UsersListModal from '../components/UsersListModal.vue';
+//import NewPostModal from '../components/NewPostModal.vue';
+
 export default {
+  components: {
+    Modal,
+    //UsersListModal,
+    //NewPostModal
+  },
   data() {
     return {
       user: null,
@@ -13,94 +22,199 @@ export default {
       followersCount: null,
       followingCount: null,
       isInputEnabled: false,
-
-      posts: [
-        { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
-        { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
-        { id: 1, image: '../public/marco1.jpg', caption: 'Caption 1' },
-        { id: 2, image: '../public/marco1.jpg', caption: 'Caption 2' },
-      ],
+      selectedPost: null,
+      followPath: null,
+      createPost: false,
+      posts: [],
+      caption: '',
+      file: null
     };
   },
-
   methods: {
     async getUser() {
-      var path = `/profiles/${this.id}/profile`;
-      try {
-        var response = await this.$axios.get(path);
-        if (response.status === 200) {
-          this.user = response.data.user;
-          this.username = response.data.user.username;
-          this.inputValue = this.username; 
-          this.followersCount = response.data.followers;
-          this.followingCount = response.data.following;
-        }
-      } catch (e) {
-        console.error('Failed to fetch user:', e);
-      }
-    },
+      const path = `/profiles/${this.id}/profile`;
+      console.log(`Fetching user profile from: ${path}`);
+  
+    try {
+      const response = await axios.get(path);
+      console.log(`Response status: ${response.status}`);
+    
+    if (response.status === 200) {
+      console.log('User data:', response.data);
+
+      // Destructure response data
+      const { user, photos, followers, following } = response.data;
+      
+      // Update component data
+      this.user = user;
+      this.username = user.username;
+      this.inputValue = this.username;
+      this.followersCount = followers;
+      this.followingCount = following;
+      this.posts = photos; 
+      
+      console.log('Updated component data:', {
+        user: this.user,
+        username: this.username,
+        followersCount: this.followersCount,
+        followingCount: this.followingCount,
+        posts: this.posts
+      });
+    }
+    } catch (e) {
+      console.error('Failed to fetch user:', e);
+    }
+      
+  },
+
 
     enableInput() {
-      console.log('enableInput called');
-      this.isInputEnabled = true; 
-      console.log('isInputEnabled:', this.isInputEnabled);
+      this.isInputEnabled = true;
     },
 
     onBlur() {
-      console.log('onBlur called');
       if (this.isInputEnabled) {
-        console.log('Input blurred, saving...');
-        this.editProfile(); 
-      } else {
-        console.log('isInputEnabled is false, not saving.');
+        this.editProfile();
       }
     },
 
     onEnter() {
-      console.log('onEnter called');
       if (this.isInputEnabled) {
-        console.log('Enter pressed, saving...');
-        this.editProfile(); 
-      } else {
-        console.log('isInputEnabled is false, not saving.');
+        this.editProfile();
       }
     },
 
     async editProfile() {
-      console.log('editProfile called');
-      if (!this.isInputEnabled) return; 
+      if (!this.isInputEnabled) return;
 
-      this.loading = true;
-      this.errormsg = null;
-      var path = `/profiles/${this.id}/username`;
       try {
-        let response = await this.$axios.put(path, {
-          username: this.inputValue, // Send the updated username
-        });
+        const response = await axios.put(`/profiles/${this.id}/username`, { username: this.inputValue });
         if (response.status === 200) {
-          this.username = this.inputValue; // Update local username
-          localStorage.username = this.username;
-          this.user.username = this.inputValue; // Update user object
-          console.log('Profile updated successfully');
+          this.username = this.inputValue;
+          this.user.username = this.inputValue;
+          localStorage["username"] = this.username
         }
       } catch (e) {
-        this.errormsg = 'Failed to update profile: ' + e.toString();
-        this.inputValue = this.username; // Revert changes on error
-        console.error(this.errormsg);
+        console.error('Failed to update profile:', e);
+        this.inputValue = this.username;
       } finally {
-        this.loading = false;
-        this.isInputEnabled = false; // Disable input after saving
-        console.log('isInputEnabled set to false after saving');
+        this.isInputEnabled = false;
       }
     },
-  },
 
+    async toggleFollow() {
+      if (this.isFollowing) {
+        await this.unfollowUser();
+      } else {
+        await this.followUser();
+      }
+    },
+
+    async followUser() {
+      try {
+        const response = await axios.put(`/profiles/${this.id}/followed/${this.user.id}`);
+        if (response.status === 200) {
+          this.isFollowing = true;
+          this.followersCount++;
+        }
+      } catch (e) {
+        console.error('Failed to follow user:', e);
+      }
+    },
+
+    async unfollowUser() {
+      try {
+        const response = await axios.delete(`/profiles/${this.id}/followed/${this.user.id}`);
+        if (response.status === 200) {
+          this.isFollowing = false;
+          this.followersCount--;
+        }
+      } catch (e) {
+        console.error('Failed to unfollow user:', e);
+      }
+    },
+
+    async toggleBan() {
+      if (this.isBanned) {
+        await this.unbanUser();
+      } else {
+        await this.banUser();
+      }
+    },
+
+    async banUser() {
+      try {
+        const response = await axios.put(`/profiles/${this.id}/bans/${this.user.id}`);
+        if (response.status === 200) {
+          this.isBanned = true;
+          this.isFollowing = false;
+          this.followersCount--;
+        }
+      } catch (e) {
+        console.error('Failed to ban user:', e);
+      }
+    },
+
+    async unbanUser() {
+      try {
+        const response = await axios.delete(`/profiles/${this.id}/bans/${this.user.id}`);
+        if (response.status === 200) {
+          this.isBanned = false;
+        }
+      } catch (e) {
+        console.error('Failed to unban user:', e);
+      }
+    },
+
+    toggleModal(post) {
+      this.selectedPost = post;
+    },
+
+    toggleFollowModal(index) {
+      this.followPath = index;
+    },
+
+    toggleCreateModal(reload) {
+      this.createPost = !this.createPost;
+      if (reload) {
+        this.getPhotos(); // Assuming you have this method to refresh photos
+      }
+    },
+
+    onFileChange(event) {
+      this.file = event.target.files[0];
+    },
+
+    async uploadPhoto() {
+      const formData = new FormData();
+      formData.append('image', this.file);
+      formData.append('caption', this.caption);
+      try {
+        const response = await axios.post(`/profiles/${this.id}/profile`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        if (response.status === 201) {
+          // Update posts list and reset form
+          this.posts.push({ 
+            id: response.data.pid, 
+            image: URL.createObjectURL(this.file), 
+            caption: this.caption 
+          });
+          this.caption = '';
+          this.file = null;
+        }
+      } catch (e) {
+        console.error('Failed to upload photo:', e);
+      }
+    }
+  },
   mounted() {
     this.getUser();
   }
-}
+};
 </script>
-
 
 
 <template>
@@ -118,14 +232,20 @@ export default {
                    @blur="onBlur"
                    @keydown.enter="onEnter">
           </div>
-          <button class="btn btn-outline-primary follow-btn" v-if="!isFollowing">Follow</button>
-          <button class="btn btn-outline-secondary follow-btn" v-else>Unfollow</button>
-          <button class="btn btn-outline-primary ban-btn" v-if="!isBanned">Ban</button>
-          <button class="btn btn-outline-secondary ban-btn" v-else>Unban</button>
+          <button class="btn btn-outline-primary follow-btn" v-if="!isFollowing" @click="toggleFollow">Follow</button>
+          <button class="btn btn-outline-secondary follow-btn" v-else @click="toggleFollow">Unfollow</button>
+          <button class="btn btn-outline-primary ban-btn" v-if="!isBanned" @click="toggleBan">Ban</button>
+          <button class="btn btn-outline-secondary ban-btn" v-else @click="toggleBan">Unban</button>
           <div class="stats mt-3">
-            <span class="mr-3">  posts:  <strong> {{ postsCount }} </strong></span>
-            <span class="mr-3">  followers:  <strong> {{ followersCount }} </strong></span>
-            <span class="mr-3">  following:  <strong> {{ followingCount }} </strong></span>
+            <span class="mr-3">posts: <strong>{{ postsCount }}</strong></span>
+            <span class="mr-3">followers: <strong>{{ followersCount }}</strong></span>
+            <span class="mr-3">following: <strong>{{ followingCount }}</strong></span>
+          </div>
+          <!-- Upload Photo Form -->
+          <div class="upload-form mt-4">
+            <input type="file" @change="onFileChange" />
+            <textarea v-model="caption" placeholder="Add a caption..."></textarea>
+            <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
           </div>
         </div>
       </div>
@@ -137,18 +257,26 @@ export default {
         <!-- Posts Grid -->
         <div class="row mt-4">
           <div v-for="post in posts" :key="post.id" class="col-md-4 mb-4">
-            <img :src="post.image" class="img-fluid" :alt="post.caption">
+            <img :src="post.image" class="img-fluid" :alt="post.caption" @click="toggleModal(post)">
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <Modal v-if="selectedPost" @close="toggleModal(null)" :photo="selectedPost"></Modal>
+  <!--<UsersListModal v-if="followPath" @close="toggleFollowModal(null)" :list_mode="followPath" :username="user.username" :user_id="user.id" :bans="bans"></UsersListModal>
+  <NewPostModal v-if="createPost" @close="toggleCreateModal(false)" @closeReload="toggleCreateModal(true)" :username="user.username"></NewPostModal>
+  -->
 </template>
 
 
 
 
+
+
 <style scoped>
+/*
 .profile-page {
   max-width: 900px;
   margin: 0 auto;
@@ -158,7 +286,6 @@ export default {
   display: flex;
   align-items: center;
 }
-
 
 .profile-details {
   display: flex;
@@ -174,31 +301,20 @@ export default {
   font-size: 20px;
   font-weight: bold;
   border: 2px solid red;
-  align-items: top;
   background-color: #3CBC8D;
   color: white;
-}
-
-.profile-name-unselected::placeholder {
-  opacity:1
 }
 
 .profile-name-selected {
   font-size: 20px;
   font-weight: bold;
   border: 2px solid green;
-  align-items: top;
   background-color: #3CBC8D;
   color: white;
 }
 
-.profile-name-selected::placeholder {
-  opacity:1
-}
-
-
 .stats {
   font-size: 16px;
 }
-
+*/
 </style>

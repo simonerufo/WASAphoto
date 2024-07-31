@@ -63,15 +63,17 @@ type AppDatabase interface {
 	//ban a user adding him in db
 	BanUser(banning_id int, banned_id int) error
 	//getting from db user profile using id
-	GetUserProfile(user_id int) (Profile, error)
+	GetUserProfileByID(profileID int) (Profile, error)
 	//getting from db user profile using username
 	GetUserProfileByUsername(username string) (Profile, error)
 	//retrieving the user stream
 	GetStream(user_id int) ([]Post, error)
 	//uploading a photo(post) into db
-	InsertPhoto(user_id int, caption string, photo []byte) error
+	InsertPhoto(userID int, caption string, photo []byte) (int, error)
 	//checks if a photo exists in db
 	CheckPhoto(user_id int, photo_id int) (bool, error)
+	//gets a photo from db
+	GetPhoto(userID int, photoID int) (*Photo, error)
 	//deletes a photo from db
 	DeletePhoto(user_id int, photo_id int) error
 	//insert an entry into like table

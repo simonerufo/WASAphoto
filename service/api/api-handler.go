@@ -17,6 +17,9 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/profiles/:user_id/username",rt.wrap(rt.getProfileByUsername))
 	//search
 	rt.router.GET("/profiles/:user_id/profile", rt.wrap(rt.getProfile))
+	rt.router.POST("/profiles/:user_id/profile", rt.wrap(rt.uploadPhoto))
+
+	rt.router.GET("/profiles/:user_id/photos/:photo_id", rt.wrap(rt.getPhoto))
 	//rt.router.GET("/", rt.getHelloWorld)
 	//rt.router.GET("/context", rt.wrap(rt.getContextReply))
 	// Special routes

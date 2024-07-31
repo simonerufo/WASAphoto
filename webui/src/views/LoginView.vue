@@ -98,7 +98,7 @@ export default {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+  box-sizing: border-box;
 }
 
 /* Button styling */

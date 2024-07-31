@@ -5,7 +5,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"fmt"
+	"fmt" 	
+	"time"
+	"encoding/base64"
 )
 
 type User struct {
@@ -13,6 +15,21 @@ type User struct {
 	Username string `json:"username"`
 }
 
+type UserPhoto struct {
+	PhotoID		int   `json:"photo_id"`
+	UserID      int  `json:"user_id"`
+	Image       string    `json:"image"`       // Base64-encoded image
+	Timestamp   time.Time `json:"timestamp"`   // Date and time of upload
+	LikeCount   int       `json:"likeCount"`   // Number of likes
+	CommentCount int      `json:"commentCount"` // Number of comments
+	Liked       bool      `json:"liked"`       // Whether the photo is liked by the user
+	Caption     string    `json:"caption"`     // Caption for the photo
+	Time        string    `json:"time"`        // Publication time
+}
+
+func encodeToBase64(data []byte) string {
+	return base64.StdEncoding.EncodeToString(data)
+}
 // checks if the username is valid
 func (user User) isNameValid() bool {
 	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile

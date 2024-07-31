@@ -40,12 +40,11 @@ var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
 );`
 */
 var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
-    photo_id INT AUTO_INCREMENT,
+    photo_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INT NOT NULL,
     caption STRING NOT NULL,
     photo BLOB NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(photo_id),
     UNIQUE(photo_id, user_id),
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );`

@@ -27,12 +27,17 @@ type Comment struct {
 }
 
 type Photo struct {
-	UserID    int       `json:"user_id"`
-	PhotoID   int       `json:"pid"`
-	Path      string    `json:"photo_path"`
-	Caption   string    `json:"caption"`
-	Timestamp time.Time `json:"time"`
+	PhotoID		int   `json:"photo_id"`
+	UserID      int  `json:"user_id"`
+	Image       string    `json:"image"`       // Base64-encoded image
+	Timestamp   time.Time `json:"timestamp"`   // Date and time of upload
+	LikeCount   int       `json:"likeCount"`   // Number of likes
+	CommentCount int      `json:"commentCount"` // Number of comments
+	Liked       bool      `json:"liked"`       // Whether the photo is liked by the user
+	Caption     string    `json:"caption"`     // Caption for the photo
+	Time        string    `json:"time"`        // Publication time
 }
+
 type Profile struct {
 	User User `json:"user"`
 	Photos    []Photo `json:"photos"`

@@ -224,28 +224,75 @@ paths:
                         photos: profile_posts, followers: 500, following: 30}
         "404":
           description: user not found
+  
+  /profiles/{user_id}/photos:
     post:
       tags: ["action"]
       operationId: uploadPhoto
-      summary: user uploading a photo on his profile
-      description: user uploading a photo on his profile
+      summary: Upload a photo
+      description: User uploads a photo to their profile
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user who wants to upload a photo
+          required: true
+          schema:
+            $ref: "#/components/schemas/UserID"
       requestBody:
+        required: true
         content:
           multipart/form-data:
-            schema: 
-              description: photo and caption of the post
-              type: object
-              properties:
-                image: {$ref : "#/components/schemas/Image"}
-                caption: {$ref : "#/components/schemas/Caption"}
-
+            schema: { $ref:"#/components/schemas/UserPhoto"}
       responses:
-          "201":
-            description: Photo successfully uploaded on profile
-            content:
-              application/json:
-                schema: {$ref: "#/components/schemas/PhotoID"}
-                example: {pid: 185}
+        '201':
+          description: Photo uploaded successfully
+          content:
+            application/json:
+              schema: { $ref:"#/components/schemas/UserPhoto" }
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /profiles/{user_id}/photos/{photo_id}:
+    parameters:
+      - name: user_id
+        in: path
+        description: ID of the user whose photo is being retrieved
+        required: true
+        schema:
+          $ref: "#/components/schemas/UserID"
+      - name: photo_id
+        in: path
+        description: ID of the photo to retrieve
+        required: true
+        schema:
+          $ref: "#/components/schemas/PhotoID"
+    get:
+      tags:
+        - action
+      operationId: getPhoto
+      summary: Retrieve a specific photo by its ID
+      description: Get details of a photo uploaded by the user using the photo ID.
+      responses:
+        '200':
+          description: Photo successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPhoto"
+              example:
+                user_id: 1
+                pid: 45
+                photo: "base64-encoded-image-data"
+                caption: "A beautiful sunset"
+                time: "2023-11-21T23:19:59"
+        '400':
+          description: Bad request (invalid photo ID)
+        '404':
+          description: Photo not found
+        '500':
+          description: Internal server error
 
   /profiles/{user_id}/stream:
     parameters:
@@ -457,14 +504,48 @@ components:
               - {$ref: "#/components/schemas/UserID"}
           minItems: 0
           maxItems: 10000000
-    
+
     UserPhoto:
-      title: User photo
-      description: photo uploaded by the user
+      title: User Photo
+      description: Details of an uploaded photo
+      type: object
       properties:
+        photo_id: {$ref: "#/components/schemas/PhotoID"}
         user_id: {$ref: "#/components/schemas/UserID"}
-        pid: {$ref: "#/components/schemas/PhotoID"}
-        photo: {$ref: "#/components/schemas/Image"}
+        image:
+          $ref: '#/components/schemas/Image'
+        timestamp:
+          type: string
+          description: date and time when the image was posted
+          format: date-time
+          example: "2010-09-20T16:10:19Z"
+          minLength: 20
+          maxLength: 20
+          readOnly: true
+        likeCount:
+          description: number of likes that the photo received
+          type: integer
+          example: 10
+          minimum: 0
+          readOnly: true
+        commentCount:
+          description: number of comments that the photo received
+          type: integer
+          example: 10
+          minimum: 0
+          readOnly: true
+        liked:
+          description: flag that retrieves if the users liked to the photo
+          type: boolean
+          example: false
+          readOnly: true
+    # UserPhoto:
+    #   title: User photo
+    #   description: photo uploaded by the user
+    #   properties:
+    #     user_id: {$ref: "#/components/schemas/UserID"}
+    #     pid: {$ref: "#/components/schemas/PhotoID"}
+    #     photo: {$ref: "#/components/schemas/Image"}
 #          title: photo path
 #          description: "describes the path of a photo"
 #          type : string

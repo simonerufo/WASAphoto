@@ -70,10 +70,10 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 
 
 func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	//Verifying the user authorization
-	userID,err := Auth(w,r)
-	if err != nil{
-		fmt.Printf("AUTH")
+	// Verifying the user authorization
+	_, err := Auth(w, r)
+	if err != nil {
+		fmt.Println("AUTH")
 		http.Error(w, "User not authorized", http.StatusUnauthorized)
 		return
 	}
@@ -81,28 +81,15 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	// Retrieving the id of the profile that is going to be shown
 	profileID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
-		fmt.Printf("ID")
+		fmt.Println("ID")
 		http.Error(w, "Invalid user id", http.StatusBadRequest)
 		return
 	}
 
-	// Checking if the user searched has banned the current user
-	ban, err := rt.db.GetBan(profileID, userID)
-	if err != nil {
-		fmt.Printf("BAN")
-		http.Error(w, "Error checking the ban", http.StatusBadGateway)
-		return
-	}
-	if ban {
-		fmt.Printf("User with id: %d banned user with id: %d\n", profileID, userID)
-		http.Error(w, "You have been banned by this user", http.StatusForbidden)
-		return
-	}
-
 	// Retrieving the profile from the database
-	profile, err := rt.db.GetUserProfile(profileID)
+	profile, err := rt.db.GetUserProfileByID(profileID)
 	if err != nil {
-		fmt.Printf("DB")
+		fmt.Println("DB")
 		http.Error(w, "Error while getting user profile", http.StatusBadGateway)
 		return
 	}
@@ -111,10 +98,11 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {
-		fmt.Printf("ENCODE")
+		fmt.Println("ENCODE")
 		http.Error(w, "Error while encoding user profile", http.StatusInternalServerError)
 	}
 }
+
 /*
 func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	
