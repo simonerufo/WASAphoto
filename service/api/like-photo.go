@@ -4,58 +4,56 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt _router) LikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	user_id, err := strconv.Atoi(ps.ByName("user_id"))
+func (rt *_router) LikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
-		http.Error(w, "Error while fetching user id from parameters", http.StatusBadRequest)
+		http.Error(w, "Error while fetching user ID from parameters", http.StatusBadRequest)
 		return
 	}
 
-	target_id, err := strconv.Atoi(ps.ByName("target_id"))
+	targetPhotoID, err := strconv.Atoi(ps.ByName("photo_id"))
 	if err != nil {
-		http.Error(w, "Error while fetching target id from parameters", http.StatusBadRequest)
+		http.Error(w, "Error while fetching target photo ID from parameters", http.StatusBadRequest)
 		return
 	}
 
-	pid, err := strconv.Atoi(ps.ByName("pid"))
+	Auth(w,r)
+
+	ownerID, err := rt.db.GetPhotoOwner(targetPhotoID)
 	if err != nil {
-		http.Error(w, "Error while fetching photo id from parameters", http.StatusBadRequest)
+		if strings.Contains(err.Error(), "does not exist") {
+			http.Error(w, "Photo not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Error while fetching photo owner", http.StatusInternalServerError)
+		}
 		return
 	}
 
-	isAuth(w, r, user_id)
-
-	isBanned, err := rt.db.GetBan(target_id, user_id)
+	isBanned, err := rt.db.GetBan(ownerID, userID)
 	if err != nil {
-		http.Error(w, "Error while checking if user banned you", http.StatusBadRequest)
+		http.Error(w, "Error while checking if user banned you", http.StatusInternalServerError)
 		return
 	}
 
 	if isBanned {
-		http.Error(w, "User you're trying to like banned you!", http.StatusBadRequest)
+		http.Error(w, "User you're trying to like banned you!", http.StatusForbidden)
 		return
 	}
 
-	postExist, err := rt.db.CheckPhoto(target_id, pid)
+	err = rt.db.InsertLike(userID, ownerID, targetPhotoID)
 	if err != nil {
-		http.Error(w, "Error while trying to check if post exist", http.StatusBadRequest)
-		return
-	}
-	if !postExist {
-		http.Error(w, "You can't like a post that doesn't exist!", http.StatusBadRequest)
+		http.Error(w, "Error while inserting a like entry in the database", http.StatusInternalServerError)
 		return
 	}
 
-	err = rt.db.InsertLike(user_id, target_id, pid)
-	if err != nil {
-		http.Error(w, "Error while inserting a like entry in db", http.StatusBadRequest)
-		return
-	}
-	//success
-	fmt.Printf("Post successfully liked!\n")
+	w.WriteHeader(http.StatusNoContent)
+	fmt.Fprintln(w, "Photo successfully liked!")
 }
+
+

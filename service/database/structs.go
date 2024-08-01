@@ -44,3 +44,4 @@ type Profile struct {
 	Followers int `json:"followers"`
 	Following int `json:"following"`
 }
+

@@ -5,7 +5,7 @@ import(
 	"encoding/base64"
 	"database/sql"
 )
-
+/*
 // Getting the User profile from his id
 func (db *appdbimpl) GetUserProfile(userID int) (Profile, error) {
     var userProfile Profile
@@ -70,7 +70,7 @@ func (db *appdbimpl) GetUserProfile(userID int) (Profile, error) {
 
     return userProfile, nil
 }
-
+*/
 func (db *appdbimpl) GetUserProfileByUsername(username string) (Profile, error) {
     var userProfile Profile
     var user User

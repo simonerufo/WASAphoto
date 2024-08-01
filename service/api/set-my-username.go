@@ -50,7 +50,7 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 
 	//the user can update just his name
 	if userID != uid{
-		http.Error(w,"invalid action",http.StatusForbidden)
+		http.Error(w,"Cannot update this username",http.StatusUnauthorized)
 		return
 	}
 	

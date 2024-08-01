@@ -90,58 +90,92 @@ paths:
 
 
 
-  /profiles/{user_id}/{photo_id}:
+  /profiles/{user_id}/photos/{photo_id}:
     parameters:
       - name: user_id
         in: path
-        description: id of user that wants to upload a photo
+        description: ID of user
         schema: { $ref: "#/components/schemas/UserID"}
         required: true
       - name: photo_id
         in: path
-        description: id of photo that's going to be uploaded
-        schema: { $ref: "#/components/schemas/UserID"}
+        description: ID of photo
+        schema: { $ref: "#/components/schemas/PhotoID"}
         required: true
-#    post:
-#      tags: ["action"]
-#      operationId: uploadPhoto
-#      summary: user uploading a photo on his profile
-#      description: user uploading a photo on his profile
-#      requestBody:
-#        content:
-#          application/json:
-#            schema: {$ref: "#/components/schemas/UserPhoto"}
-#      responses:
-#       "201":
-#        description: Photo successfully uploaded on profile
-#        content:
-#          application/json:
-#            schema: {$ref: "#/components/schemas/PhotoID"}
-#            example: {pid: 185}
     delete:
-      tags: ["action"]
-      operationId: deletePhoto
-      summary: user deleting a photo
-      description: remove a photo from user profile
+        tags: ["action"]
+        operationId: deletePhoto
+        summary: user deleting a photo
+        description: remove a photo from user profile
+        responses:
+          "204":
+            description: Photo successfully deleted
+          "400":
+            description: Bad Request - Invalid user_id or photo_id
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: {error: "Error while retrieving user ID from parameters"}
+          "401":
+            description: Unauthorized - Invalid or missing token
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: {error: "Unauthorized"}
+          "404":
+            description: Not Found - Photo does not exist
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: {error: "Photo not found"}
+          "500":
+            description: Internal Server Error - Server encountered an error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: {error: "Error while trying to delete photo from database"}
+    get:
+      tags:
+        - action
+      operationId: getPhoto
+      summary: Retrieve a specific photo by its ID
+      description: Get details of a photo uploaded by the user using the photo ID.
       responses:
-        "200":
-          description: photo successfully deleted
+        '200':
+          description: Photo successfully retrieved
           content:
-            application/json: 
-              schema: {$ref: "#/components/schemas/PhotoID"}
-              example: {pid: 185}
-  /profiles/{user_id}/followed/{target_uid}:
-    parameters:
-      - name: user_id
-        in: path
-        description: user's id that wants to follow/unfollow another user
-        schema: {$ref: "#/components/schemas/UserID"}
-        required: true
-      - name: target_uid
-        in: path
-        description: user's id that is going to be followed/unfollowed
-        schema: {$ref: "#/components/schemas/UserID"}
-        required: true
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPhoto"
+              example:
+                user_id: 1
+                pid: 45
+                photo: "base64-encoded-image-data"
+                caption: "A beautiful sunset"
+                time: "2023-11-21T23:19:59"
+        '400':
+          description: Bad request (invalid photo ID)
+        '404':
+          description: Photo not found
+        '500':
+          description: Internal server error
+
     put:
       tags: ["action"]
       operationId: followUser
@@ -158,14 +192,14 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Followed"}
               example: {username: Marco, user_id: 128}
-    delete:
-      tags: ["action"]
-      operationId: unfollowUser
-      summary: "unfollow a user"
-      description: removing from the followed list a user
-      responses:
-       "204":
-          description: user successfully unfollowed
+#    delete:
+#      tags: ["action"]
+#      operationId: unfollowUser
+#      summary: "unfollow a user"
+#      description: removing from the followed list a user
+#      responses:
+#       "204":
+#          description: user successfully unfollowed
   /profiles/{user_id}/bans/{target_uid}:
     parameters:
       - name: user_id
@@ -254,45 +288,21 @@ paths:
         '500':
           description: Internal server error
 
-  /profiles/{user_id}/photos/{photo_id}:
-    parameters:
-      - name: user_id
-        in: path
-        description: ID of the user whose photo is being retrieved
-        required: true
-        schema:
-          $ref: "#/components/schemas/UserID"
-      - name: photo_id
-        in: path
-        description: ID of the photo to retrieve
-        required: true
-        schema:
-          $ref: "#/components/schemas/PhotoID"
-    get:
-      tags:
-        - action
-      operationId: getPhoto
-      summary: Retrieve a specific photo by its ID
-      description: Get details of a photo uploaded by the user using the photo ID.
-      responses:
-        '200':
-          description: Photo successfully retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserPhoto"
-              example:
-                user_id: 1
-                pid: 45
-                photo: "base64-encoded-image-data"
-                caption: "A beautiful sunset"
-                time: "2023-11-21T23:19:59"
-        '400':
-          description: Bad request (invalid photo ID)
-        '404':
-          description: Photo not found
-        '500':
-          description: Internal server error
+  # /profiles/{user_id}/photos/{photo_id}:
+  #   parameters:
+  #     - name: user_id
+  #       in: path
+  #       description: ID of the user whose photo is being retrieved
+  #       required: true
+  #       schema:
+  #         $ref: "#/components/schemas/UserID"
+  #     - name: photo_id
+  #       in: path
+  #       description: ID of the photo to retrieve
+  #       required: true
+  #       schema:
+  #         $ref: "#/components/schemas/PhotoID"
+    
 
   /profiles/{user_id}/stream:
     parameters:
@@ -313,7 +323,7 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Stream"}
               example: {user_post: posts from user}
-  /profiles/{user_id}/likes/{target_photoid}:
+  /profiles/{user_id}/likes/{photo_id}:
     parameters:
       - name: user_id
         in: path
@@ -336,23 +346,138 @@ paths:
             schema: {$ref: "#/components/schemas/Stream"}
       responses:
         "200":
-          description: user successfully liked a photo
+          description: User successfully liked a photo
           content:
             application/json:
               schema: {$ref: "#/components/schemas/Liked"}
               example: {photo_id: 298}
+        "400":
+          description: Bad Request - Invalid user_id or target_photoid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Error while retrieving user ID or target photo ID from parameters"}
+        "401":
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Unauthorized"}
+        "404":
+          description: Not Found - Photo does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Photo not found"}
+        "500":
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Internal server error"}
     delete:
       tags: ["action"]
       operationId: unlikePhoto
       summary: remove like from photo
       description: user with current_id removes from Liked list photo id with target_id
       responses:
-        "200":
-          description: user successfully removed a like from photo 
+        "204":
+          description: User successfully removed a like from photo
+        "400":
+          description: Bad Request - Invalid user_id or target_photoid
           content:
             application/json:
-              schema: {$ref: "#/components/schemas/Liked"}
-              example: {photo_id: 298}
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Error while retrieving user ID or target photo ID from parameters"}
+        "401":
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Unauthorized"}
+        "404":
+          description: Not Found - Photo does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Photo not found"}
+        "500":
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                example: {error: "Internal server error"}
+    
+  /photos/{photo_id}/likes:
+    parameters:
+      - name: photo_id
+        in: path
+        description: ID of the photo to retrieve likes for
+        required: true
+        schema: { $ref: "#/components/schemas/PhotoID" }
+
+    get:
+      tags: ["action"]
+      summary: Retrieve likes for a photo
+      description: |
+        Retrieve a list of users who liked the specified photo.
+      operationId: getLikes
+      responses:
+        "200":
+          description: Successfully retrieved the list of likes
+          content:
+            application/json:
+              schema:
+                type: array
+                description: The list of likes
+                minItems: 0
+                maxItems: 1000000
+                items:
+                  type: object
+                  properties:
+                    userID: {$ref: "#/components/schemas/UserID" }
+                    username: {$ref: "#/components/schemas/Username" }
+        "400":
+          description: Bad request. The request could not be understood or was missing required parameters.
+        "401":
+          description: Unauthorized. Authentication is required and has failed or has not been provided.
+        "404":
+          description: Not found. The specified photo could not be found.
+        "500":
+          description: Internal server error. An error occurred on the server.
+           
   /profiles/{target_id}/comments/{target_photoid}:
     parameters:
       - name: user_id

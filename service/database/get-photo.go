@@ -90,3 +90,18 @@ func (db *appdbimpl) CheckPhoto(user_id int, photo_id int) (bool, error) {
 	return photoExists, err
 
 }
+
+func (db *appdbimpl) GetPhotoOwner(photoID int) (int, error) {
+	query := `SELECT user_id FROM Photo WHERE photo_id = ?`
+	var ownerID int
+
+	err := db.c.QueryRow(query, photoID).Scan(&ownerID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, fmt.Errorf("photo with id %d does not exist", photoID)
+		}
+		return 0, err
+	}
+
+	return ownerID, nil
+}

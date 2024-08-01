@@ -9,43 +9,42 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt _router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	user_id, err := strconv.Atoi(ps.ByName("user_id"))
+func (rt _router) RemoveLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Extract user_id from the URL parameters
+	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
-		http.Error(w, "Error while fetching user id from parameters", http.StatusBadRequest)
+		http.Error(w, "Error while fetching user ID from parameters", http.StatusBadRequest)
 		return
 	}
 
-	target_id, err := strconv.Atoi(ps.ByName("target_id"))
+	// Extract photo_id from the URL parameters
+	photoID, err := strconv.Atoi(ps.ByName("photo_id"))
 	if err != nil {
-		http.Error(w, "Error while fetching target id from parameters", http.StatusBadRequest)
+		http.Error(w, "Error while fetching photo ID from parameters", http.StatusBadRequest)
 		return
 	}
 
-	photo_id, err := strconv.Atoi(ps.ByName("photo_id"))
+	// Check if the user is authenticated
+	Auth(w,r)
+
+	// Retrieve the owner_id from the database (needed for deleting the like)
+	ownerID, err := rt.db.GetPhotoOwner(photoID)
 	if err != nil {
-		http.Error(w, "Error while fetching photo id from parameters", http.StatusBadRequest)
+		if err.Error() == "not found" {
+			http.Error(w, "Photo not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Error while retrieving photo owner", http.StatusInternalServerError)
+		}
 		return
 	}
 
-	isAuth(w, r, user_id)
-
-	photoExists, err := rt.db.CheckPhoto(target_id, photo_id)
+	// Delete the like entry from the database
+	err = rt.db.DeleteLike(userID, ownerID, photoID)
 	if err != nil {
-		http.Error(w, "Error while checking if post exists", http.StatusBadRequest)
+		http.Error(w, "Error while deleting like from database", http.StatusInternalServerError)
 		return
 	}
 
-	if !photoExists {
-		http.Error(w, "You can't unlike a post that doesn't even exist!", http.StatusBadRequest)
-		return
-	}
-
-	err = rt.db.DeleteLike(user_id, target_id, photo_id)
-	if err != nil {
-		http.Error(w, "Error while deleting like from db", http.StatusBadRequest)
-		return
-	}
-
-	fmt.Printf("Post successfully unliked!\n")
+	// Successfully removed the like
+	fmt.Fprintln(w, "Like successfully removed!")
 }

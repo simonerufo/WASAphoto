@@ -74,12 +74,16 @@ type AppDatabase interface {
 	CheckPhoto(user_id int, photo_id int) (bool, error)
 	//gets a photo from db
 	GetPhoto(userID int, photoID int) (*Photo, error)
+	//gets the owner of a photo by using his corresponding photo id
+	GetPhotoOwner(photoID int) (int, error)
 	//deletes a photo from db
 	DeletePhoto(user_id int, photo_id int) error
 	//insert an entry into like table
 	InsertLike(user_id int, owner_id int, post_id int) error
 	//delete an entry from like table
 	DeleteLike(user_id int, owner_id int, post_id int) error
+	//Get all likes related to a photo
+	GetLikesForPhoto(photoID int) ([]Like, error)
 	//insert an entry into comment table
 	InsertComment(user_id int, owner_id int, photo_id int, text string) error
 	//check if a comment exists in comment table

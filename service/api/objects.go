@@ -27,6 +27,14 @@ type UserPhoto struct {
 	Time        string    `json:"time"`        // Publication time
 }
 
+
+type Like struct {
+    UserID   int    `json:"user_id"`
+    Username string `json:"username"`
+    PhotoID  int    `json:"photo_id"`
+}
+
+
 func encodeToBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }

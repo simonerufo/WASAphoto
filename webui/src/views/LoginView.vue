@@ -1,36 +1,48 @@
 <script>
 import { Auth } from '../services/axios';
+
 export default {
-	data: function() {
-		return {
-            username: null,
-            id: null,
-			usernameValidation: new RegExp('^[a-z][a-z0-9]*$'),
-		}
-	},
-	methods: {
-        async login() {
-			try {
-                if (!this.usernameValidation.test(this.username)) throw "Invalid username, it must start with letters and contain only lowercase letters and numbers"
-                if (this.username.length < 3 || this.username.length > 13) throw "Invalid username, it must contains mininum 3 characters and maximum 13 characters"
-                let response = await this.$axios.post('/session', {
-                   "username": this.username,
-                });
-                
-				this.id = parseInt(response.data);
-				localStorage.id = this.id;
-				localStorage.username = this.username;
-                this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.id;
-                this.$router.push("/home");
-                
-           } catch (e) {
-                console.log(e)
-            };
+  data() {
+    return {
+      username: null,
+      id: null,
+      usernameValidation: new RegExp('^[a-z][a-z0-9]*$'),
+    }
+  },
+  methods: {
+    async login() {
+      try {
+        // Validate username
+        if (!this.usernameValidation.test(this.username)) {
+          alert("Invalid username: it must start with letters and contain only lowercase letters and numbers.");
+          return;
         }
-	},
-	mounted() {
-        localStorage.clear();
-	}
+        if (this.username.length < 3 || this.username.length > 13) {
+          alert("Invalid username: it must contain a minimum of 3 characters and a maximum of 13 characters.");
+          return;
+        }
+
+        // Make the login request
+        let response = await this.$axios.post('/session', {
+          "username": this.username,
+        });
+        
+        this.id = parseInt(response.data);
+        localStorage.id = this.id;
+        localStorage.username = this.username;
+        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.id;
+        this.$router.push("/home");
+
+      } catch (e) {
+        // Handle unexpected errors
+        console.error('Login failed:', e);
+        alert('Login failed. Please try again.');
+      }
+    }
+  },
+  mounted() {
+    localStorage.clear();
+  }
 }
 </script>
 
@@ -46,8 +58,6 @@ export default {
     </div>
   </div>
 </template>
-
-
 
 <style scoped>
 /* Wrapper styling to center the login-container */
