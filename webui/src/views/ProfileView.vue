@@ -41,8 +41,10 @@ export default {
           this.inputValue = this.username;
           this.followersCount = followers;
           this.followingCount = following;
-          this.posts = photos;
-          this.postsCount = photos.length;
+
+          // Sort photos by timestamp (newest first)
+          this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          this.postsCount = this.posts.length;
 
           console.log('Updated component data:', {
             user: this.user,
@@ -92,8 +94,6 @@ export default {
       }
     },
 
-
-
     toggleModal(post) {
       if (post && post.photo_id) {
         this.$router.push({ path: `/profiles/${this.id}/photos/${post.photo_id}` });
@@ -101,7 +101,6 @@ export default {
         console.error('Post ID is invalid', post);
       }
     },
-
 
     toggleCreateModal(reload) {
       this.createPost = !this.createPost;
@@ -135,7 +134,8 @@ export default {
             timestamp: new Date().toISOString()
           };
 
-          this.posts.push(post);
+          // Insert the new photo at the beginning of the array
+          this.posts.unshift(post);
           this.postsCount++;
           this.caption = '';
           this.file = null;
@@ -186,7 +186,7 @@ export default {
       <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
         <div class="row mt-4">
           <div v-for="post in posts" :key="post.id" class="col-md-4 mb-4">
-            <img :src="post.image" class="img-fluid" :alt="post.caption" @click="toggleModal(post)">
+            <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
           </div>
         </div>
       </div>
@@ -252,5 +252,13 @@ export default {
 .upload-form button {
   display: block;
   width: 100%;
+}
+
+.photo {
+  transition: filter 0.3s ease;
+}
+
+.photo:hover {
+  filter: brightness(1.5);
 }
 </style>

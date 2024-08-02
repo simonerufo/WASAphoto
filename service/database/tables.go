@@ -58,19 +58,19 @@ var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
 	-text : text wrote by user in the comment
 	-timestamp: current timestamp assigned to comment whenever it's created
 */
-var COMMENT_TABLE = `CREATE TABLE IF NOT EXISTS Comment(
+var COMMENT_TABLE = `
+	CREATE TABLE IF NOT EXISTS Comment (
 	comment_id INTEGER AUTO_INCREMENT,
 	post_id INTEGER NOT NULL,
 	owner_id INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	text TEXT NOT NULL,
 	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY(comment_id,post_id,owner_id)
-	FOREIGN KEY(post_id,owner_id) REFERENCES Post(user_id,post_id)
-		ON DELETE CASCADE,
-	FOREIGN KEY(user_id) REFERENCES User(user_id)
-		ON DELETE CASCADE
-);`
+	PRIMARY KEY(comment_id),
+	FOREIGN KEY(post_id, owner_id) REFERENCES Post(user_id, post_id) ON DELETE CASCADE,
+	FOREIGN KEY(user_id) REFERENCES User(user_id) ON DELETE CASCADE
+);
+`
 
 //LIKE
 /*

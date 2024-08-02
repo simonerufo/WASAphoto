@@ -85,11 +85,20 @@ type AppDatabase interface {
 	//Get all likes related to a photo
 	GetLikesForPhoto(photoID int) ([]Like, error)
 	//insert an entry into comment table
-	InsertComment(user_id int, owner_id int, photo_id int, text string) error
+	InsertComment(user_id int, owner_id int, photo_id int, text string) (int, error)
 	//check if a comment exists in comment table
 	CheckComment(user_id int, photo_id int, comment_id int) (bool, error)
+	//Getting all comments referred to a photo
+	GetCommentsByPhotoID(postID int) ([]Comment, error)
+	//Get a comment using his id
+	GetCommentByID(commentID int) (Comment, error)
 	//delete a comment from comments table
 	DeleteComment(user_id int, photo_id int, comment_id int) error
+	//retrieves the photo id from a comment and user id
+	GetPhotoIDFromComment(commentID int, userID int) (int, error)
+	// checks if a specific user owns the photo referred to a specific comment
+	CheckPhotoOwnership(commentID int, userID int) (bool, error)
+
 	Ping() error
 }
 

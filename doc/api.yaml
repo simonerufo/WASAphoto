@@ -478,7 +478,7 @@ paths:
         "500":
           description: Internal server error. An error occurred on the server.
            
-  /profiles/{target_id}/comments/{target_photoid}:
+ 
     parameters:
       - name: user_id
         in: path
@@ -519,7 +519,233 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/CommentID"}
               example: {comment_id: 7}
-          
+  /profiles/{user_id}/comments/{photo_id}:
+    parameters:
+      - name: user_id
+        in: path
+        description: The user ID of the user who will receive the comment.
+        schema: {  $ref: "#/components/schemas/UserID" }
+        required: true
+      - name: photo_id
+        in: path
+        description: The photo ID on which the comment is made.
+        schema: { $ref: "#/components/schemas/PhotoID" }
+        required: true
+    
+    post:
+      tags:
+        - action
+      operationId: commentPhoto
+      summary: Comment on a photo
+      description: Adds a comment to the list of comments on a photo for a user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+            examples:
+              example1:
+                value:
+                  comment_text: "good panorama!"
+      responses:
+        '200':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              example:
+                comment_id: 7
+                comment_text: "good panorama!"
+        '400':
+          description: Bad request, possibly invalid data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    description: The HTTP error code
+                  error_message:
+                    type: string
+                    description: A description of the error
+                required:
+                  - error_code
+                  - error_message
+              example:
+                error_code: 400
+                error_message: "Invalid comment data"
+        '404':
+          description: User or photo not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    description: The HTTP error code
+                  error_message:
+                    type: string
+                    description: A description of the error
+                required:
+                  - error_code
+                  - error_message
+              example:
+                error_code: 404
+                error_message: "User or photo not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    description: The HTTP error code
+                  error_message:
+                    type: string
+                    description: A description of the error
+                required:
+                  - error_code
+                  - error_message
+              example:
+                error_code: 500
+                error_message: "Server error"
+                
+  /profiles/{user_id}/comments/{comment_id}:
+    parameters:
+      - name: user_id
+        in: path
+        description: The user ID of the user who will receive the comment.
+        schema: {  $ref: "#/components/schemas/UserID" }
+        required: true
+      - name: photo_id
+        in: path
+        description: The photo ID on which the comment is made.
+        schema: { $ref: "#/components/schemas/PhotoID" }
+        required: true
+    delete:
+      tags:
+        - action
+      operationId: uncommentPhoto
+      summary: Remove a comment from a photo
+      description: Removes a comment from the list of comments on a photo for a user.
+      responses:
+        '200':
+          description: Comment removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentID'
+              example:
+                comment_id: 7
+        '400':
+          description: Bad request, possibly invalid data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    description: The HTTP error code
+                  error_message:
+                    type: string
+                    description: A description of the error
+                required:
+                  - error_code
+                  - error_message
+              example:
+                error_code: 400
+                error_message: "Invalid comment ID"
+        '404':
+          description: Comment or user/photo not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    description: The HTTP error code
+                  error_message:
+                    type: string
+                    description: A description of the error
+                required:
+                  - error_code
+                  - error_message
+              example:
+                error_code: 404
+                error_message: "Comment or user/photo not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    description: The HTTP error code
+                  error_message:
+                    type: string
+                    description: A description of the error
+                required:
+                  - error_code
+                  - error_message
+              example:
+                error_code: 500
+                error_message: "Server error"
+                
+  /profiles/{user_id}/photos/{photo_id}/comments:
+    parameters:
+      - name: user_id
+        in: path
+        description: The user ID of the profile that owns the photo
+        schema: { $ref: "#/components/schemas/UserID"}
+        required: true
+      - name: photo_id
+        in: path
+        description: The photo ID for which comments are being retrieved
+        schema: { $ref: "#/components/schemas/PhotoID"}
+        required: true
+    get:
+      tags: ["action"]
+      operationId: getPhotoComments
+      summary: Retrieve all comments for a photo
+      description: Get all comments associated with a specific photo owned by a user
+      responses:
+        "200":
+          description: List of comments for the specified photo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+              example:
+                - comment_id: 1
+                  comment_text: "Great photo!"
+                  user_id: 5
+                  timestamp: "2024-08-01T12:34:56Z"
+                - comment_id: 2
+                  comment_text: "Love this view!"
+                  user_id: 8
+                  timestamp: "2024-08-01T13:22:10Z"
+        "404":
+          description: Photo not found or no comments available
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No comments found for this photo."
+       
 #COMPONENTS
 components:
   securitySchemes:
@@ -564,7 +790,14 @@ components:
           $ref: "#/components/schemas/CommentID"
         comment_text:
           $ref: "#/components/schemas/CommentText"
-        
+        timestamp:
+          type: string
+          description: date and time when the comment is posted
+          format: date-time
+          example: "2010-01-20T16:10:19Z"
+          minLength: 20
+          maxLength: 20
+          readOnly: true
         
       
     Liked:

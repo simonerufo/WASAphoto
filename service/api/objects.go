@@ -34,6 +34,12 @@ type Like struct {
     PhotoID  int    `json:"photo_id"`
 }
 
+type Comment struct {
+	Username    string `json:"username"`
+	CommentID   int    `json:"comment_id"`
+	CommentText string `json:"comment_text"`
+	Timestamp   string `json:"timestamp"`
+}
 
 func encodeToBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
@@ -88,7 +94,6 @@ func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
 
 
 func Auth(w http.ResponseWriter, r *http.Request) (int, error) {
-	// Retrieving the Authorization header
 	authHeader := r.Header.Get("Authorization")
 	// Expecting format "Bearer <token>"
 	const bearerPrefix = "Bearer "

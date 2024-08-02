@@ -17,13 +17,20 @@ type Post struct {
 	Timestamp   time.Time `json:"timestamp"`
 }
 
+// type Comment struct {
+// 	CommentID int       `json:"comment_id"`
+// 	PostID    int       `json:"post_id"`
+// 	OwnerID   int       `json:"owner_id"`
+// 	User      User      `json:"user_id"`
+// 	Text      string    `json:"text"`
+// 	Timestamp time.Time `json:"timestamp"`
+// }
+
 type Comment struct {
-	CommentID int       `json:"comment_id"`
-	PostID    int       `json:"post_id"`
-	OwnerID   int       `json:"owner_id"`
-	User      User      `json:"user_id"`
-	Text      string    `json:"text"`
-	Timestamp time.Time `json:"timestamp"`
+	Username    string `json:"username"`
+	CommentID   int    `json:"comment_id"`
+	CommentText string `json:"comment_text"`
+	Timestamp   string `json:"timestamp"`
 }
 
 type Photo struct {
