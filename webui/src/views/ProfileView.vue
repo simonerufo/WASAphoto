@@ -127,8 +127,10 @@ export default {
 
         if (response.status === 201) {
           console.log(response.data);
+          const { photo_id } = response.data; // Ensure this field is returned from the backend
+
           const post = {
-            id: response.data.photo_id,
+            photo_id, // Use the correct field name
             image: URL.createObjectURL(this.file),
             caption: this.caption,
             timestamp: new Date().toISOString()
@@ -147,9 +149,10 @@ export default {
   },
   mounted() {
     this.getUser();
-  },
+  }
 };
 </script>
+
 
 <template>
   <div class="container profile-page">
