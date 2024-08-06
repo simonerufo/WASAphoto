@@ -10,53 +10,61 @@ import (
 )
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	//getting the http parameters
+	// Getting the HTTP parameters
 	user_id, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
-		http.Error(w, "cannot parse current uid", http.StatusBadRequest)
+		http.Error(w, "Invalid user_id: cannot parse user ID", http.StatusBadRequest)
 		return
 	}
-	target_id, err := strconv.Atoi(ps.ByName("target_id"))
+	following_id, err := strconv.Atoi(ps.ByName("following_id"))
 	if err != nil {
-		http.Error(w, "cannot parse target uid", http.StatusBadRequest)
+		http.Error(w, "Invalid following_id: cannot parse following ID", http.StatusBadRequest)
 		return
 	}
 
-	//checking invalid operations
-	if user_id == target_id {
-		http.Error(w, "invalid action, you can't unfollow your self!", http.StatusBadRequest)
+	// Checking invalid operations
+	if user_id == following_id {
+		http.Error(w, "Invalid action: you can't unfollow yourself!", http.StatusBadRequest)
 		return
 	}
 
-	//getting and checking if target and current users exists
+	// Getting and checking if current user exists
 	current_user, err := rt.db.GetUserByID(user_id)
 	if err != nil {
-		http.Error(w, "current user not recognized", http.StatusBadRequest)
+		http.Error(w, "Current user not recognized", http.StatusNotFound)
 		return
 	}
 
-	//checking if user was followed by main user
-	isFollowed, err := rt.db.GetFollow(user_id, target_id)
+	// Checking if user is followed by main user
+	isFollowed, err := rt.db.GetFollow(user_id, following_id)
 	if err != nil {
-		http.Error(w, "error checking if user to be unfollowed, is followed", http.StatusBadRequest)
+		http.Error(w, "Error checking if the user is followed", http.StatusInternalServerError)
 		return
 	}
 	if !isFollowed {
-		w.Write([]byte("impossible unfollow, user is not followed"))
-	}
-	target_user, err := rt.db.GetUserByID(target_id)
-	if err != nil {
-		http.Error(w, "target user not recognized", http.StatusBadRequest)
+		http.Error(w, "Unfollow failed: user is not followed", http.StatusBadRequest)
 		return
 	}
 
-	//authentication check
-	isAuth(w, r, current_user.UserID)
+	// Getting and checking if target user exists
+	target_user, err := rt.db.GetUserByID(following_id)
+	if err != nil {
+		http.Error(w, "Target user not recognized", http.StatusNotFound)
+		return
+	}
 
-	//adding the follow relation into database
-	rt.db.UnfollowUser(current_user.UserID, target_user.UserID)
+	// Authentication check
+	Auth(w,r)
 
-	//success message
+	// Removing the follow relation from database
+	err = rt.db.UnfollowUser(current_user.UserID, target_user.UserID)
+	if err != nil {
+		http.Error(w, "Error unfollowing user", http.StatusInternalServerError)
+		return
+	}
+
+	// Success message
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "user %s succesfully followed %s", current_user.Username, target_user.Username)
+	fmt.Fprintf(w, "User %s successfully unfollowed %s", current_user.Username, target_user.Username)
 }
+

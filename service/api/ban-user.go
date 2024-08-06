@@ -4,50 +4,46 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"encoding/json"
 
 	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	/*
-		TODO:
-			-get dei parametri della req e cast
-			-controllare se l'user vuole bannarsi da solo
-			-controllare se l'user che deve essere bannato esiste
-			-auth
-			-add to db
-			-messaggio di successo
-
-	*/
-	user_id, err := strconv.Atoi(ps.ByName("user_id"))
+func (rt *_router) BanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
-		http.Error(w, "cannot parse current uid", http.StatusBadRequest)
+		http.Error(w, "cannot parse user_id", http.StatusBadRequest)
 		return
 	}
-	target_id, err := strconv.Atoi(ps.ByName("target_id"))
+	targetID, err := strconv.Atoi(ps.ByName("target_uid"))
 	if err != nil {
-		http.Error(w, "cannot parse target uid", http.StatusBadRequest)
+		http.Error(w, "cannot parse target_uid", http.StatusBadRequest)
 		return
 	}
 
-	if user_id == target_id {
+	if userID == targetID {
 		http.Error(w, "you can't ban yourself!", http.StatusBadRequest)
 		return
 	}
 
-	banned_user, err := rt.db.GetUserByID(target_id)
+	bannedUser, err := rt.db.GetUserByID(targetID)
 	if err != nil {
-		http.Error(w, "user you're trying to ban doesn't exits", http.StatusBadRequest)
+		http.Error(w, "user you're trying to ban doesn't exist", http.StatusNotFound)
 		return
 	}
 
-	isAuth(w, r, user_id)
+	Auth(w,r)
 
-	err = rt.db.BanUser(user_id, banned_user.UserID)
+	err = rt.db.BanUser(userID, bannedUser.UserID)
 	if err != nil {
-		http.Error(w, "error while banning user", http.StatusBadRequest)
+		http.Error(w, "error while banning user", http.StatusInternalServerError)
+		return
 	}
 
-	fmt.Printf("user: %s successfully banned", banned_user.Username)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bannedUser)
+
+	fmt.Printf("user: %s successfully banned", bannedUser.Username)
 }
+

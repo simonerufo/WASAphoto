@@ -14,14 +14,7 @@ import (
 updates the username using a PUT request to the server
 */
 func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	/*
-		TODO:
-			-richiedere l'id e verificare se è lo stesso dell'utente che ha fatto la req (ps.ByName())
-			-richiedere il body della richiesta per cambiare l'username (json encode)
-			-verificare che il nome sia valido
-			-aggiornare la entry del db dell'user
-			-messaggio di risposta
-	*/
+
 	var userData User
 
 	//getting user id that's calling the request

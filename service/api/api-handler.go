@@ -10,15 +10,13 @@ func (rt *_router) Handler() http.Handler {
 	//login
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 
-	//user actions
 	rt.router.PUT("/profiles/:user_id/username", rt.wrap(rt.setMyUsername))
-	rt.router.PUT("/profiles/:user_id/followed/:target_id", rt.wrap(rt.followUser))
 	//getting user profile
 	rt.router.GET("/profiles/:user_id/username",rt.wrap(rt.getProfileByUsername))
 	//search
 	rt.router.GET("/profiles/:user_id/profile", rt.wrap(rt.getProfile))
-	rt.router.POST("/profiles/:user_id/profile", rt.wrap(rt.uploadPhoto))
 
+	rt.router.POST("/profiles/:user_id/profile", rt.wrap(rt.uploadPhoto))
 	rt.router.GET("/profiles/:user_id/photos/:photo_id", rt.wrap(rt.getPhoto))
 	rt.router.DELETE("/profiles/:user_id/photos/:photo_id",rt.wrap(rt.deletePhoto))
 
@@ -30,6 +28,13 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/profiles/:user_id/photos/:photo_id/comments", rt.wrap(rt.GetPhotoComments))
 	rt.router.DELETE("/profiles/:user_id/comments/:comment_id", rt.wrap(rt.RemoveComment))
 
+	rt.router.PUT("/profiles/:user_id/following/:following_id", rt.wrap(rt.followUser))
+	rt.router.DELETE("/profiles/:user_id/following/:following_id", rt.wrap(rt.unfollowUser))
+	rt.router.GET("/profiles/:user_id/follow", rt.wrap(rt.GetFollowers))
+
+	rt.router.PUT("/profiles/:user_id/bans/:target_uid", rt.wrap(rt.BanUser))
+	rt.router.DELETE("/profiles/:user_id/bans/:target_uid", rt.wrap(rt.UnbanUser))
+	rt.router.GET("/profiles/:user_id/ban", rt.wrap(rt.GetBanList))
 	//rt.router.GET("/", rt.getHelloWorld)
 	//rt.router.GET("/context", rt.wrap(rt.getContextReply))
 	// Special routes

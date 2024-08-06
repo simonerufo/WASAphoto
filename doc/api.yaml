@@ -37,7 +37,7 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/UserID"
-              example: {"user_id": 17}
+
   /profiles/{user_id}/username:
     parameters:
       - name: user_id
@@ -220,22 +220,88 @@ paths:
       requestBody:
         content:
           application/json:
-            schema: {$ref: "#/components/schemas/User"}
+            schema: {$ref: "#/components/schemas/User" }
       responses:
         "200":
           description: user successfully added to ban list
           content:
             application/json:
-              schema: {$ref: "#/components/schemas/Banned"}
-              example: {username: lollo, user_id: 67}
+              schema: {$ref: "#/components/schemas/User"}
+        "400":
+          description: Invalid request (e.g., invalid user_id or target_uid)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Invalid user_id or target_uid"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "User not found"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Internal server error"
     delete:
       tags: ["action"]
       operationId: unbanUser
-      summary: "unban a user"
+      summary: unban a user
       description: remove the target_uid user from user's current_uid banned list
       responses:
         "204":
           description: user successfully unbanned
+        "400":
+          description: Invalid request (e.g., invalid user_id or target_uid)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Invalid user_id or target_uid"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "User not found"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Internal server error"
+
   /profiles/{user_id}/profile:
     parameters:
       - name: user_id
@@ -309,7 +375,8 @@ paths:
       - name: user_id
         in: path
         description: "user id that wants to get the stream"
-        schema: {$ref: "#/components/schemas/UserID"}
+        schema:
+          $ref: "#/components/schemas/UserID"
         required: true
     get:
       tags: ["stream"]
@@ -321,8 +388,27 @@ paths:
           description: stream successfully retrieved
           content:
             application/json:
-              schema: {$ref: "#/components/schemas/Stream"}
-              example: {user_post: posts from user}
+              schema:
+                $ref: "#/components/schemas/Stream"
+        "400":
+          description: Bad Request - Invalid user id
+          content:
+            application/json:
+              example:
+                error: "Invalid user id"
+        "404":
+          description: Not Found - User not found or no posts in the stream
+          content:
+            application/json:
+              example:
+                error: "User not found or no posts available"
+        "500":
+          description: Internal Server Error - Unable to retrieve the stream
+          content:
+            application/json:
+              example:
+                error: "Unable to retrieve the stream due to server error"
+
   /profiles/{user_id}/likes/{photo_id}:
     parameters:
       - name: user_id
@@ -745,7 +831,114 @@ paths:
                   message:
                     type: string
                     example: "No comments found for this photo."
-       
+  
+  /profiles/{user_id}/following/{following_id}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { $ref: "#/components/schemas/UserID" }
+      - name: following_id
+        in: path
+        required: true
+        schema: { $ref: "#/components/schemas/UserID" }
+    put:
+      summary: Follow a user
+      description: Follow a user specified by the following_id.
+      responses:
+        '200':
+          description: Successfully followed the user
+        '400':
+          description: Invalid user_id or following_id
+        '401':
+          description: Unauthorized
+    delete:
+      summary: Unfollow a user
+      description: Unfollow a user specified by the following_id.
+      responses:
+        '200':
+          description: Successfully unfollowed the user
+        '400':
+          description: Invalid user_id or following_id
+        '401':
+          description: Unauthorized
+
+  /profiles/{user_id}/follow:
+    get:
+      summary: Retrieve all users that follow the specified user
+      description: Get a list of users that follow the user identified by the user_id.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: ID of the user whose followers are to be retrieved
+          schema: { $ref: "#/components/schemas/UserID" }
+      responses:
+        '200':
+          description: A list of users that follow the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/User" }
+        '400':
+          description: Invalid user_id supplied
+
+        '404':
+          description: User not found
+
+  /profiles/{user_id}/ban:
+    parameters:
+      - name: user_id
+        in: path
+        description: The user's ID whose ban list is to be retrieved
+        schema: {$ref: "#/components/schemas/UserID"}
+        required: true
+    get:
+      tags: ["action"]
+      operationId: getBanList
+      summary: Get a user's ban list
+      description: Retrieve the list of users banned by the specified user
+      responses:
+        "200":
+          description: Successfully retrieved the ban list
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Banned"}
+        "400":
+          description: Invalid request (e.g., invalid user_id)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Invalid user_id"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "User not found"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Internal server error"
+
 #COMPONENTS
 components:
   securitySchemes:

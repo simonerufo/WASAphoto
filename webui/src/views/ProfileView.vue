@@ -34,14 +34,14 @@ export default {
         if (response.status === 200) {
           console.log('User data:', response.data);
 
-          const { user, photos, followers, following } = response.data;
+          const { user, photos, followers, following, isFollowing } = response.data;
 
           this.user = user;
           this.username = user.username;
           this.inputValue = this.username;
           this.followersCount = followers;
           this.followingCount = following;
-
+          this.isFollowing = isFollowing;
           // Sort photos by timestamp (newest first)
           this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           this.postsCount = this.posts.length;
@@ -145,7 +145,25 @@ export default {
       } catch (e) {
         console.error('Failed to upload photo:', e);
       }
-    }
+    },
+    async toggleFollow() {
+      const path = `/profiles/${this.id}/following/${this.user.id}`;
+      const method = this.isFollowing ? 'DELETE' : 'PUT';
+    
+      try {
+        const response = await axios({
+          method,
+          url: path
+        });
+
+        if (response.status === (this.isFollowing ? 200 : 201)) {
+          this.isFollowing = !this.isFollowing;
+          this.followersCount += this.isFollowing ? 1 : -1;
+        }
+      } catch (e) {
+        console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
+      }
+    },
   },
   mounted() {
     this.getUser();
@@ -168,7 +186,13 @@ export default {
                    @blur="onBlur"
                    @keydown.enter="onEnter">
           </div>
-          <button class="btn btn-outline-primary follow-btn" v-if="!isFollowing" @click="toggleFollow">Follow</button>
+          <button class="btn btn-outline-primary follow-btn" 
+                  v-if="!isFollowing" 
+                  @click="toggleFollow">Follow</button>
+          <button class="btn btn-outline-secondary follow-btn" 
+                  v-else 
+                  @click="toggleFollow">Unfollow</button>
+          <!--<button class="btn btn-outline-primary follow-btn" v-if="!isFollowing" @click="toggleFollow">Follow</button>-->
           <button class="btn btn-outline-secondary follow-btn" v-else @click="toggleFollow">Unfollow</button>
           <button class="btn btn-outline-primary ban-btn" v-if="!isBanned" @click="toggleBan">Ban</button>
           <button class="btn btn-outline-secondary ban-btn" v-else @click="toggleBan">Unban</button>

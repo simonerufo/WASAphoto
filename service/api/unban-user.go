@@ -9,46 +9,50 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt _router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// getto i parametri dell'user che vuole fare l'unban e quelli dell'user che viene sbannato
-	user_id, err := strconv.Atoi(ps.ByName("user_id"))
+func (rt *_router) UnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Get the user_id and target_uid from the request parameters
+	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
 		http.Error(w, "Error while parsing from parameters user id", http.StatusBadRequest)
 		return
 	}
 
-	target_id, err := strconv.Atoi(ps.ByName("target_id"))
+	targetID, err := strconv.Atoi(ps.ByName("target_uid"))
 	if err != nil {
 		http.Error(w, "Error while parsing from parameters target id", http.StatusBadRequest)
 		return
 	}
 
-	if user_id == target_id {
-		http.Error(w, "Error while trying unban yourself", http.StatusBadRequest)
+	// Ensure the user is not trying to unban themselves
+	if userID == targetID {
+		http.Error(w, "Error while trying to unban yourself", http.StatusBadRequest)
 		return
 	}
 
-	isBanned, err := rt.db.GetBan(user_id, target_id)
+	// Check if the target user is banned by the user
+	isBanned, err := rt.db.GetBan(userID, targetID)
 	if err != nil {
-		http.Error(w, "Error while retrieving target id from db", http.StatusBadRequest)
+		http.Error(w, "Error while retrieving ban status from db", http.StatusInternalServerError)
 		return
 	}
+
 	if !isBanned {
-		http.Error(w, "Error while trying unban a user not banned", http.StatusBadRequest)
-	}
-
-	isAuth(w, r, user_id)
-
-	err = rt.db.UnbanUser(user_id, target_id)
-	if err != nil {
-		http.Error(w, "Error while trying to remove ban relation", http.StatusBadRequest)
+		http.Error(w, "Error while trying to unban a user not banned", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("user successfully unbanned\n")
-	//non puoi sbannare te stesso
-	//controlla se l'user da sbannare esiste
-	// auth
-	//db
-	// messaggio di successo
+	// Check if the user is authorized to perform this action
+	Auth(w,r)
+
+	// Remove the ban relationship from the database
+	err = rt.db.UnbanUser(userID, targetID)
+	if err != nil {
+		http.Error(w, "Error while trying to remove ban relation", http.StatusInternalServerError)
+		return
+	}
+
+	// Return success response
+	w.WriteHeader(http.StatusNoContent)
+	fmt.Println("User successfully unbanned")
 }
+

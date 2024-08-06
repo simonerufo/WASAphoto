@@ -7,6 +7,7 @@ export default {
       post: null,
       likeCount: 0,
       liked: false,
+      banned: false,
       commentText: '',
       comments: []
     };
@@ -31,6 +32,7 @@ export default {
           this.post = postData;
           this.likeCount = postData.likeCount || 0;
           this.liked = postData.liked || false;
+          this.banned = postData.banned || false;
         }
       } catch (e) {
         console.error('Failed to fetch post details:', e);
@@ -121,10 +123,35 @@ export default {
         console.error('Failed to remove comment:', e);
         alert('Failed to remove comment');
       }
+    },
+
+    async toggleBanUser() {
+      const targetUid = this.$route.params.user_id;
+      const userId = this.$route.params.current_user_id;
+
+      try {
+        if (this.banned) {
+          const response = await axios.delete(`/profiles/${userId}/bans/${targetUid}`);
+          if (response.status === 204) {
+            this.banned = false;
+            alert('User unbanned successfully');
+          }
+        } else {
+          const response = await axios.put(`/profiles/${userId}/bans/${targetUid}`);
+          if (response.status === 200) {
+            this.banned = true;
+            alert('User banned successfully');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to ban/unban user:', e);
+        alert('Failed to ban/unban user');
+      }
     }
   }
 };
 </script>
+
 
 
 <template>
@@ -138,6 +165,9 @@ export default {
         {{ liked ? 'Unlike' : 'Like' }} ({{ likeCount }})
       </button>
       <button @click="deletePost">Delete Post</button>
+      <button @click="toggleBanUser">
+        {{ banned ? 'Unban User' : 'Ban User' }}
+      </button>
     </div>
     <div>
       <h2>Comments</h2>
@@ -150,7 +180,6 @@ export default {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .post-details {

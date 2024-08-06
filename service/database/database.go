@@ -60,6 +60,8 @@ type AppDatabase interface {
 	UnbanUser(banning_id int, banned_id int) error
 	//checks if a user followed another user
 	GetFollow(following_id int, followed_id int) (bool, error)
+	//retrieves all users that followed the user with userID
+	GetFollowersForUser(userID int) ([]User, error)
 	//ban a user adding him in db
 	BanUser(banning_id int, banned_id int) error
 	//getting from db user profile using id
@@ -98,6 +100,8 @@ type AppDatabase interface {
 	GetPhotoIDFromComment(commentID int, userID int) (int, error)
 	// checks if a specific user owns the photo referred to a specific comment
 	CheckPhotoOwnership(commentID int, userID int) (bool, error)
+	// retrieves the ban list of a user
+	GetBanList(userID int) ([]int, error)
 
 	Ping() error
 }
