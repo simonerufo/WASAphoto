@@ -42,7 +42,6 @@ type Photo struct {
 	CommentCount int      `json:"commentCount"` // Number of comments
 	Liked       bool      `json:"liked"`       // Whether the photo is liked by the user
 	Caption     string    `json:"caption"`     // Caption for the photo
-	Time        string    `json:"time"`        // Publication time
 }
 
 type Profile struct {

@@ -69,7 +69,7 @@ type AppDatabase interface {
 	//getting from db user profile using username
 	GetUserProfileByUsername(username string) (Profile, error)
 	//retrieving the user stream
-	GetStream(user_id int) ([]Post, error)
+	GetStream(user_id int) ([]Photo, error)
 	//uploading a photo(post) into db
 	InsertPhoto(userID int, caption string, photo []byte) (int, error)
 	//checks if a photo exists in db

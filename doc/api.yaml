@@ -563,19 +563,6 @@ paths:
           description: Not found. The specified photo could not be found.
         "500":
           description: Internal server error. An error occurred on the server.
-           
- 
-    parameters:
-      - name: user_id
-        in: path
-        description: user id's that is going to receive a comment
-        schema: {$ref: "#/components/schemas/UserID"}
-        required: true
-      - name: target_photoid
-        in: path
-        description: photo id's that is receiving a comment
-        schema: {$ref: "#/components/schemas/PhotoID"}
-        required: true
     post:
       tags: ["action"]
       operationId: commentPhoto
@@ -605,6 +592,7 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/CommentID"}
               example: {comment_id: 7}
+  
   /profiles/{user_id}/comments/{photo_id}:
     parameters:
       - name: user_id
