@@ -10,32 +10,33 @@ func (rt *_router) Handler() http.Handler {
 	//login
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 
+	//username set/change
 	rt.router.PUT("/profiles/:user_id/username", rt.wrap(rt.setMyUsername))
 	//getting user profile
-	rt.router.GET("/profiles/:user_id/username",rt.wrap(rt.getProfileByUsername))
-	//search
+	rt.router.GET("/profile", rt.getProfileByUsername)
 	rt.router.GET("/profiles/:user_id/profile", rt.wrap(rt.getProfile))
-
+	//photo utility
 	rt.router.POST("/profiles/:user_id/profile", rt.wrap(rt.uploadPhoto))
 	rt.router.GET("/profiles/:user_id/photos/:photo_id", rt.wrap(rt.getPhoto))
 	rt.router.DELETE("/profiles/:user_id/photos/:photo_id",rt.wrap(rt.deletePhoto))
-
+	//photo likes
 	rt.router.PUT("/profiles/:user_id/likes/:photo_id", rt.wrap(rt.LikePhoto))
 	rt.router.GET("/photos/:photo_id/likes", rt.wrap(rt.GetPhotoLikes))
 	rt.router.DELETE("/profiles/:user_id/likes/:photo_id", rt.wrap(rt.RemoveLike))
-
+	//photo comments
 	rt.router.POST("/profiles/:user_id/comments/:photo_id", rt.wrap(rt.CommentPhoto))
 	rt.router.GET("/profiles/:user_id/photos/:photo_id/comments", rt.wrap(rt.GetPhotoComments))
 	rt.router.DELETE("/profiles/:user_id/comments/:comment_id", rt.wrap(rt.RemoveComment))
-
+	//follow
 	rt.router.PUT("/profiles/:user_id/following/:following_id", rt.wrap(rt.followUser))
 	rt.router.DELETE("/profiles/:user_id/following/:following_id", rt.wrap(rt.unfollowUser))
-	rt.router.GET("/profiles/:user_id/follow", rt.wrap(rt.GetFollowers))
-
+	rt.router.GET("/profiles/:user_id/followers", rt.wrap(rt.GetFollowers))
+	rt.router.GET("/profiles/:user_id/following", rt.GetFollowing)
+	//ban
 	rt.router.PUT("/profiles/:user_id/bans/:target_uid", rt.wrap(rt.BanUser))
 	rt.router.DELETE("/profiles/:user_id/bans/:target_uid", rt.wrap(rt.UnbanUser))
 	rt.router.GET("/profiles/:user_id/ban", rt.wrap(rt.GetBan))
-
+	//profile stream
 	rt.router.GET("/profiles/:user_id/stream", rt.GetMyStream)
 	//rt.router.GET("/", rt.getHelloWorld)
 	//rt.router.GET("/context", rt.wrap(rt.getContextReply))

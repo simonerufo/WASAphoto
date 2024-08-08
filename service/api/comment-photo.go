@@ -35,16 +35,16 @@ func (rt _router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	Auth(w, r)
 
 	// Check if the photo exists
-	isOnline, err := rt.db.CheckPhoto(userID, photoID)
-	if err != nil {
-		http.Error(w, "Error while checking if a photo is in db", http.StatusInternalServerError)
-		return
-	}
+	// isOnline, err := rt.db.CheckPhoto(userID, photoID)
+	// if err != nil {
+	// 	http.Error(w, "Error while checking if a photo is in db", http.StatusInternalServerError)
+	// 	return
+	// }
 
-	if !isOnline {
-		http.Error(w, "You can't comment on a post that does not exist", http.StatusNotFound)
-		return
-	}
+	// if !isOnline {
+	// 	http.Error(w, "You can't comment on a post that does not exist", http.StatusNotFound)
+	// 	return
+	// }
 
 	// Parse the comment text from the request body
 	var commentReq CommentRequest

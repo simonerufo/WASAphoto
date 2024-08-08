@@ -7,9 +7,9 @@ export default {
       post: null,
       likeCount: 0,
       liked: false,
-      banned: false,
       commentText: '',
-      comments: []
+      comments: [],
+      isOwner: false // To track if the current user owns the profile
     };
   },
   async mounted() {
@@ -17,6 +17,7 @@ export default {
     const userId = this.$route.params.user_id;
 
     try {
+      await this.checkOwnership(userId); // Check if the current user is the owner
       await this.fetchPostDetails(userId, postId);
       await this.fetchComments(userId, postId);
     } catch (e) {
@@ -24,6 +25,18 @@ export default {
     }
   },
   methods: {
+    async checkOwnership(profileUserId) {
+      try {
+        const response = await axios.get('/user/me'); // Endpoint to get current authenticated user
+        if (response.status === 200) {
+          const currentUser = response.data;
+          this.isOwner = currentUser.id === profileUserId; // Check if the current user is the profile owner
+        }
+      } catch (e) {
+        console.error('Failed to check ownership:', e);
+      }
+    },
+
     async fetchPostDetails(userId, postId) {
       try {
         const response = await axios.get(`/profiles/${userId}/photos/${postId}`);
@@ -32,7 +45,6 @@ export default {
           this.post = postData;
           this.likeCount = postData.likeCount || 0;
           this.liked = postData.liked || false;
-          this.banned = postData.banned || false;
         }
       } catch (e) {
         console.error('Failed to fetch post details:', e);
@@ -78,6 +90,11 @@ export default {
       const postId = this.$route.params.photo_id;
       const userId = this.$route.params.user_id;
 
+      if (!this.isOwner) {
+        alert('You do not have permission to delete this post');
+        return;
+      }
+
       try {
         const response = await axios.delete(`/profiles/${userId}/photos/${postId}`);
         if (response.status === 204) {
@@ -92,7 +109,7 @@ export default {
 
     async addComment() {
       const postId = this.$route.params.photo_id;
-      const userId = this.$route.params.user_id;
+      const userId = localStorage.getItem("id");
 
       try {
         const response = await axios.post(`/profiles/${userId}/comments/${postId}`, {
@@ -116,7 +133,6 @@ export default {
       try {
         const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
         if (response.status === 200) {
-          // Remove the comment from the list
           this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
         }
       } catch (e) {
@@ -124,35 +140,9 @@ export default {
         alert('Failed to remove comment');
       }
     },
-
-    async toggleBanUser() {
-      const targetUid = this.$route.params.user_id;
-      const userId = this.$route.params.current_user_id;
-
-      try {
-        if (this.banned) {
-          const response = await axios.delete(`/profiles/${userId}/bans/${targetUid}`);
-          if (response.status === 204) {
-            this.banned = false;
-            alert('User unbanned successfully');
-          }
-        } else {
-          const response = await axios.put(`/profiles/${userId}/bans/${targetUid}`);
-          if (response.status === 200) {
-            this.banned = true;
-            alert('User banned successfully');
-          }
-        }
-      } catch (e) {
-        console.error('Failed to ban/unban user:', e);
-        alert('Failed to ban/unban user');
-      }
-    }
   }
 };
 </script>
-
-
 
 <template>
   <div class="post-details">
@@ -164,19 +154,16 @@ export default {
       <button @click="toggleLikePhoto">
         {{ liked ? 'Unlike' : 'Like' }} ({{ likeCount }})
       </button>
-      <button @click="deletePost">Delete Post</button>
-      <button @click="toggleBanUser">
-        {{ banned ? 'Unban User' : 'Ban User' }}
-      </button>
+      <button v-if="isOwner" @click="deletePost">Delete Post</button>
     </div>
     <div>
       <h2>Comments</h2>
+      <textarea v-model="commentText" placeholder="Add a comment"></textarea>
+      <button @click="addComment">Post Comment</button>
     </div>
-    <textarea v-model="commentText" placeholder="Add a comment"></textarea>
-    <button @click="addComment">Post Comment</button>
     <div v-for="comment in comments" :key="comment.comment_id">
       <p><strong>{{ comment.username }}:</strong> {{ comment.comment_text }} <em>{{ comment.timestamp }}</em></p>
-      <button @click="removeComment(comment.comment_id)">Remove</button>
+      <button v-if="isOwner" @click="removeComment(comment.comment_id)">Remove</button>
     </div>
   </div>
 </template>

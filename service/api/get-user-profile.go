@@ -137,35 +137,37 @@ func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, 
 }
 */
 
-func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// Extract the username from the query parameters
-	username := r.URL.Query().Get("username")
-	if username == "" {
-		http.Error(w, "Username is required", http.StatusBadRequest)
-		return
-	}
+func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    // Extract the username from the query parameters
+    username := r.URL.Query().Get("username")
+    if username == "" {
+        http.Error(w, "Username is required", http.StatusBadRequest)
+        return
+    }
 
-	// Fetch the user profile by username
-	userProfile, err := rt.db.GetUserProfileByUsername(username)
-	if err != nil {
-		fmt.Printf("Error fetching user profile for username %s: %v\n", username, err)
-		http.Error(w, "Error fetching user profile", http.StatusInternalServerError)
-		return
-	}
+    // Fetch the user profile by username
+    userProfile, err := rt.db.GetUserProfileByUsername(username)
+    if err != nil {
+        fmt.Printf("Error fetching user profile for username %s: %v\n", username, err)
+        http.Error(w, "Error fetching user profile", http.StatusInternalServerError)
+        return
+    }
 
-	// Check if the user profile is empty
-	if userProfile.User.UserID == 0 {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
+    // Check if the user profile is empty
+    if userProfile.User.UserID == 0 {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
 
-	// Set response headers and encode the response
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(userProfile); err != nil {
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
-	}
+    // Set response headers and encode the response
+    w.Header().Set("Content-Type", "application/json")
+    if err := json.NewEncoder(w).Encode(userProfile); err != nil {
+        http.Error(w, "Error encoding response", http.StatusInternalServerError)
+        return
+    }
 
-	fmt.Printf("USER: %s\n", username)
+    fmt.Printf("USER: %s\n", username)
 }
+
+
 

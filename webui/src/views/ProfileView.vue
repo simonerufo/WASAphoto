@@ -1,5 +1,5 @@
 <script>
-import axios from '../services/axios';
+import axios, { Auth, getId } from '../services/axios'; // Adjust the path if needed
 
 export default {
   data() {
@@ -15,17 +15,18 @@ export default {
       followingCount: null,
       isInputEnabled: false,
       selectedPost: null,
-      followPath: null,
       createPost: false,
       posts: [],
       caption: '',
-      file: null
+      file: null,
+      isOwner: false // Track if the current user is the owner
     };
   },
   methods: {
     async getUser() {
       const path = `/profiles/${this.id}/profile`;
       console.log(`Fetching user profile from: ${path}`);
+
 
       try {
         const response = await axios.get(path);
@@ -34,14 +35,19 @@ export default {
         if (response.status === 200) {
           console.log('User data:', response.data);
 
-          const { user, photos, followers, following, isFollowing } = response.data;
-
+          const { user, photos, followers, following, isFollowing, isBanned } = response.data;
           this.user = user;
           this.username = user.username;
           this.inputValue = this.username;
           this.followersCount = followers;
           this.followingCount = following;
           this.isFollowing = isFollowing;
+          this.isBanned = isBanned;
+
+          // Check if the current user is the owner
+          this.isOwner = Number(getId()) === user.user_id;
+          console.log(getId(), user.user_id);
+          console.log(this.isOwner);
           // Sort photos by timestamp (newest first)
           this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           this.postsCount = this.posts.length;
@@ -84,7 +90,7 @@ export default {
         if (response.status === 200) {
           this.username = this.inputValue;
           this.user.username = this.inputValue;
-          localStorage["username"] = this.username;
+          localStorage.setItem("username", this.username);
         }
       } catch (e) {
         console.error('Failed to update profile:', e);
@@ -146,10 +152,11 @@ export default {
         console.error('Failed to upload photo:', e);
       }
     },
+
     async toggleFollow() {
       const path = `/profiles/${this.id}/following/${this.user.id}`;
       const method = this.isFollowing ? 'DELETE' : 'PUT';
-    
+
       try {
         const response = await axios({
           method,
@@ -171,7 +178,6 @@ export default {
 };
 </script>
 
-
 <template>
   <div class="container profile-page">
     <div class="row profile-header mt-4">
@@ -186,33 +192,39 @@ export default {
                    @blur="onBlur"
                    @keydown.enter="onEnter">
           </div>
-          <button class="btn btn-outline-primary follow-btn" 
-                  v-if="!isFollowing" 
-                  @click="toggleFollow">Follow</button>
-          <button class="btn btn-outline-secondary follow-btn" 
-                  v-else 
-                  @click="toggleFollow">Unfollow</button>
-          <!--<button class="btn btn-outline-primary follow-btn" v-if="!isFollowing" @click="toggleFollow">Follow</button>-->
-          <button class="btn btn-outline-secondary follow-btn" v-else @click="toggleFollow">Unfollow</button>
-          <button class="btn btn-outline-primary ban-btn" v-if="!isBanned" @click="toggleBan">Ban</button>
-          <button class="btn btn-outline-secondary ban-btn" v-else @click="toggleBan">Unban</button>
+
+          <!-- Conditional rendering based on ownership -->
+          <template v-if="isOwner">
+            <!-- Upload photo form -->
+            <div class="upload-form mt-4">
+              <input type="file" @change="onFileChange" />
+              <textarea v-model="caption" placeholder="Add a caption..."></textarea>
+              <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
+            </div>
+          </template>
+
+          <template v-else>
+            <!-- Follow and Ban buttons -->
+            <button v-if="!isFollowing" class="btn btn-outline-primary follow-btn" @click="toggleFollow">Follow</button>
+            <button v-else class="btn btn-outline-secondary follow-btn" @click="toggleFollow">Unfollow</button>
+
+            <button v-if="!isBanned" class="btn btn-outline-primary ban-btn" @click="toggleBan">Ban</button>
+            <button v-else class="btn btn-outline-secondary ban-btn" @click="toggleBan">Unban</button>
+          </template>
+
           <div class="stats mt-3">
             <span class="mr-3">posts: <strong>{{ postsCount }}</strong></span>
             <span class="mr-3">followers: <strong>{{ followersCount }}</strong></span>
             <span class="mr-3">following: <strong>{{ followingCount }}</strong></span>
           </div>
-          <div class="upload-form mt-4">
-            <input type="file" @change="onFileChange" />
-            <textarea v-model="caption" placeholder="Add a caption..."></textarea>
-            <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
-          </div>
         </div>
       </div>
     </div>
+
     <div class="tab-content" id="profileTabsContent">
       <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
         <div class="row mt-4">
-          <div v-for="post in posts" :key="post.id" class="col-md-4 mb-4">
+          <div v-for="post in posts" :key="post.photo_id" class="col-md-4 mb-4">
             <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
           </div>
         </div>
@@ -220,6 +232,7 @@ export default {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .profile-page {

@@ -63,8 +63,14 @@ export default {
 				</RouterLink>
 			  </li>
 			  <li class="nav-item">
+				<RouterLink to="/search" class="nav-link">
+				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#compass"/></svg>
+				  Search
+				</RouterLink>
+			  </li>
+			  <li class="nav-item">
 				<RouterLink :to="link" class="nav-link">
-				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#star"/></svg>
+				  <svg class="feather"><use href="/feather-sprite-v4.29.0.svg#image"/></svg>
 				  Profile: {{ username }}
 				</RouterLink>
 			  </li>
@@ -85,7 +91,6 @@ export default {
 	</div>
   </template>
   
-  <style>
-  /* Add styles as needed */
-  </style>
+<style>
+</style>
   

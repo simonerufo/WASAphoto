@@ -38,6 +38,29 @@ paths:
               schema: 
                 $ref: "#/components/schemas/UserID"
 
+  /profile:
+    parameters:
+      - name: username
+        in: query
+        description: the username of the user that is going to be retrieved
+        schema: { $ref: "#/components/schemas/Username" }
+        required: true
+    get:
+      summary: Get user profile by username
+      description: Retrieve the profile of a user by their username.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile"}
+        '400':
+          description: Bad request (e.g., missing or invalid parameters)
+        '404':
+          description: Profile not found
+        '500':
+          description: Internal server error
+
   /profiles/{user_id}/username:
     parameters:
       - name: user_id
@@ -851,7 +874,7 @@ paths:
         '401':
           description: Unauthorized
 
-  /profiles/{user_id}/follow:
+  /profiles/{user_id}/followers:
     get:
       summary: Retrieve all users that follow the specified user
       description: Get a list of users that follow the user identified by the user_id.
@@ -864,6 +887,29 @@ paths:
       responses:
         '200':
           description: A list of users that follow the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/User" }
+        '400':
+          description: Invalid user_id supplied
+
+        '404':
+          description: User not found
+  /profiles/{user_id}/following:
+    get:
+      summary: Retrieve all users that the user follows
+      description: Get a list of users that are followed by the user identified by the user_id.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: ID of the user whose followers are to be retrieved
+          schema: { $ref: "#/components/schemas/UserID" }
+      responses:
+        '200':
+          description: A list of users that are followed the specified user
           content:
             application/json:
               schema:

@@ -62,6 +62,8 @@ type AppDatabase interface {
 	GetFollow(following_id int, followed_id int) (bool, error)
 	//retrieves all users that followed the user with userID
 	GetFollowersForUser(userID int) ([]User, error)
+	//retrieves all followed user by using his userID
+	GetFollowingForUser(userID int) ([]User, error)
 	//ban a user adding him in db
 	BanUser(banning_id int, banned_id int) error
 	//getting from db user profile using id
