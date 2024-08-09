@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"fmt"
 	"strconv"
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
+
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -86,7 +86,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	fmt.Printf("id:%d, user:%s\n",token,userData.Username)
 }
 */
-func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var userData User
 	// Decode user data from body request
 	err := json.NewDecoder(r.Body).Decode(&userData)

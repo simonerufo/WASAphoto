@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) UnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) UnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get the user_id and target_uid from the request parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

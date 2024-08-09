@@ -8,6 +8,7 @@ export default {
       username: null,
       inputValue: '',
       id: this.$route.params.user_id,
+      currentUserId: Number(getId()), // Store the current user ID
       isFollowing: false,
       isBanned: false,
       postsCount: 0,
@@ -19,14 +20,14 @@ export default {
       posts: [],
       caption: '',
       file: null,
-      isOwner: false // Track if the current user is the owner
+      isOwner: false, // Track if the current user is the owner
+      errorMessage: '' // Error message for display
     };
   },
   methods: {
     async getUser() {
       const path = `/profiles/${this.id}/profile`;
       console.log(`Fetching user profile from: ${path}`);
-
 
       try {
         const response = await axios.get(path);
@@ -45,9 +46,8 @@ export default {
           this.isBanned = isBanned;
 
           // Check if the current user is the owner
-          this.isOwner = Number(getId()) === user.user_id;
-          console.log(getId(), user.user_id);
-          console.log(this.isOwner);
+          this.isOwner = this.currentUserId === user.user_id;
+
           // Sort photos by timestamp (newest first)
           this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           this.postsCount = this.posts.length;
@@ -63,6 +63,7 @@ export default {
         }
       } catch (e) {
         console.error('Failed to fetch user:', e);
+        this.errorMessage = 'Failed to fetch user profile. Please try again later.';
       }
     },
 
@@ -91,10 +92,12 @@ export default {
           this.username = this.inputValue;
           this.user.username = this.inputValue;
           localStorage.setItem("username", this.username);
+          this.errorMessage = ''; // Clear any previous error
         }
       } catch (e) {
         console.error('Failed to update profile:', e);
-        this.inputValue = this.username;
+        this.errorMessage = 'Failed to update profile. Please try again later.';
+        this.inputValue = this.username; // Revert to old username
       } finally {
         this.isInputEnabled = false;
       }
@@ -105,6 +108,7 @@ export default {
         this.$router.push({ path: `/profiles/${this.id}/photos/${post.photo_id}` });
       } else {
         console.error('Post ID is invalid', post);
+        this.errorMessage = 'Invalid post ID. Please try again.';
       }
     },
 
@@ -120,6 +124,11 @@ export default {
     },
 
     async uploadPhoto() {
+      if (!this.file) {
+        this.errorMessage = 'Please select a file to upload.';
+        return;
+      }
+
       const formData = new FormData();
       formData.append('image', this.file);
       formData.append('caption', this.caption);
@@ -133,28 +142,29 @@ export default {
 
         if (response.status === 201) {
           console.log(response.data);
-          const { photo_id } = response.data; // Ensure this field is returned from the backend
+          const { photo_id } = response.data;
 
           const post = {
-            photo_id, // Use the correct field name
+            photo_id,
             image: URL.createObjectURL(this.file),
             caption: this.caption,
             timestamp: new Date().toISOString()
           };
 
-          // Insert the new photo at the beginning of the array
           this.posts.unshift(post);
           this.postsCount++;
           this.caption = '';
           this.file = null;
+          this.errorMessage = ''; // Clear any previous error
         }
       } catch (e) {
         console.error('Failed to upload photo:', e);
+        this.errorMessage = 'Failed to upload photo. Please try again later.';
       }
     },
 
     async toggleFollow() {
-      const path = `/profiles/${this.id}/following/${this.user.id}`;
+      const path = `/profiles/${this.currentUserId}/following/${this.id}`;
       const method = this.isFollowing ? 'DELETE' : 'PUT';
 
       try {
@@ -166,11 +176,33 @@ export default {
         if (response.status === (this.isFollowing ? 200 : 201)) {
           this.isFollowing = !this.isFollowing;
           this.followersCount += this.isFollowing ? 1 : -1;
+          this.errorMessage = ''; // Clear any previous error
         }
       } catch (e) {
         console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
+        this.errorMessage = `Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user. Please try again later.`;
       }
     },
+
+    async toggleBan() {
+      const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
+      const method = this.isBanned ? 'DELETE' : 'PUT';
+
+      try {
+        const response = await axios({
+          method,
+          url: path
+        });
+
+        if (response.status === (this.isBanned ? 200 : 201)) {
+          this.isBanned = !this.isBanned;
+          this.errorMessage = ''; // Clear any previous error
+        }
+      } catch (e) {
+        console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e);
+        this.errorMessage = `Failed to ${this.isBanned ? 'unban' : 'ban'} user. Please try again later.`;
+      }
+    }
   },
   mounted() {
     this.getUser();
@@ -178,8 +210,14 @@ export default {
 };
 </script>
 
+
 <template>
   <div class="container profile-page">
+    <!-- Display Error Message -->
+    <div v-if="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+
     <div class="row profile-header mt-4">
       <div class="col-md-8">
         <div class="profile-details">
@@ -236,69 +274,114 @@ export default {
 
 <style scoped>
 .profile-page {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 800px; /* Container width */
+  margin: 0 auto; /* Center container horizontally */
+  font-family: 'Arial', sans-serif;
+  padding: 20px; /* Padding around the container */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
 }
 
 .profile-header {
+  width: 100%; /* Full width of the container */
+  max-width: 800px; /* Ensure it doesn't exceed the container's width */
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Stack profile details vertically */
+  align-items: center; /* Center profile details horizontally */
+  gap: 20px; /* Spacing between elements */
+  padding: 10px;
+  border: 1px solid #0033cc;
+  border-radius: 8px;
+  background: #e0e0e0;
+  box-shadow: 2px 2px 5px #888;
 }
 
 .profile-details {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid #000;
-  border-radius: 10px;
+  width: 100%; /* Full width within the profile header */
+  max-width: 600px; /* Limit width for better alignment */
+  text-align: center; /* Center text inside the profile details */
+}
+
+.profile-name-unselected,
+.profile-name-selected {
+  font-size: 18px; /* Font size for profile name */
+  font-weight: bold;
+  border: 1px solid #0033cc;
+  padding: 5px;
+  border-radius: 3px;
+  display: inline-block; /* Fit content width */
 }
 
 .profile-name-unselected {
-  font-size: 20px;
-  font-weight: bold;
-  border: 2px solid red;
-  background-color: #3CBC8D;
-  color: white;
+  background-color: #d0d0d0;
+  color: #000;
 }
 
 .profile-name-selected {
-  font-size: 20px;
-  font-weight: bold;
-  border: 2px solid green;
-  background-color: #3CBC8D;
-  color: white;
+  background-color: #a0a0a0;
+  color: #000;
 }
 
 .stats {
-  font-size: 16px;
+  font-size: 14px; /* Font size for stats */
+  color: #000;
+  margin-top: 10px;
+  text-align: center; /* Center text inside stats */
 }
 
 .upload-form {
+  width: 100%; /* Full width within the profile header */
+  max-width: 600px; /* Limit width for better alignment */
   margin-top: 20px;
+  background: #e0e0e0;
+  padding: 10px;
+  border: 1px solid #0033cc;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px #888;
 }
 
-.upload-form input[type="file"] {
-  margin-bottom: 10px;
+.upload-form input[type="file"],
+.upload-form textarea,
+.upload-form button {
+  display: block;
+  width: calc(100% - 22px); /* Full width minus padding */
+  margin: 0 auto 10px auto; /* Center elements horizontally */
+  border: 1px solid #0033cc;
+  border-radius: 3px;
 }
 
 .upload-form textarea {
-  width: 100%;
-  margin-bottom: 10px;
   padding: 5px;
+  background: #fff;
+  color: #000;
 }
 
 .upload-form button {
-  display: block;
-  width: 100%;
+  background: #0033cc;
+  color: #fff;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.upload-form button:hover {
+  background: #0055ff;
 }
 
 .photo {
+  border: 1px solid #0033cc;
+  border-radius: 3px;
   transition: filter 0.3s ease;
+  width: 100%; /* Ensure photos are responsive */
+  max-width: 100%; /* Prevent overflow */
 }
 
 .photo:hover {
-  filter: brightness(1.5);
+  filter: brightness(1.2);
 }
 </style>
+
+
+

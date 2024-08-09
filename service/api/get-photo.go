@@ -6,7 +6,6 @@ import(
     "time"
 	"strconv"
 	"github.com/julienschmidt/httprouter"
-    "git.simonerufo.it/WASAphoto/service/api/reqcontext"
 )
 /*
 func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -51,7 +50,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
     fmt.Printf("PHOTO: user_id=%d, photo_id=%d\n", userID, photoID)
 }
 */
-func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     // Extract the user ID and photo ID from the URL parameters
     userIDStr := ps.ByName("user_id")
     photoIDStr := ps.ByName("photo_id")

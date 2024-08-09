@@ -7,7 +7,6 @@ import (
 	"strconv"
 	
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 /*
@@ -69,7 +68,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 */
 
 
-func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Verifying the user authorization
 	_, err := Auth(w, r)
 	if err != nil {

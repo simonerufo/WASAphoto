@@ -6,11 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) LikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) LikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
 		http.Error(w, "Error while fetching user ID from parameters", http.StatusBadRequest)

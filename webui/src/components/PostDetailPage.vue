@@ -1,5 +1,5 @@
 <script>
-import axios from '../services/axios';
+import axios, { getId } from '../services/axios';
 
 export default {
   data() {
@@ -26,15 +26,9 @@ export default {
   },
   methods: {
     async checkOwnership(profileUserId) {
-      try {
-        const response = await axios.get('/user/me'); // Endpoint to get current authenticated user
-        if (response.status === 200) {
-          const currentUser = response.data;
-          this.isOwner = currentUser.id === profileUserId; // Check if the current user is the profile owner
-        }
-      } catch (e) {
-        console.error('Failed to check ownership:', e);
-      }
+      this.isOwner = getId() === profileUserId;
+      console.log(this.isOwner);
+      console.log(Number(getId()),profileUserId);
     },
 
     async fetchPostDetails(userId, postId) {
@@ -170,16 +164,81 @@ export default {
 
 <style scoped>
 .post-details {
+  max-width: 800px; /* Container width */
+  margin: 0 auto; /* Center container horizontally */
+  padding: 20px;
+  background-color: #d0d0d0; /* Light gray background color */
+  border: 1px solid #a0a0a0; /* Subtle border for classic look */
+  border-radius: 5px;
+  font-family: 'Arial', sans-serif;
   text-align: center;
+}
+
+.post-details h1 {
+  font-size: 24px;
+  color: #000;
+  margin-bottom: 20px;
 }
 
 .post-details img {
   max-width: 100%;
   height: auto;
+  border: 1px solid #a0a0a0;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.post-details p {
+  font-size: 16px;
+  color: #000;
+}
+
+button {
+  background-color: #0033cc; /* Classic blue button color */
+  color: #fff;
+  border: 1px solid #002a80; /* Darker blue border */
+  border-radius: 3px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px;
+  transition: background-color 0.3s; /* Smooth transition on hover */
+}
+
+button:hover {
+  background-color: #0055ff; /* Lighter blue on hover */
 }
 
 textarea {
   width: 100%;
   height: 100px;
+  padding: 5px;
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  background-color: #fff;
+  color: #000;
+}
+
+.comment {
+  background-color: #e0e0e0; /* Slightly lighter gray for comments */
+  border: 1px solid #a0a0a0;
+  border-radius: 3px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.comment p {
+  margin: 0;
+}
+
+.comment button {
+  background-color: #cc0000; /* Red color for remove button */
+  border: 1px solid #990000; /* Darker red border */
+}
+
+.comment button:hover {
+  background-color: #ff0000; /* Brighter red on hover */
 }
 </style>
+

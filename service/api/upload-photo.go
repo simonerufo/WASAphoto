@@ -8,11 +8,10 @@ import (
 	"time"
 	"strconv"
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Retrieve user ID from parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

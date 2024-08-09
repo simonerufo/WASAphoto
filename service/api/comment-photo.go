@@ -7,17 +7,13 @@ import (
 	"strconv"
 	"time"
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-type CommentRequest struct {
-	CommentText string `json:"comment_text"`
-}
 
 
 
-func (rt _router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt _router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get the params (user_id and photo_id)
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

@@ -72,26 +72,44 @@ export default {
         return "Unknown";
       }
     },
+    // async fetchUserPhotos() {
+    //   try {
+    //     this.userPhotos = []; // Clear previous photos
+    //     this.followedUsernames = {}; // Clear previous usernames
+
+    //     // Fetch the stream for the main user
+    //     console.log(`Fetching photos for main user ID ${this.userID}`);
+    //     const path = `/profiles/${this.userID}/stream`;
+    //     const response = await axios.get(path);
+
+    //     // Ensure the response is in JSON format
+    //     if (response.data) {
+    //       // Assume photos contain image URLs or base64 data
+    //       this.userPhotos = response.data;
+
+    //       // Fetch usernames for each photo
+    //       for (let photo of this.userPhotos) {
+    //         const username = await this.fetchUsername(photo.user_id);
+    //         this.followedUsernames = { ...this.followedUsernames, [photo.user_id]: username };
+    //       }
+    //     } else {
+    //       console.warn(`Unexpected data format for the main user ${this.currentUsername}:`, response.data);
+    //     }
+    //   } catch (e) {
+    //     this.errormsg = e.toString();
+    //   }
+    // },
     async fetchUserPhotos() {
       try {
-        this.userPhotos = []; // Clear previous photos
-        this.followedUsernames = {}; // Clear previous usernames
-
-        // Fetch the stream for the main user
-        console.log(`Fetching photos for main user ID ${this.userID}`);
+        this.userPhotos = [];
+        this.followedUsernames = {};
+        
         const path = `/profiles/${this.userID}/stream`;
         const response = await axios.get(path);
-        console.log(`Response data for main user ID ${this.userID}:`, response.data);
-
-        // Check the structure of response.data
-        if (Array.isArray(response.data)) {
+        
+        if (response.data) {
+          console.log('API Response:', response.data);
           this.userPhotos = response.data;
-
-          // Fetch usernames for each photo
-          for (let photo of this.userPhotos) {
-            const username = await this.fetchUsername(photo.user_id);
-            this.followedUsernames = { ...this.followedUsernames, [photo.user_id]: username };
-          }
         } else {
           console.warn(`Unexpected data format for the main user ${this.currentUsername}:`, response.data);
         }
@@ -99,12 +117,26 @@ export default {
         this.errormsg = e.toString();
       }
     },
+
+    onImageError(photoId) {
+      console.error(`Failed to load image for photo ID: ${photoId}`);
+      // Optional: Set a placeholder image URL or a default image
+      this.userPhotos = this.userPhotos.map(photo => {
+        if (photo.photo_id === photoId) {
+          // Make sure the path to 'filler.jpg' is correct
+          photo.image = 'filler.jpg'; 
+        }
+        return photo;
+      });
+    }
+
   },
   async mounted() {
     await this.refresh();
   },
 };
 </script>
+
 
 <template>
   <div class="stream-page">
@@ -118,9 +150,9 @@ export default {
 
     <div v-if="userPhotos.length > 0">
       <div v-for="photo in userPhotos" :key="photo.photo_id" class="col-md-4 mb-4">
-        <img :src="photo.image" class="img-fluid photo" :alt="followedUsernames[photo.user_id] || 'User photo'" @error="handleImageError">
+        <img :src="photo.image" alt="Photo" class="photo" @error="onImageError(photo.photo_id)">
         <div class="photo-info">
-          <p class="photo-username"><strong>{{ followedUsernames[photo.user_id] || 'Loading...' }}</strong> </p>
+          <p class="photo-username"><strong>{{ followedUsernames[photo.user_id] || 'Loading...' }}</strong></p>
           <p class="photo-timestamp"><strong>Timestamp:</strong> {{ formatTimestamp(photo.timestamp) }}</p>
           <p class="photo-caption"><strong>Caption:</strong> {{ photo.caption }}</p>
         </div>
@@ -129,6 +161,8 @@ export default {
     <div v-else>No photos available.</div>
   </div>
 </template>
+
+
 
 <style>
 .photo {

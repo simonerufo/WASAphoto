@@ -5,11 +5,10 @@ import(
 	"strings"
 	"encoding/json"
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     // Retrieve photo ID from parameters
     photoID, err := strconv.Atoi(ps.ByName("photo_id"))
     if err != nil {

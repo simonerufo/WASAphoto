@@ -41,6 +41,11 @@ type Comment struct {
 	Timestamp   string `json:"timestamp"`
 }
 
+type CommentRequest struct {
+	CommentText string `json:"comment_text"`
+}
+
+
 func encodeToBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }

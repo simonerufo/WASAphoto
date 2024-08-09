@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"git.simonerufo.it/WASAphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt _router) RemoveLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt _router) RemoveLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Extract user_id from the URL parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
