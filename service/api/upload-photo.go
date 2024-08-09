@@ -20,7 +20,11 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Auth check
-	Auth(w, r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	// Parse the multipart form with a maximum file size limit
 	err = r.ParseMultipartForm(16 << 20) // max 16 MB

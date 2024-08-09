@@ -53,8 +53,8 @@ export default {
 		<nav id="sidebarMenu" v-if="!isSessionPage" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
 		  <div class="position-sticky pt-3 sidebar-sticky">
 			<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-			  <span>General</span>
-			</h6>
+			  <!-- <span>** MENU **</span> -->
+			</h6> 
 			<ul class="nav flex-column">
 			  <li class="nav-item">
 				<RouterLink to="/home" class="nav-link">
@@ -92,46 +92,137 @@ export default {
   </template>
   
   <style scoped>
-  .profile-page {
-	max-width: 800px; /* Container width */
-	margin: 0 auto; /* Center container horizontally */
+  /* General Container */
+  .container-fluid {
+	background-color: #f0f0f0; /* Light grey background to match profile page */
 	font-family: 'Arial', sans-serif;
-	padding: 20px; /* Padding around the container */
+  }
+  
+  /* Sidebar Styling */
+  #sidebarMenu {
+	background: #e0e0e0; /* Match profile page background */
+	border-right: 1px solid #0033cc; /* Consistent border color */
+	box-shadow: 2px 0 5px #888; /* Subtle shadow for sidebar */
+	padding: 10px;
+  }
+  
+  .sidebar-sticky {
+	position: relative;
+  }
+  
+  .sidebar-heading {
+	font-size: 14px;
+	font-weight: bold;
+	color: #0033cc;
+	text-transform: uppercase;
+	padding: 10px;
+	background-color: #d0d0d0; /* Light gray for the sidebar heading */
+	border-bottom: 1px solid #0033cc;
+	border-radius: 3px;
+	text-align: center;
+  }
+  
+  .nav-item .nav-link {
+	color: #000;
+	font-weight: bold;
+	background-color: #d0d0d0;
+	margin: 5px 0;
+	padding: 8px 15px;
+	border-radius: 3px;
+	text-align: left;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	border: 1px solid #0033cc;
+	box-shadow: 2px 2px 5px #888;
+  }
+  
+  .nav-item .nav-link:hover {
+	background-color: #a0a0a0;
+	box-shadow: 2px 2px 5px #666;
+  }
+  
+  .nav-item .logout-button {
+	color: #fff;
+	font-weight: bold;
+	background-color: #d9534f; /* Bootstrap danger color */
+	margin: 5px 0;
+	padding: 8px 15px;
+	border-radius: 3px;
+	text-align: left;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	border: 1px solid #d9534f;
+	box-shadow: 2px 2px 5px #888;
+  }
+  
+  .nav-item .logout-button:hover {
+	background-color: #c9302c; /* Darker shade on hover */
+	box-shadow: 2px 2px 5px #666;
+  }
+  
+  /* Header Styling */
+  .navbar {
+	background-color: #0033cc; /* Dark blue for the header */
+	border-bottom: 1px solid #0033cc;
+	box-shadow: 0 2px 5px #888;
+	padding: 10px 15px;
+  }
+  
+  .navbar-brand {
+	color: #fff;
+	font-family: 'Arial', sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+  }
+  
+  .navbar-toggler-icon {
+	filter: invert(100%);
+  }
+  
+  /* Main Content Area */
+  .main {
+	background-color: #f0f0f0; /* Light grey background for consistency */
+	padding: 20px;
+	border-left: 1px solid #0033cc;
+  }
+  
+  /* Profile Page Style (unchanged) */
+  .profile-page {
+	max-width: 800px;
+	margin: 0 auto;
+	font-family: 'Arial', sans-serif;
+	padding: 20px;
 	display: flex;
 	flex-direction: column;
-	align-items: center; /* Center content horizontally */
-	background-color: #d0d0d0; /* Light gray background color */
-	border: 1px solid #a0a0a0; /* Optional: subtle border for a more classic look */
+	align-items: center;
   }
   
   .profile-header {
-	width: 100%; /* Full width of the container */
-	max-width: 800px; /* Ensure it doesn't exceed the container's width */
+	width: 100%;
+	max-width: 800px;
 	display: flex;
-	flex-direction: column; /* Stack profile details vertically */
-	align-items: center; /* Center profile details horizontally */
-	gap: 20px; /* Spacing between elements */
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
 	padding: 10px;
 	border: 1px solid #0033cc;
 	border-radius: 8px;
-	background: #e0e0e0; /* Slightly lighter gray for contrast */
+	background: #e0e0e0;
 	box-shadow: 2px 2px 5px #888;
   }
   
   .profile-details {
-	width: 100%; /* Full width within the profile header */
-	max-width: 600px; /* Limit width for better alignment */
-	text-align: center; /* Center text inside the profile details */
+	width: 100%;
+	max-width: 600px;
+	text-align: center;
   }
   
   .profile-name-unselected,
   .profile-name-selected {
-	font-size: 18px; /* Font size for profile name */
+	font-size: 18px;
 	font-weight: bold;
 	border: 1px solid #0033cc;
 	padding: 5px;
 	border-radius: 3px;
-	display: inline-block; /* Fit content width */
+	display: inline-block;
   }
   
   .profile-name-unselected {
@@ -145,17 +236,17 @@ export default {
   }
   
   .stats {
-	font-size: 14px; /* Font size for stats */
+	font-size: 14px;
 	color: #000;
 	margin-top: 10px;
-	text-align: center; /* Center text inside stats */
+	text-align: center;
   }
   
   .upload-form {
-	width: 100%; /* Full width within the profile header */
-	max-width: 600px; /* Limit width for better alignment */
+	width: 100%;
+	max-width: 600px;
 	margin-top: 20px;
-	background: #e0e0e0; /* Slightly lighter gray for contrast */
+	background: #e0e0e0;
 	padding: 10px;
 	border: 1px solid #0033cc;
 	border-radius: 8px;
@@ -166,8 +257,8 @@ export default {
   .upload-form textarea,
   .upload-form button {
 	display: block;
-	width: calc(100% - 22px); /* Full width minus padding */
-	margin: 0 auto 10px auto; /* Center elements horizontally */
+	width: calc(100% - 22px);
+	margin: 0 auto 10px auto;
 	border: 1px solid #0033cc;
 	border-radius: 3px;
   }
@@ -195,14 +286,12 @@ export default {
 	border: 1px solid #0033cc;
 	border-radius: 3px;
 	transition: filter 0.3s ease;
-	width: 100%; /* Ensure photos are responsive */
-	max-width: 100%; /* Prevent overflow */
+	width: 100%;
+	max-width: 100%;
   }
   
   .photo:hover {
 	filter: brightness(1.2);
   }
   </style>
-  
-  
   

@@ -35,7 +35,9 @@ func (rt *_router) Handler() http.Handler {
 	//ban
 	rt.router.PUT("/profiles/:user_id/bans/:target_uid", rt.BanUser)
 	rt.router.DELETE("/profiles/:user_id/bans/:target_uid", rt.UnbanUser)
-	rt.router.GET("/profiles/:user_id/ban", rt.GetBan)
+	rt.router.GET("/profiles/:user_id/bans/:target_uid", rt.GetBan)
+	rt.router.GET("/profiles/:user_id/ban", rt.GetBanList)
+
 	//profile stream
 	rt.router.GET("/profiles/:user_id/stream", rt.GetMyStream)
 	//rt.router.GET("/", rt.getHelloWorld)

@@ -53,7 +53,11 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Authentication check
-	Auth(w,r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	// Removing the follow relation from database
 	err = rt.db.UnfollowUser(current_user.UserID, target_user.UserID)

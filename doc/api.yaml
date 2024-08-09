@@ -324,6 +324,49 @@ paths:
                     type: string
               example:
                 error: "Internal server error"
+    get:
+      tags: ["action"]
+      operationId: getBan
+      summary: get the user who banned another user
+      responses:
+        "200": 
+          description: user successfully retrieved
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/User"}
+        "400":
+          description: Invalid request (e.g., invalid user_id or target_uid)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Invalid user_id or target_uid"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "User not found"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "Internal server error"
 
   /profiles/{user_id}/profile:
     parameters:
@@ -347,6 +390,8 @@ paths:
                         photos: profile_posts, followers: 500, following: 30}
         "404":
           description: user not found
+        "500":
+          description: internal server error
   
   /profiles/{user_id}/photos:
     post:
@@ -376,22 +421,6 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
-
-  # /profiles/{user_id}/photos/{photo_id}:
-  #   parameters:
-  #     - name: user_id
-  #       in: path
-  #       description: ID of the user whose photo is being retrieved
-  #       required: true
-  #       schema:
-  #         $ref: "#/components/schemas/UserID"
-  #     - name: photo_id
-  #       in: path
-  #       description: ID of the photo to retrieve
-  #       required: true
-  #       schema:
-  #         $ref: "#/components/schemas/PhotoID"
-    
 
   /profiles/{user_id}/stream:
     parameters:
@@ -897,6 +926,7 @@ paths:
 
         '404':
           description: User not found
+ 
   /profiles/{user_id}/following:
     get:
       summary: Retrieve all users that the user follows

@@ -22,7 +22,11 @@ func (rt *_router) LikePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	Auth(w,r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	ownerID, err := rt.db.GetPhotoOwner(targetPhotoID)
 	if err != nil {

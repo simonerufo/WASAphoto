@@ -25,7 +25,11 @@ func (rt _router) RemoveComment(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Check if the user is authenticated
-	Auth(w, r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	
 	// check if user owns the photo associated with the given comment ID

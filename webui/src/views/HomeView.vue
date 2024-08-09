@@ -10,7 +10,7 @@ export default {
       userID: 0,
       userPhotos: [], // This will hold the photos from the main user
       followedUsers: [], // List of users followed by the main user
-      followedUsernames: {} // Mapping of user IDs to usernames
+      followedUsernames: {}, // Mapping of user IDs to usernames
     };
   },
   methods: {
@@ -29,25 +29,28 @@ export default {
       }
       this.loading = false;
     },
+
     formatTimestamp(timestamp) {
       const date = new Date(timestamp);
       const options = {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       };
-      return date.toLocaleDateString('en-US', options);
+      return date.toLocaleDateString("en-US", options);
     },
     sortPhotosByTimestamp() {
-      this.userPhotos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      this.userPhotos.sort(
+        (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+      );
     },
     async fetchUserInfo() {
       try {
         this.userID = localStorage.getItem("id");
-        this.currentUsername = localStorage.getItem('username');
+        this.currentUsername = localStorage.getItem("username");
         await this.fetchFollowedUsers(this.userID); // Fetch followed users
       } catch (e) {
         this.errormsg = e.toString();
@@ -72,71 +75,60 @@ export default {
         return "Unknown";
       }
     },
-    // async fetchUserPhotos() {
-    //   try {
-    //     this.userPhotos = []; // Clear previous photos
-    //     this.followedUsernames = {}; // Clear previous usernames
-
-    //     // Fetch the stream for the main user
-    //     console.log(`Fetching photos for main user ID ${this.userID}`);
-    //     const path = `/profiles/${this.userID}/stream`;
-    //     const response = await axios.get(path);
-
-    //     // Ensure the response is in JSON format
-    //     if (response.data) {
-    //       // Assume photos contain image URLs or base64 data
-    //       this.userPhotos = response.data;
-
-    //       // Fetch usernames for each photo
-    //       for (let photo of this.userPhotos) {
-    //         const username = await this.fetchUsername(photo.user_id);
-    //         this.followedUsernames = { ...this.followedUsernames, [photo.user_id]: username };
-    //       }
-    //     } else {
-    //       console.warn(`Unexpected data format for the main user ${this.currentUsername}:`, response.data);
-    //     }
-    //   } catch (e) {
-    //     this.errormsg = e.toString();
-    //   }
-    // },
     async fetchUserPhotos() {
       try {
-        this.userPhotos = [];
-        this.followedUsernames = {};
-        
+        this.userPhotos = []; // Clear previous photos
+        this.followedUsernames = {}; // Clear previous usernames
+
+        // Fetch the stream for the main user
         const path = `/profiles/${this.userID}/stream`;
         const response = await axios.get(path);
-        
+
         if (response.data) {
-          console.log('API Response:', response.data);
-          this.userPhotos = response.data;
+          this.userPhotos = response.data.map((photo) => {
+            // Ensure each photo image has the correct data URL prefix
+            if (photo.image && !photo.image.startsWith("data:image")) {
+              photo.image = `data:image/jpeg;base64,${photo.image}`;
+            }
+            return photo;
+          });
+
+          // Fetch usernames for each photo
+          for (let photo of this.userPhotos) {
+            const username = await this.fetchUsername(photo.user_id);
+            this.followedUsernames = {
+              ...this.followedUsernames,
+              [photo.user_id]: username,
+            };
+          }
         } else {
-          console.warn(`Unexpected data format for the main user ${this.currentUsername}:`, response.data);
+          console.warn(
+            `Unexpected data format for the main user ${this.currentUsername}:`,
+            response.data
+          );
         }
       } catch (e) {
         this.errormsg = e.toString();
       }
     },
-
     onImageError(photoId) {
       console.error(`Failed to load image for photo ID: ${photoId}`);
-      // Optional: Set a placeholder image URL or a default image
-      this.userPhotos = this.userPhotos.map(photo => {
+      // Use a placeholder image from Bootstrap as filler
+      this.userPhotos = this.userPhotos.map((photo) => {
         if (photo.photo_id === photoId) {
-          // Make sure the path to 'filler.jpg' is correct
-          photo.image = 'filler.jpg'; 
+          photo.image =
+            //"https://via.placeholder.com/150?text=No+Image"; // Bootstrap placeholder image
+            "https://loremflickr.com/320/240"
         }
         return photo;
       });
-    }
-
+    },
   },
   async mounted() {
     await this.refresh();
   },
 };
 </script>
-
 
 <template>
   <div class="stream-page">
@@ -148,13 +140,32 @@ export default {
 
     <div v-if="loading">Loading...</div>
 
-    <div v-if="userPhotos.length > 0">
-      <div v-for="photo in userPhotos" :key="photo.photo_id" class="col-md-4 mb-4">
-        <img :src="photo.image" alt="Photo" class="photo" @error="onImageError(photo.photo_id)">
+    <div v-if="userPhotos.length > 0" class="photo-grid">
+      <div v-for="photo in userPhotos" :key="photo.photo_id" class="photo-card">
+        <!-- RouterLink for the image -->
+        <RouterLink :to="`/profiles/${photo.user_id}/photos/${photo.photo_id}`">
+          <img
+            :src="photo.image"
+            alt="Photo"
+            class="photo"
+            @error="onImageError(photo.photo_id)"
+          />
+        </RouterLink>
+        
+        <!-- Photo information -->
         <div class="photo-info">
-          <p class="photo-username"><strong>{{ followedUsernames[photo.user_id] || 'Loading...' }}</strong></p>
-          <p class="photo-timestamp"><strong>Timestamp:</strong> {{ formatTimestamp(photo.timestamp) }}</p>
-          <p class="photo-caption"><strong>Caption:</strong> {{ photo.caption }}</p>
+          <!-- RouterLink for the username -->
+          <RouterLink :to="`/profiles/${photo.user_id}/profile`" class="photo-username">
+            <strong>{{ followedUsernames[photo.user_id] || "Loading..." }}</strong>
+          </RouterLink>
+          
+          <!-- Timestamp and caption -->
+          <p class="photo-timestamp">
+            <strong>Timestamp:</strong> {{ formatTimestamp(photo.timestamp) }}
+          </p>
+          <p class="photo-caption">
+            <strong>Caption:</strong> {{ photo.caption }}
+          </p>
         </div>
       </div>
     </div>
@@ -163,19 +174,62 @@ export default {
 </template>
 
 
+<style scoped>
+.stream-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
 
-<style>
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+.photo-card {
+  width: 300px;
+  background: #e0e0e0;
+  border: 1px solid #0033cc;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px #888;
+  padding: 10px;
+  text-align: center;
+}
+
 .photo {
   width: 100%;
   height: auto;
   object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid #0033cc;
 }
+
 .photo-info {
   margin-top: 10px;
 }
+
 .photo-username,
 .photo-timestamp,
 .photo-caption {
   margin: 5px 0;
+}
+
+.photo-username {
+  display: block;
+  color: #0033cc;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.photo-username:hover {
+  text-decoration: underline;
 }
 </style>

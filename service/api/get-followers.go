@@ -16,6 +16,12 @@ func (rt *_router) GetFollowers(w http.ResponseWriter, r *http.Request, ps httpr
         return
     }
 
+    _, err = Auth(w, r)
+    if err != nil {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+
     // Retrieve the list of followers for the specified user
     followers, err := rt.db.GetFollowersForUser(userID)
     if err != nil {

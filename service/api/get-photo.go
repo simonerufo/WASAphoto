@@ -55,8 +55,6 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
     userIDStr := ps.ByName("user_id")
     photoIDStr := ps.ByName("photo_id")
 
-    // Log the received parameters
-    fmt.Printf("Received GET request with user_id=%s and photo_id=%s\n", userIDStr, photoIDStr)
     
     // Convert userID and photoID to integers
     userID, err := strconv.Atoi(userIDStr)
@@ -73,20 +71,21 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
         return
     }
 
-    // Log the converted IDs
-    fmt.Printf("Converted user_id=%d and photo_id=%d\n", userID, photoID)
+    _,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+        return
+	}
     
     // Fetch the photo details from the database
     photoData, err := rt.db.GetPhoto(userID, photoID)
     if err != nil {
-        fmt.Printf("Error fetching photo for user_id=%d and photo_id=%d: %v\n", userID, photoID, err)
         http.Error(w, "Error fetching photo", http.StatusInternalServerError)
         return
     }
 
     // Check if the photo is found
     if photoData == nil {
-        fmt.Printf("Photo not found for user_id=%d and photo_id=%d\n", userID, photoID)
         http.Error(w, "Photo not found", http.StatusNotFound)
         return
     }
@@ -104,8 +103,6 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
         Liked:       false, 
     }
 
-    // Log the retrieved photo details
-    fmt.Printf("Retrieved photo: %+v\n", photo)
 
     // Set response headers and encode the response
     w.Header().Set("Content-Type", "application/json")

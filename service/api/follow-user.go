@@ -41,7 +41,11 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Authentication check
-	Auth(w,r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	// Adding the follow relation into database
 	err = rt.db.FollowUser(current_user.UserID, target_user.UserID)

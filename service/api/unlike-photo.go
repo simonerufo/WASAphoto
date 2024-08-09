@@ -24,7 +24,11 @@ func (rt _router) RemoveLike(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Check if the user is authenticated
-	Auth(w,r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	// Retrieve the owner_id from the database (needed for deleting the like)
 	ownerID, err := rt.db.GetPhotoOwner(photoID)

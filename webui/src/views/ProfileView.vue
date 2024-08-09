@@ -1,5 +1,5 @@
 <script>
-import axios, { Auth, getId } from '../services/axios'; // Adjust the path if needed
+import axios, { getId } from '../services/axios'; // Adjust the path if needed
 
 export default {
   data() {
@@ -25,10 +25,68 @@ export default {
     };
   },
   methods: {
+    async checkIfFollowing() {
+      // The ID of the profile the current user is visiting
+      const profileUserId = this.id
+
+      // Get the current user's ID from localStorage
+      const currentUserId = getId();
+
+      try {
+        // Make a request to fetch the list of users that the current user follows
+        const response = await axios.get(`/profiles/${currentUserId}/following`);
+
+        if (response.status === 200) {
+          const followedUsers = response.data || [];
+
+          // Extract only the user_ids from the followed users
+          const followedUserIds = followedUsers.map(user => user.user_id);
+
+          // Check if the profileUserId is in the list of followed user_ids
+          this.isFollowing = followedUserIds.includes(Number(profileUserId));
+
+          console.log(`Is following: ${this.isFollowing}`);
+        } else {
+          console.warn(`Unexpected response status ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error checking if the user is following the profile:", error);
+      }
+    },
+
+    async checkIfBanned() {
+      const profileUserId = this.id;
+      const currentUserId = getId();
+
+      try {
+        const response = await axios.get(`profiles/${currentUserId}/ban`);
+
+        if (response.status === 200) {
+          const bannedUserIDs = response.data.banned_user_ids;
+
+          console.log("Response Data:", bannedUserIDs);
+
+          // Ensure bannedUserIDs is an array before using .some()
+          if (Array.isArray(bannedUserIDs)) {
+            this.isBanned = bannedUserIDs.some(bannedId => Number(bannedId) === Number(profileUserId));
+          } else {
+            console.warn("bannedUserIDs is not an array:", bannedUserIDs);
+            this.isBanned = false;
+          }
+
+          console.log("isBanned:", this.isBanned);
+        } else {
+          console.warn(`Unexpected response status ${response.status}`);
+        }
+      } catch (error) {
+        console.error("Error checking if the user is banned:", error);
+      }
+    },
+
+
     async getUser() {
       const path = `/profiles/${this.id}/profile`;
       console.log(`Fetching user profile from: ${path}`);
-
       try {
         const response = await axios.get(path);
         console.log(`Response status: ${response.status}`);
@@ -47,7 +105,8 @@ export default {
 
           // Check if the current user is the owner
           this.isOwner = this.currentUserId === user.user_id;
-
+          this.checkIfFollowing();
+          this.checkIfBanned();
           // Sort photos by timestamp (newest first)
           this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           this.postsCount = this.posts.length;
@@ -66,6 +125,8 @@ export default {
         this.errorMessage = 'Failed to fetch user profile. Please try again later.';
       }
     },
+
+    
 
     enableInput() {
       this.isInputEnabled = true;
@@ -92,11 +153,11 @@ export default {
           this.username = this.inputValue;
           this.user.username = this.inputValue;
           localStorage.setItem("username", this.username);
-          this.errorMessage = ''; // Clear any previous error
+          this.errorMessage = '';
         }
       } catch (e) {
         console.error('Failed to update profile:', e);
-        this.errorMessage = 'Failed to update profile. Please try again later.';
+        this.errorMessage = "Failed to update profile: the username must be long 3 to 16 chars";
         this.inputValue = this.username; // Revert to old username
       } finally {
         this.isInputEnabled = false;
@@ -176,7 +237,7 @@ export default {
         if (response.status === (this.isFollowing ? 200 : 201)) {
           this.isFollowing = !this.isFollowing;
           this.followersCount += this.isFollowing ? 1 : -1;
-          this.errorMessage = ''; // Clear any previous error
+          this.errorMessage = '';
         }
       } catch (e) {
         console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
@@ -184,25 +245,97 @@ export default {
       }
     },
 
+    // async toggleBan() {
+    //   const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
+    //   const method = this.isBanned ? 'DELETE' : 'PUT';
+    //   const followPath = `/profiles/${this.currentUserId}/following/${this.id}`;
+    //   const followMethod = 'DELETE';
+
+    //   try {
+    //     // Make the ban request
+    //     const banResponse = await axios({
+    //       method,
+    //       url: path
+    //     });
+    
+    //     if (banResponse.status === (this.isBanned ? 200 : 201)) {
+    //       this.isBanned = !this.isBanned;
+    //       this.errorMessage = '';
+
+    //       // If the user was banned, remove the follow relationship
+    //       if (this.isBanned) {
+    //         try {
+    //           console.log("BANNED");
+    //           const followResponse = await axios({
+    //             method: followMethod,
+    //             url: followPath
+    //           });
+
+    //           if (followResponse.status === 200) {
+    //             console.log("UNFOLLOWED")
+    //             this.isFollowing = false;
+    //             this.followersCount--;
+    //             console.log('Successfully unfollowed the user');
+    //           } else {
+    //             console.warn(`Unexpected response status from unfollow API: ${followResponse.status}`);
+    //           }
+    //         } catch (error) {
+    //           console.error('Error removing follow relationship:', error);
+    //           this.errorMessage = 'Failed to unfollow user after banning.';
+    //         }
+    //       }
+    //     }
+    //   } catch (e) {
+    //     console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e);
+    //     this.errorMessage = `Failed to ${this.isBanned ? 'unban' : 'ban'} user. Please try again later.`;
+    //   }
+    // }
     async toggleBan() {
+      
       const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
       const method = this.isBanned ? 'DELETE' : 'PUT';
+      const followPath = `/profiles/${this.id}/following/${this.currentUserId}`;
+      const followMethod = 'DELETE';
 
       try {
-        const response = await axios({
+        // Make the ban request
+        const banResponse = await axios({
           method,
           url: path
         });
-
-        if (response.status === (this.isBanned ? 200 : 201)) {
+        console.log(banResponse.status);
+        if (banResponse.status === 200) {
+          // Update the banned status immediately
+          
           this.isBanned = !this.isBanned;
-          this.errorMessage = ''; // Clear any previous error
+          this.errorMessage = '';
+
+          // If the user was banned, remove the follow relationship
+          if (this.isBanned) {
+            try {
+              const followResponse = await axios({
+                method: followMethod,
+                url: followPath
+              }); 
+              if (followResponse.status === 200) {
+                // Update the following status and count
+                this.followersCount--;
+                console.log('Successfully unfollowed the user');
+              } else {
+                console.warn(`Unexpected response status from unfollow API: ${followResponse.status}`);
+              }
+            } catch (error) {
+              console.error('Error removing follow relationship:', error);
+              this.errorMessage = 'Failed to unfollow user after banning.';
+            }
+          }
         }
       } catch (e) {
         console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e);
         this.errorMessage = `Failed to ${this.isBanned ? 'unban' : 'ban'} user. Please try again later.`;
       }
     }
+
   },
   mounted() {
     this.getUser();
@@ -252,7 +385,9 @@ export default {
 
           <div class="stats mt-3">
             <span class="mr-3">posts: <strong>{{ postsCount }}</strong></span>
+            <br>
             <span class="mr-3">followers: <strong>{{ followersCount }}</strong></span>
+            <br>
             <span class="mr-3">following: <strong>{{ followingCount }}</strong></span>
           </div>
         </div>
@@ -263,8 +398,9 @@ export default {
       <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
         <div class="row mt-4">
           <div v-for="post in posts" :key="post.photo_id" class="col-md-4 mb-4">
-            <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
+           <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
           </div>
+
         </div>
       </div>
     </div>
@@ -371,12 +507,14 @@ export default {
 }
 
 .photo {
+  width: 600px;
+  height: 240px;
   border: 1px solid #0033cc;
   border-radius: 3px;
   transition: filter 0.3s ease;
-  width: 100%; /* Ensure photos are responsive */
-  max-width: 100%; /* Prevent overflow */
+  display: block;
 }
+
 
 .photo:hover {
   filter: brightness(1.2);

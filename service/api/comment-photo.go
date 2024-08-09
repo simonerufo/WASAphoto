@@ -28,7 +28,11 @@ func (rt _router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Authenticate the user
-	Auth(w, r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	// Check if the photo exists
 	// isOnline, err := rt.db.CheckPhoto(userID, photoID)

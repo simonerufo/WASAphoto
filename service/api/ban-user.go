@@ -32,7 +32,11 @@ func (rt *_router) BanUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	Auth(w,r)
+	_,err = Auth(w,r)
+	if err != nil{
+		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+		return
+	}
 
 	err = rt.db.BanUser(userID, bannedUser.UserID)
 	if err != nil {
