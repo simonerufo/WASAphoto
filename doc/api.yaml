@@ -631,6 +631,9 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Comment"}
               example: {comment_id: 7, comment_text: "good panorama!"}
+        "400":
+          description: user not found
+        
 
     delete:
       tags: ["action"]

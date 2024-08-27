@@ -1,16 +1,52 @@
 package database
 
-import("fmt")
+import(
+	"fmt"
+	"encoding/base64")
 
-func (db *appdbimpl) GetStream(user_id int) ([]Photo, error) {
+// func (db *appdbimpl) GetStream(user_id int) ([]Photo, error) {
+// 	var posts []Photo
+// 	GETPostsFollowed := `SELECT Photo.photo_id, Photo.user_id, Photo.photo, Photo.timestamp, Photo.caption
+// 						 FROM Photo
+// 						 JOIN Follow ON Photo.user_id = Follow.followed_id
+// 						 WHERE Follow.following_id = ?
+// 						 ORDER BY Photo.timestamp DESC`
+
+// 	rows, err := db.c.Query(GETPostsFollowed, user_id)
+// 	if err != nil {
+// 		fmt.Printf("error while executing query: %v\n", err)
+// 		return posts, err
+// 	}
+// 	defer rows.Close()
+
+// 	for rows.Next() {
+// 		var post Photo
+// 		if err := rows.Scan(&post.PhotoID, &post.UserID, &post.Image, &post.Timestamp, &post.Caption); err != nil {
+// 			fmt.Printf("error while iterating over table: %v\n", err)
+// 			return posts, err
+// 		}
+// 		posts = append(posts, post)
+// 	}
+
+// 	return posts, nil
+// }
+
+func (db *appdbimpl) GetStream(userID int) ([]Photo, error) {
 	var posts []Photo
-	GETPostsFollowed := `SELECT Photo.photo_id, Photo.user_id, Photo.photo, Photo.timestamp, Photo.caption
+
+	// SQL query to get the posts from followed users
+	GETPostsFollowed := `SELECT 
+							Photo.photo_id, 
+							Photo.user_id, 
+							Photo.photo, 
+							Photo.caption, 
+							Photo.timestamp
 						 FROM Photo
 						 JOIN Follow ON Photo.user_id = Follow.followed_id
 						 WHERE Follow.following_id = ?
 						 ORDER BY Photo.timestamp DESC`
 
-	rows, err := db.c.Query(GETPostsFollowed, user_id)
+	rows, err := db.c.Query(GETPostsFollowed, userID)
 	if err != nil {
 		fmt.Printf("error while executing query: %v\n", err)
 		return posts, err
@@ -19,13 +55,26 @@ func (db *appdbimpl) GetStream(user_id int) ([]Photo, error) {
 
 	for rows.Next() {
 		var post Photo
-		if err := rows.Scan(&post.PhotoID, &post.UserID, &post.Image, &post.Timestamp, &post.Caption); err != nil {
+		var imageData []byte
+
+		// Scan the basic post data into the Photo struct
+		if err := rows.Scan(&post.PhotoID, &post.UserID, &imageData, &post.Caption, &post.Timestamp); err != nil {
 			fmt.Printf("error while iterating over table: %v\n", err)
 			return posts, err
 		}
-		//post.Time = post.Timestamp.Format("2006-01-02 15:04:05")
+
+		// Convert image data to base64-encoded string
+		post.Image = fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(imageData))
+
+		// Add the post to the slice
 		posts = append(posts, post)
+	}
+
+	if err = rows.Err(); err != nil {
+		fmt.Printf("Error during rows iteration: %v\n", err)
+		return posts, err
 	}
 
 	return posts, nil
 }
+

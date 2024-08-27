@@ -72,6 +72,7 @@ export default {
       if (response.status === 200) {
         const postData = response.data;
         this.post = postData;
+        console.log(this.post.image);
         this.checkIfLikedPhoto(); // Check if the photo is liked by the current user
         await this.fetchLikeCount(postId); // Fetch the like count
       }

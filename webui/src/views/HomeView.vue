@@ -86,9 +86,9 @@ export default {
 
         if (response.data) {
           this.userPhotos = response.data.map((photo) => {
-            // Ensure each photo image has the correct data URL prefix
             if (photo.image && !photo.image.startsWith("data:image")) {
               photo.image = `data:image/jpeg;base64,${photo.image}`;
+              console.log(photo.image);
             }
             return photo;
           });
