@@ -26,7 +26,7 @@ func (rt *_router) Handler() http.Handler {
 	//photo comments
 	rt.router.POST("/profiles/:user_id/comments/:photo_id", rt.CommentPhoto)
 	rt.router.GET("/profiles/:user_id/photos/:photo_id/comments", rt.GetPhotoComments)
-	rt.router.DELETE("/profiles/:user_id/comments/:comment_id", rt.RemoveComment)
+	rt.router.DELETE("/profiles/:user_id/comments/:photo_id", rt.RemoveComment)
 	//follow
 	rt.router.PUT("/profiles/:user_id/following/:following_id", rt.followUser)
 	rt.router.DELETE("/profiles/:user_id/following/:following_id", rt.unfollowUser)

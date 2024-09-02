@@ -110,6 +110,7 @@ export default {
           // Sort photos by timestamp (newest first)
           this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           this.postsCount = this.posts.length;
+          
 
           console.log('Updated component data:', {
             user: this.user,

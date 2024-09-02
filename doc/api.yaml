@@ -47,6 +47,7 @@ paths:
         required: true
     get:
       summary: Get user profile by username
+      operationId: getUserProfileByUsername
       description: Retrieve the profile of a user by their username.
       responses:
         '200':
@@ -215,14 +216,7 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Followed"}
               example: {username: Marco, user_id: 128}
-#    delete:
-#      tags: ["action"]
-#      operationId: unfollowUser
-#      summary: "unfollow a user"
-#      description: removing from the followed list a user
-#      responses:
-#       "204":
-#          description: user successfully unfollowed
+
   /profiles/{user_id}/bans/{target_uid}:
     parameters:
       - name: user_id
@@ -410,13 +404,15 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: { $ref:"#/components/schemas/UserPhoto"}
+            schema: 
+              $ref: "#/components/schemas/UserPhoto"
       responses:
         '201':
           description: Photo uploaded successfully
           content:
             application/json:
-              schema: { $ref:"#/components/schemas/UserPhoto" }
+              schema:
+                $ref: "#/components/schemas/UserPhoto"
         '400':
           description: Bad request
         '500':
@@ -468,7 +464,7 @@ paths:
         description: user id's that wants to like/unlike or comment/uncomment a post
         schema: {$ref: "#/components/schemas/UserID"}
         required: true
-      - name: target_photoid
+      - name: photo_id
         in: path
         description: photo id's that is receiving a like/comment or deleting it
         schema: {$ref: "#/components/schemas/PhotoID"}
@@ -577,7 +573,7 @@ paths:
                   error:
                     type: string
                 example: {error: "Internal server error"}
-    
+
   /photos/{photo_id}/likes:
     parameters:
       - name: photo_id
@@ -598,15 +594,18 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                description: The list of likes
-                minItems: 0
-                maxItems: 1000000
-                items:
-                  type: object
-                  properties:
-                    userID: {$ref: "#/components/schemas/UserID" }
-                    username: {$ref: "#/components/schemas/Username" }
+                type: object
+                properties:
+                  likes:
+                    type: array
+                    description: The list of users who liked the photo
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          $ref: "#/components/schemas/UserID"
+                        username:
+                          $ref: "#/components/schemas/Username"
         "400":
           description: Bad request. The request could not be understood or was missing required parameters.
         "401":
@@ -615,39 +614,32 @@ paths:
           description: Not found. The specified photo could not be found.
         "500":
           description: Internal server error. An error occurred on the server.
-    post:
-      tags: ["action"]
-      operationId: commentPhoto
-      summary: comment a photo
-      description: user with current_id adds to Comments list of user with target_id    
-      requestBody:
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/Comment"}
-      responses:
-        "200":
-          description: user successfully commented post
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/Comment"}
-              example: {comment_id: 7, comment_text: "good panorama!"}
-        "400":
-          description: user not found
-        
+   
+    # post:
+    #     tags: ["action"]
+    #     operationId: commentPhoto
+    #     summary: Comment on a photo
+    #     description: User with `user_id` adds a comment to the specified photo.
+    #     requestBody:
+    #       content:
+    #         application/json:
+    #           schema: 
+    #             $ref: "#/components/schemas/Comment"
+    #     responses:
+    #       "200":
+    #         description: User successfully commented on the photo
+    #         content:
+    #           application/json:
+    #             schema:
+    #               $ref: "#/components/schemas/Comment"
+    #             example: 
+    #               comment_id: 7
+    #               comment_text: "good panorama!"
+    #       "400":
+    #         description: User not found or bad request
 
-    delete:
-      tags: ["action"]
-      operationId: uncommentPhoto
-      summary: remove a comment from photo
-      description: user with current_id removes from user's comment list with target_id
-      responses:
-        "200":
-          description: user successfully removed a comment from photo 
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/CommentID"}
-              example: {comment_id: 7}
-  
+
+
   /profiles/{user_id}/comments/{photo_id}:
     parameters:
       - name: user_id
@@ -744,18 +736,6 @@ paths:
                 error_code: 500
                 error_message: "Server error"
                 
-  /profiles/{user_id}/comments/{comment_id}:
-    parameters:
-      - name: user_id
-        in: path
-        description: The user ID of the user who will receive the comment.
-        schema: {  $ref: "#/components/schemas/UserID" }
-        required: true
-      - name: photo_id
-        in: path
-        description: The photo ID on which the comment is made.
-        schema: { $ref: "#/components/schemas/PhotoID" }
-        required: true
     delete:
       tags:
         - action
@@ -829,17 +809,18 @@ paths:
                 error_code: 500
                 error_message: "Server error"
                 
+
   /profiles/{user_id}/photos/{photo_id}/comments:
     parameters:
       - name: user_id
         in: path
         description: The user ID of the profile that owns the photo
-        schema: { $ref: "#/components/schemas/UserID"}
+        schema: { $ref: "#/components/schemas/UserID" }
         required: true
       - name: photo_id
         in: path
         description: The photo ID for which comments are being retrieved
-        schema: { $ref: "#/components/schemas/PhotoID"}
+        schema: { $ref: "#/components/schemas/PhotoID" }
         required: true
     get:
       tags: ["action"]
@@ -852,18 +833,24 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Comment"
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Comment"
+                required:
+                  - comments
               example:
-                - comment_id: 1
-                  comment_text: "Great photo!"
-                  user_id: 5
-                  timestamp: "2024-08-01T12:34:56Z"
-                - comment_id: 2
-                  comment_text: "Love this view!"
-                  user_id: 8
-                  timestamp: "2024-08-01T13:22:10Z"
+                comments:
+                  - comment_id: 1
+                    comment_text: "Great photo!"
+                    user_id: 5
+                    timestamp: "2024-08-01T12:34:56Z"
+                  - comment_id: 2
+                    comment_text: "Love this view!"
+                    user_id: 8
+                    timestamp: "2024-08-01T13:22:10Z"
         "404":
           description: Photo not found or no comments available
           content:
@@ -874,6 +861,7 @@ paths:
                   message:
                     type: string
                     example: "No comments found for this photo."
+
   
   /profiles/{user_id}/following/{following_id}:
     parameters:
@@ -907,28 +895,43 @@ paths:
           description: Unauthorized
 
   /profiles/{user_id}/followers:
+    parameters:
+      - name: user_id
+        in: path
+        description: The user ID of the profile whose followers are being retrieved
+        schema: { $ref: "#/components/schemas/UserID" }
+        required: true
     get:
-      summary: Retrieve all users that follow the specified user
-      description: Get a list of users that follow the user identified by the user_id.
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          description: ID of the user whose followers are to be retrieved
-          schema: { $ref: "#/components/schemas/UserID" }
+      tags: ["action"]
+      operationId: getUserFollowers
+      summary: Retrieve all followers of a user
+      description: Get all followers associated with a specific user
       responses:
-        '200':
-          description: A list of users that follow the specified user
+        "200":
+          description: List of followers for the specified user
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: "#/components/schemas/User" }
-        '400':
-          description: Invalid user_id supplied
+                type: object
+                properties:
+                  followers:
+                    type: array
+                    description: A list of followers for the user
+                    items:
+                      $ref: "#/components/schemas/User"
+                required:
+                  - followers
+        "404":
+          description: User not found or no followers available
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No followers found for this user."
 
-        '404':
-          description: User not found
  
   /profiles/{user_id}/following:
     get:
@@ -946,8 +949,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: "#/components/schemas/User" }
+                type: object
+                properties:
+                  followers:
+                    type: array
+                    description: A list of followers for the user
+                    items:
+                      $ref: "#/components/schemas/User"
+                required:
+                  - followers
         '400':
           description: Invalid user_id supplied
 
@@ -1118,8 +1128,8 @@ components:
           description: list of users' names and IDs banned by user
           items:
             oneOf:
-              - {$ref: "#/components/schemas/Username"}
-              - {$ref: "#/components/schemas/UserID"}
+              - $ref: "#/components/schemas/Username"
+              - $ref: "#/components/schemas/UserID"
           minItems: 0
           maxItems: 10000000
 
@@ -1140,13 +1150,13 @@ components:
           minLength: 20
           maxLength: 20
           readOnly: true
-        likeCount:
+        likecount:
           description: number of likes that the photo received
           type: integer
           example: 10
           minimum: 0
           readOnly: true
-        commentCount:
+        commentcount:
           description: number of comments that the photo received
           type: integer
           example: 10
@@ -1157,40 +1167,7 @@ components:
           type: boolean
           example: false
           readOnly: true
-    # UserPhoto:
-    #   title: User photo
-    #   description: photo uploaded by the user
-    #   properties:
-    #     user_id: {$ref: "#/components/schemas/UserID"}
-    #     pid: {$ref: "#/components/schemas/PhotoID"}
-    #     photo: {$ref: "#/components/schemas/Image"}
-#          title: photo path
-#          description: "describes the path of a photo"
-#          type : string
-#          pattern: '^\/(?:[\w]+\/)*[\w]+\.[a-zA-Z]{2,}$'
-#          example: "path/images/photo.png"
-#          minLength: 1
-#          maxLength: 100
-          
         caption: {$ref: "#/components/schemas/Caption"}
-          
-#        likes_number:
-#          title: likes number
-#          description: "number of likes received from users"
-#          type: integer
-#          example: 500
-#        comments_number:
-#          title: comments number
-#          description: "number of comments received from users"
-#          type: integer
-#          example: 5
-#        comments_list:
-#          title: comments list
-#          description: array of Comment
-#          type: array
-#          items: {$ref: "#/components/schemas/Comment"}
-#          minItems: 0
-#          maxItems: 10000000
         time:
           title: time
           description: pubblication time
@@ -1206,7 +1183,7 @@ components:
           description: base 64 image.
           type: string
           format: byte
-          minLength: 0
+          minLength: 1
           maxLength: 1000000000
            
     Caption:
@@ -1247,7 +1224,7 @@ components:
         username:
           type: string
           description: "name of the user"
-          example: "Simone"
+          example: "simone"
           pattern: '^[a-z][a-z0-9]*$'
           minLength: 3
           maxLength: 16
@@ -1261,12 +1238,7 @@ components:
           $ref: "#/components/schemas/UserID"
         username:
           $ref: "#/components/schemas/Username"
-#        follow_list:
-#          $ref: "#/components/schemas/Followed"
-#        ban_list:
-#          $ref: "#/components/schemas/Banned"
-#        liked_list:
-#          $ref: "#/components/schemas/Liked"
+
           
     Profile:
       title: Profile
@@ -1285,7 +1257,7 @@ components:
           description: users number following the user
           type: integer
           example: 700
-        photoCount:
+        photocount:
           type: integer
           description: The number of photos posted by the user
           example: 12

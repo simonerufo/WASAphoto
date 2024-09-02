@@ -18,7 +18,7 @@ func (rt _router) RemoveComment(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Extract photo_id from the URL parameters
-	commentID, err := strconv.Atoi(ps.ByName("comment_id"))
+	commentID, err := strconv.Atoi(ps.ByName("photo_id"))
 	if err != nil {
 		http.Error(w, "Error while fetching comment ID from parameters", http.StatusBadRequest)
 		return
@@ -49,26 +49,7 @@ func (rt _router) RemoveComment(w http.ResponseWriter, r *http.Request, ps httpr
 		http.Error(w,"Error while retrieving the photo id from database", http.StatusInternalServerError)
 		return
 	}
-	// Verify if the comment belongs to the user
-	// comment, err := rt.db.GetCommentByID(comment_id)
-	// if err != nil {
-	// 	if err.Error() == "not found" {
-	// 		http.Error(w, "Comment not found", http.StatusNotFound)
-	// 	} else {
-	// 		http.Error(w, "Error while retrieving comment", http.StatusInternalServerError)
-	// 	}
-	// 	return
-	// }
-	
-	// user,err := rt.db.GetUserByID(userID)
-	// if err != nil{
-	// 	http.Error(w,"Error while retrieving user from database", http.StatusInternalServerError)
-	// }
 
-	// if comment.Username != user.Username  {
-	// 	http.Error(w, "Unauthorized to delete this comment", http.StatusForbidden)
-	// 	return
-	// }
 
 	// Delete the comment entry from the database
 	err = rt.db.DeleteComment(userID,photoID,commentID)
