@@ -13,7 +13,7 @@ import (
 
 
 
-func (rt _router) CommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt _router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get the params (user_id and photo_id)
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

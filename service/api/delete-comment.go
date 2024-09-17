@@ -9,7 +9,7 @@ import (
 )
 
 // RemoveComment handles the deletion of a comment.
-func (rt _router) RemoveComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt _router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Extract user_id from the URL parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
