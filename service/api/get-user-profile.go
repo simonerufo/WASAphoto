@@ -68,7 +68,7 @@ func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprou
 */
 
 
-func (rt *_router) getProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Verifying the user authorization
 	_, err := Auth(w, r)
 	if err != nil {

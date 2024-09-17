@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) LikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
 		http.Error(w, "Error while fetching user ID from parameters", http.StatusBadRequest)

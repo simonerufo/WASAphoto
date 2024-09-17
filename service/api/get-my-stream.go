@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) GetMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     // Extract user_id from request parameters
     userID, err := strconv.Atoi(ps.ByName("user_id"))
     if err != nil {

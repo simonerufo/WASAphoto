@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) UnbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get the user_id and target_uid from the request parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

@@ -47,6 +47,7 @@ paths:
         required: true
     get:
       summary: Get user profile by username
+      tags: ["action"]
       operationId: getUserProfileByUsername
       description: Retrieve the profile of a user by their username.
       responses:
@@ -72,7 +73,7 @@ paths:
           
     put:
       tags: ["action"]
-      operationId: setMyUserName
+      operationId: setMyUsername
       summary: update the username
       description: setting the username to user with this uid 
       requestBody:
@@ -86,31 +87,33 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/UserID" }
               example: { "user_id": 15}
-    get:
-      summary: Get user profile by username
-      description: Retrieve the profile of a user by their username.
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          schema: { $ref: "#/components/schemas/Username"}
-          description: The user ID of the user making the request
-        - name: username
-          in: query
-          required: true
-          schema: { $ref: "#/components/schemas/Username"}
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Profile"}
-        '400':
-          description: Bad request (e.g., missing or invalid parameters)
-        '404':
-          description: Profile not found
-        '500':
-          description: Internal server error
+    # get:
+    #   summary: Get user profile by username
+    #   description: Retrieve the profile of a user by their username.
+    #   tags: ["action"]
+    #   operationId: getMyUsername
+    #   parameters:
+    #     - name: user_id
+    #       in: path
+    #       required: true
+    #       schema: { $ref: "#/components/schemas/Username"}
+    #       description: The user ID of the user making the request
+    #     - name: username
+    #       in: query
+    #       required: true
+    #       schema: { $ref: "#/components/schemas/Username"}
+    #   responses:
+    #     '200':
+    #       description: Successful response
+    #       content:
+    #         application/json:
+    #           schema: { $ref: "#/components/schemas/Profile"}
+    #     '400':
+    #       description: Bad request (e.g., missing or invalid parameters)
+    #     '404':
+    #       description: Profile not found
+    #     '500':
+    #       description: Internal server error
 
 
 
@@ -175,8 +178,7 @@ paths:
                       type: string
                       example: {error: "Error while trying to delete photo from database"}
     get:
-      tags:
-        - action
+      tags: ["action"]
       operationId: getPhoto
       summary: Retrieve a specific photo by its ID
       description: Get details of a photo uploaded by the user using the photo ID.
@@ -615,31 +617,6 @@ paths:
         "500":
           description: Internal server error. An error occurred on the server.
    
-    # post:
-    #     tags: ["action"]
-    #     operationId: commentPhoto
-    #     summary: Comment on a photo
-    #     description: User with `user_id` adds a comment to the specified photo.
-    #     requestBody:
-    #       content:
-    #         application/json:
-    #           schema: 
-    #             $ref: "#/components/schemas/Comment"
-    #     responses:
-    #       "200":
-    #         description: User successfully commented on the photo
-    #         content:
-    #           application/json:
-    #             schema:
-    #               $ref: "#/components/schemas/Comment"
-    #             example: 
-    #               comment_id: 7
-    #               comment_text: "good panorama!"
-    #       "400":
-    #         description: User not found or bad request
-
-
-
   /profiles/{user_id}/comments/{photo_id}:
     parameters:
       - name: user_id

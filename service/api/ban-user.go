@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) BanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
 		http.Error(w, "cannot parse user_id", http.StatusBadRequest)

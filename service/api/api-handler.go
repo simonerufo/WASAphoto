@@ -11,35 +11,35 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/session", rt.doLogin)
 
 	//username set/change
-	rt.router.PUT("/profiles/:user_id/username", rt.setMyUsername)
+	rt.router.PUT("/profiles/:user_id/username", rt.setMyUserName)
 	//getting user profile
 	rt.router.GET("/profile", rt.getProfileByUsername)
-	rt.router.GET("/profiles/:user_id/profile", rt.getProfile)
+	rt.router.GET("/profiles/:user_id/profile", rt.getUserProfile)
 	//photo utility
 	rt.router.POST("/profiles/:user_id/profile", rt.uploadPhoto)
 	rt.router.GET("/profiles/:user_id/photos/:photo_id", rt.getPhoto)
 	rt.router.DELETE("/profiles/:user_id/photos/:photo_id",rt.deletePhoto)
 	//photo likes
-	rt.router.PUT("/profiles/:user_id/likes/:photo_id", rt.LikePhoto)
+	rt.router.PUT("/profiles/:user_id/likes/:photo_id", rt.likePhoto)
 	rt.router.GET("/photos/:photo_id/likes", rt.GetPhotoLikes)
-	rt.router.DELETE("/profiles/:user_id/likes/:photo_id", rt.RemoveLike)
+	rt.router.DELETE("/profiles/:user_id/likes/:photo_id", rt.unlikePhoto)
 	//photo comments
-	rt.router.POST("/profiles/:user_id/comments/:photo_id", rt.CommentPhoto)
+	rt.router.POST("/profiles/:user_id/comments/:photo_id", rt.commentPhoto)
 	rt.router.GET("/profiles/:user_id/photos/:photo_id/comments", rt.GetPhotoComments)
-	rt.router.DELETE("/profiles/:user_id/comments/:photo_id", rt.RemoveComment)
+	rt.router.DELETE("/profiles/:user_id/comments/:photo_id", rt.uncommentPhoto)
 	//follow
 	rt.router.PUT("/profiles/:user_id/following/:following_id", rt.followUser)
 	rt.router.DELETE("/profiles/:user_id/following/:following_id", rt.unfollowUser)
 	rt.router.GET("/profiles/:user_id/followers", rt.GetFollowers)
 	rt.router.GET("/profiles/:user_id/following", rt.GetFollowing)
 	//ban
-	rt.router.PUT("/profiles/:user_id/bans/:target_uid", rt.BanUser)
-	rt.router.DELETE("/profiles/:user_id/bans/:target_uid", rt.UnbanUser)
+	rt.router.PUT("/profiles/:user_id/bans/:target_uid", rt.banUser)
+	rt.router.DELETE("/profiles/:user_id/bans/:target_uid", rt.unbanUser)
 	rt.router.GET("/profiles/:user_id/bans/:target_uid", rt.GetBan)
 	rt.router.GET("/profiles/:user_id/ban", rt.GetBanList)
 
 	//profile stream
-	rt.router.GET("/profiles/:user_id/stream", rt.GetMyStream)
+	rt.router.GET("/profiles/:user_id/stream", rt.getMyStream)
 	//rt.router.GET("/", rt.getHelloWorld)
 	//rt.router.GET("/context", rt.wrap(rt.getContextReply))
 	// Special routes
