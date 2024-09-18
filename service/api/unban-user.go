@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -56,6 +55,5 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Return success response
 	w.WriteHeader(http.StatusNoContent)
-	fmt.Println("User successfully unbanned")
 }
 

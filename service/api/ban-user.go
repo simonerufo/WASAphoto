@@ -45,8 +45,10 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bannedUser)
-
+	err = json.NewEncoder(w).Encode(bannedUser)
+	if err != nil {
+		http.Error(w, "error while encoding the json", http.StatusBadRequest)
+	}
 	fmt.Printf("user: %s successfully banned", bannedUser.Username)
 }
 

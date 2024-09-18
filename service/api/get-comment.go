@@ -48,5 +48,8 @@ func (rt _router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps ht
 	// Send the comments in the response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(comments)
+	err = json.NewEncoder(w).Encode(comments)
+	if err != nil {
+		http.Error(w, "error while encoding the json", http.StatusInternalServerError)
+	}
 }

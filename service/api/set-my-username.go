@@ -13,7 +13,7 @@ import (
 /*
 updates the username using a PUT request to the server
 */
-func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var userData User
 

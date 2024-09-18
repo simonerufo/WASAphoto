@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	
@@ -159,8 +158,6 @@ func (rt *_router) getProfileByUsername(w http.ResponseWriter, r *http.Request, 
         http.Error(w, "Error encoding response", http.StatusInternalServerError)
         return
     }
-
-    fmt.Printf("USER: %s\n", username)
 }
 
 

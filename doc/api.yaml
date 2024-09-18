@@ -31,12 +31,15 @@ paths:
                $ref: "#/components/schemas/Username"
         required: true
       responses:
-        '200':
+        "200":
           description: User log-in action successful
           content:
             application/json:
               schema: 
                 $ref: "#/components/schemas/UserID"
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /profile:
     parameters:
@@ -51,17 +54,14 @@ paths:
       operationId: getUserProfileByUsername
       description: Retrieve the profile of a user by their username.
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Profile"}
-        '400':
-          description: Bad request (e.g., missing or invalid parameters)
-        '404':
-          description: Profile not found
-        '500':
-          description: Internal server error
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /profiles/{user_id}/username:
     parameters:
@@ -86,7 +86,9 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/UserID" }
-              example: { "user_id": 15}
+        "400": {$ref: "#/components/responses/BadRequest"} 
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
     # get:
     #   summary: Get user profile by username
     #   description: Retrieve the profile of a user by their username.
@@ -116,7 +118,6 @@ paths:
     #       description: Internal server error
 
 
-
   /profiles/{user_id}/photos/{photo_id}:
     parameters:
       - name: user_id
@@ -129,6 +130,7 @@ paths:
         description: ID of photo
         schema: { $ref: "#/components/schemas/PhotoID"}
         required: true
+    
     delete:
         tags: ["action"]
         operationId: deletePhoto
@@ -137,53 +139,18 @@ paths:
         responses:
           "204":
             description: Photo successfully deleted
-          "400":
-            description: Bad Request - Invalid user_id or photo_id
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: {error: "Error while retrieving user ID from parameters"}
-          "401":
-            description: Unauthorized - Invalid or missing token
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: {error: "Unauthorized"}
-          "404":
-            description: Not Found - Photo does not exist
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: {error: "Photo not found"}
-          "500":
-            description: Internal Server Error - Server encountered an error
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: {error: "Error while trying to delete photo from database"}
+          "400": {$ref: "#/components/responses/BadRequest"}
+          "401": {$ref: "#/components/responses/Unauthorized"}
+          "403": {$ref: "#/components/responses/Forbidden"} 
+          "500": {$ref: "#/components/responses/InternalServerError"}
+    
     get:
       tags: ["action"]
       operationId: getPhoto
       summary: Retrieve a specific photo by its ID
       description: Get details of a photo uploaded by the user using the photo ID.
       responses:
-        '200':
+        "200":
           description: Photo successfully retrieved
           content:
             application/json:
@@ -195,12 +162,9 @@ paths:
                 photo: "base64-encoded-image-data"
                 caption: "A beautiful sunset"
                 time: "2023-11-21T23:19:59"
-        '400':
-          description: Bad request (invalid photo ID)
-        '404':
-          description: Photo not found
-        '500':
-          description: Internal server error
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
     put:
       tags: ["action"]
@@ -231,6 +195,7 @@ paths:
         description: user's id that is going to be banned/unbanned
         schema: {$ref: "#/components/schemas/UserID"}
         required: true
+    
     put:
       tags: ["action"]
       operationId: banUser
@@ -246,80 +211,20 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/User"}
-        "400":
-          description: Invalid request (e.g., invalid user_id or target_uid)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Invalid user_id or target_uid"
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "User not found"
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Internal server error"
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
+    
     delete:
       tags: ["action"]
       operationId: unbanUser
       summary: unban a user
       description: remove the target_uid user from user's current_uid banned list
       responses:
-        "204":
-          description: user successfully unbanned
-        "400":
-          description: Invalid request (e.g., invalid user_id or target_uid)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Invalid user_id or target_uid"
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "User not found"
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Internal server error"
+        "201": {$ref: "#/components/schemas/Success"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
     get:
       tags: ["action"]
       operationId: getBan
@@ -330,39 +235,9 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/User"}
-        "400":
-          description: Invalid request (e.g., invalid user_id or target_uid)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Invalid user_id or target_uid"
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "User not found"
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Internal server error"
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "404": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /profiles/{user_id}/profile:
     parameters:
@@ -371,6 +246,7 @@ paths:
         description: user id's profile to be shown
         schema: {$ref: "#/components/schemas/Username"}
         required: true
+    
     get:
       tags: ["action"]
       operationId: getUserProfile
@@ -384,12 +260,18 @@ paths:
               schema: {$ref: "#/components/schemas/Profile"}
               example: {username: Giova, profile_picture: img_path,
                         photos: profile_posts, followers: 500, following: 30}
-        "404":
-          description: user not found
-        "500":
-          description: internal server error
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
   
   /profiles/{user_id}/photos:
+    parameters:
+      - name: user_id
+        in: path
+        description: ID of user
+        schema: { $ref: "#/components/schemas/UserID"}
+        required: true
+
     post:
       tags: ["action"]
       operationId: uploadPhoto
@@ -409,16 +291,10 @@ paths:
             schema: 
               $ref: "#/components/schemas/UserPhoto"
       responses:
-        '201':
-          description: Photo uploaded successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserPhoto"
-        '400':
-          description: Bad request
-        '500':
-          description: Internal server error
+        "201": {$ref: "#/components/schemas/Success"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /profiles/{user_id}/stream:
     parameters:
@@ -440,24 +316,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Stream"
-        "400":
-          description: Bad Request - Invalid user id
-          content:
-            application/json:
-              example:
-                error: "Invalid user id"
-        "404":
-          description: Not Found - User not found or no posts in the stream
-          content:
-            application/json:
-              example:
-                error: "User not found or no posts available"
-        "500":
-          description: Internal Server Error - Unable to retrieve the stream
-          content:
-            application/json:
-              example:
-                error: "Unable to retrieve the stream due to server error"
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /profiles/{user_id}/likes/{photo_id}:
     parameters:
@@ -471,6 +332,7 @@ paths:
         description: photo id's that is receiving a like/comment or deleting it
         schema: {$ref: "#/components/schemas/PhotoID"}
         required: true
+   
     put:
       tags: ["action"]
       operationId: likePhoto
@@ -487,94 +349,22 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Liked"}
               example: {photo_id: 298}
-        "400":
-          description: Bad Request - Invalid user_id or target_photoid
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Error while retrieving user ID or target photo ID from parameters"}
-        "401":
-          description: Unauthorized - Invalid or missing token
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Unauthorized"}
-        "404":
-          description: Not Found - Photo does not exist
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Photo not found"}
-        "500":
-          description: Internal Server Error - Server encountered an error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Internal server error"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
+    
     delete:
       tags: ["action"]
       operationId: unlikePhoto
       summary: remove like from photo
       description: user with current_id removes from Liked list photo id with target_id
       responses:
-        "204":
-          description: User successfully removed a like from photo
-        "400":
-          description: Bad Request - Invalid user_id or target_photoid
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Error while retrieving user ID or target photo ID from parameters"}
-        "401":
-          description: Unauthorized - Invalid or missing token
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Unauthorized"}
-        "404":
-          description: Not Found - Photo does not exist
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Photo not found"}
-        "500":
-          description: Internal Server Error - Server encountered an error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                example: {error: "Internal server error"}
+        "201": {$ref: "#/components/schemas/Success"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /photos/{photo_id}/likes:
     parameters:
@@ -608,14 +398,9 @@ paths:
                           $ref: "#/components/schemas/UserID"
                         username:
                           $ref: "#/components/schemas/Username"
-        "400":
-          description: Bad request. The request could not be understood or was missing required parameters.
-        "401":
-          description: Unauthorized. Authentication is required and has failed or has not been provided.
-        "404":
-          description: Not found. The specified photo could not be found.
-        "500":
-          description: Internal server error. An error occurred on the server.
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
    
   /profiles/{user_id}/comments/{photo_id}:
     parameters:
@@ -646,7 +431,7 @@ paths:
                 value:
                   comment_text: "good panorama!"
       responses:
-        '200':
+        "200":
           description: Comment added successfully
           content:
             application/json:
@@ -655,63 +440,9 @@ paths:
               example:
                 comment_id: 7
                 comment_text: "good panorama!"
-        '400':
-          description: Bad request, possibly invalid data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error_code:
-                    type: integer
-                    description: The HTTP error code
-                  error_message:
-                    type: string
-                    description: A description of the error
-                required:
-                  - error_code
-                  - error_message
-              example:
-                error_code: 400
-                error_message: "Invalid comment data"
-        '404':
-          description: User or photo not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error_code:
-                    type: integer
-                    description: The HTTP error code
-                  error_message:
-                    type: string
-                    description: A description of the error
-                required:
-                  - error_code
-                  - error_message
-              example:
-                error_code: 404
-                error_message: "User or photo not found"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error_code:
-                    type: integer
-                    description: The HTTP error code
-                  error_message:
-                    type: string
-                    description: A description of the error
-                required:
-                  - error_code
-                  - error_message
-              example:
-                error_code: 500
-                error_message: "Server error"
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
                 
     delete:
       tags:
@@ -720,7 +451,7 @@ paths:
       summary: Remove a comment from a photo
       description: Removes a comment from the list of comments on a photo for a user.
       responses:
-        '200':
+        "200":
           description: Comment removed successfully
           content:
             application/json:
@@ -728,63 +459,9 @@ paths:
                 $ref: '#/components/schemas/CommentID'
               example:
                 comment_id: 7
-        '400':
-          description: Bad request, possibly invalid data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error_code:
-                    type: integer
-                    description: The HTTP error code
-                  error_message:
-                    type: string
-                    description: A description of the error
-                required:
-                  - error_code
-                  - error_message
-              example:
-                error_code: 400
-                error_message: "Invalid comment ID"
-        '404':
-          description: Comment or user/photo not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error_code:
-                    type: integer
-                    description: The HTTP error code
-                  error_message:
-                    type: string
-                    description: A description of the error
-                required:
-                  - error_code
-                  - error_message
-              example:
-                error_code: 404
-                error_message: "Comment or user/photo not found"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error_code:
-                    type: integer
-                    description: The HTTP error code
-                  error_message:
-                    type: string
-                    description: A description of the error
-                required:
-                  - error_code
-                  - error_message
-              example:
-                error_code: 500
-                error_message: "Server error"
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
                 
 
   /profiles/{user_id}/photos/{photo_id}/comments:
@@ -799,6 +476,7 @@ paths:
         description: The photo ID for which comments are being retrieved
         schema: { $ref: "#/components/schemas/PhotoID" }
         required: true
+   
     get:
       tags: ["action"]
       operationId: getPhotoComments
@@ -828,16 +506,8 @@ paths:
                     comment_text: "Love this view!"
                     user_id: 8
                     timestamp: "2024-08-01T13:22:10Z"
-        "404":
-          description: Photo not found or no comments available
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "No comments found for this photo."
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   
   /profiles/{user_id}/following/{following_id}:
@@ -850,26 +520,27 @@ paths:
         in: path
         required: true
         schema: { $ref: "#/components/schemas/UserID" }
+    
     put:
       summary: Follow a user
       description: Follow a user specified by the following_id.
       responses:
-        '200':
-          description: Successfully followed the user
-        '400':
-          description: Invalid user_id or following_id
-        '401':
-          description: Unauthorized
+        "201":
+          description: Upload photo and created post successful.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/schemas/Success" }
+        "400": {$ref : "#/components/responses/BadRequest"}
+        "500": {$ref : "#/components/responses/InternalServerError"}
+    
     delete:
       summary: Unfollow a user
       description: Unfollow a user specified by the following_id.
       responses:
-        '200':
-          description: Successfully unfollowed the user
-        '400':
-          description: Invalid user_id or following_id
-        '401':
-          description: Unauthorized
+        "200": {$ref: "#/components/schemas/Success"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "403": {$ref: "#/components/responses/Forbidden"}
+        "500": {$ref: "#/components/responses/InternalServerError"}
 
   /profiles/{user_id}/followers:
     parameters:
@@ -878,6 +549,7 @@ paths:
         description: The user ID of the profile whose followers are being retrieved
         schema: { $ref: "#/components/schemas/UserID" }
         required: true
+    
     get:
       tags: ["action"]
       operationId: getUserFollowers
@@ -898,28 +570,20 @@ paths:
                       $ref: "#/components/schemas/User"
                 required:
                   - followers
-        "404":
-          description: User not found or no followers available
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "No followers found for this user."
-
+        "400": {$ref : "#/components/responses/BadRequest"}
+        "500": {$ref : "#/components/responses/InternalServerError"}
  
   /profiles/{user_id}/following:
+    parameters:
+      - name: user_id
+        in: path
+        description: ID of user
+        schema: { $ref: "#/components/schemas/UserID"}
+        required: true
+    
     get:
       summary: Retrieve all users that the user follows
       description: Get a list of users that are followed by the user identified by the user_id.
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          description: ID of the user whose followers are to be retrieved
-          schema: { $ref: "#/components/schemas/UserID" }
       responses:
         '200':
           description: A list of users that are followed the specified user
@@ -935,11 +599,8 @@ paths:
                       $ref: "#/components/schemas/User"
                 required:
                   - followers
-        '400':
-          description: Invalid user_id supplied
-
-        '404':
-          description: User not found
+        "400": {$ref : "#/components/responses/BadRequest"}
+        "500": {$ref : "#/components/responses/InternalServerError"}
 
   /profiles/{user_id}/ban:
     parameters:
@@ -948,6 +609,7 @@ paths:
         description: The user's ID whose ban list is to be retrieved
         schema: {$ref: "#/components/schemas/UserID"}
         required: true
+    
     get:
       tags: ["action"]
       operationId: getBanList
@@ -959,39 +621,9 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/Banned"}
-        "400":
-          description: Invalid request (e.g., invalid user_id)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Invalid user_id"
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "User not found"
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "Internal server error"
+        "400": {$ref : "#/components/responses/BadRequest"}
+        "403": {$ref : "#/components/responses/Forbidden"}
+        "500": {$ref : "#/components/responses/InternalServerError"}
 
 #COMPONENTS
 components:
@@ -1241,7 +873,63 @@ components:
           minimum: 0
           readOnly: true
     
-        
-      
+    
+    Success:
+        title: Success
+        description: The succesfull response from server.
+        type: string
+        example: "action successfully completed"
+        minLength: 2
+        maxLength: 200
+  
+  responses:
+
+    #400
+    BadRequest:
+      description: The request was not compliant with the documentation (eg. missing fields, etc).
+      content:
+        text/plain:
+          schema:
+            description: BadRequest
+            type: string
+            example: "Bad Request"
+            minLength: 11
+            maxLength: 30
+
+    #401
+    Unauthorized:
+      description: The access token is missing or it's expired.
+      content:
+        text/plain:
+          schema:
+            description: Unauthorized
+            type: string
+            example: "Unauthorized"
+            minLength: 12
+            maxLength: 30
+
+    #403
+    Forbidden:
+      description: The user is not allowed to perform the action.
+      content:
+        text/plain:
+          schema:
+            description: Forbidden
+            type: string
+            example: "Forbidden"
+            minLength: 9
+            maxLength: 30
+
+    #500
+    InternalServerError:
+      description: The server encountered an internal error. Further info in server logs.
+      content:
+        text/plain:
+          schema:
+            description: InternalServerError
+            type: string
+            example: "Internal Server Error"
+            minLength: 21
+            maxLength: 30 
 
         

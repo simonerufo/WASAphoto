@@ -79,7 +79,11 @@ func (rt _router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(commentRes)
-
+	
+	err = json.NewEncoder(w).Encode(commentRes)
+	if err != nil {
+		http.Error(w, "error while encoding the json", http.StatusBadRequest)
+	}
+	
 	fmt.Println("Comment successfully posted!")
 }

@@ -38,5 +38,9 @@ func (rt *_router) GetFollowing(w http.ResponseWriter, r *http.Request, ps httpr
     // Set response headers and write JSON response
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(following)
+    err = json.NewEncoder(w).Encode(following)
+    if err != nil {
+		http.Error(w, "error while encoding the json", http.StatusInternalServerError)
+	}
+
 }

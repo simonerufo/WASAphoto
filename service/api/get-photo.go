@@ -2,7 +2,6 @@ package api
 import( 
 	"net/http"
 	"encoding/json"
-	"fmt" 
     "time"
 	"strconv"
 	"github.com/julienschmidt/httprouter"
@@ -59,14 +58,12 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
     // Convert userID and photoID to integers
     userID, err := strconv.Atoi(userIDStr)
     if err != nil {
-        fmt.Printf("Error converting user_id to integer: %v\n", err)
         http.Error(w, "Invalid user ID", http.StatusBadRequest)
         return
     }
 
     photoID, err := strconv.Atoi(photoIDStr)
     if err != nil {
-        fmt.Printf("Error converting photo_id to integer: %v\n", err)
         http.Error(w, "Invalid photo ID", http.StatusBadRequest)
         return
     }
@@ -107,13 +104,10 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
     // Set response headers and encode the response
     w.Header().Set("Content-Type", "application/json")
     if err := json.NewEncoder(w).Encode(photo); err != nil {
-        fmt.Printf("Error encoding response: %v\n", err)
         http.Error(w, "Error encoding response", http.StatusInternalServerError)
         return
     }
 
-    // Log successful response
-    fmt.Printf("Successfully returned photo for user_id=%d and photo_id=%d\n", userID, photoID)
 }
 
 

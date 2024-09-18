@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -48,6 +47,4 @@ func (rt _router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	// Successfully removed the like
-	fmt.Fprintln(w, "Like successfully removed!")
 }

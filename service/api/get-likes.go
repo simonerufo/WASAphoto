@@ -31,5 +31,8 @@ func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps http
     // Set response headers and write JSON response
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(likes)
+    err = json.NewEncoder(w).Encode(likes)
+    if err != nil {
+		http.Error(w, "error while encoding the json", http.StatusInternalServerError)
+	}
 }

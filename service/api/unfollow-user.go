@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -68,6 +67,5 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Success message
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "User %s successfully unfollowed %s", current_user.Username, target_user.Username)
 }
 

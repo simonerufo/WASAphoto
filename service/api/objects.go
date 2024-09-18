@@ -50,13 +50,13 @@ func encodeToBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }
 // checks if the username is valid
-func (user User) isNameValid() bool {
-	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile
-	if !rex.MatchString(user.Username) {
-		return false
-	}
-	return true
-}
+// func (user User) isNameValid() bool {
+// 	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile
+// 	if !rex.MatchString(user.Username) {
+// 		return false
+// 	}
+// 	return true
+// }
 
 // checks if the username is valid
 func validUsername(username string) bool {
@@ -81,20 +81,20 @@ func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 	return true
 }
 */
-func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
-	auth := strings.Split(r.Header.Get("Authorization"), " ")
+// func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
+// 	auth := strings.Split(r.Header.Get("Authorization"), " ")
 	
-	if len(auth) <= 1 {
-		return 0, nil
-	}
-	uid, err := strconv.Atoi(auth[1])
-	fmt.Printf("auth:%d\n",uid)
-	if err != nil || (len(id) > 0 && uid != id[0]) {
-		http.Error(w, "Unauthorized token", http.StatusUnauthorized)
-		return 0, err
-	}
-	return uid, nil
-}
+// 	if len(auth) <= 1 {
+// 		return 0, nil
+// 	}
+// 	uid, err := strconv.Atoi(auth[1])
+// 	fmt.Printf("auth:%d\n",uid)
+// 	if err != nil || (len(id) > 0 && uid != id[0]) {
+// 		http.Error(w, "Unauthorized token", http.StatusUnauthorized)
+// 		return 0, err
+// 	}
+// 	return uid, nil
+// }
 
 
 

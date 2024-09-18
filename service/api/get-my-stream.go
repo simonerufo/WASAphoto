@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,6 +37,5 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
         http.Error(w, "Error encoding response", http.StatusInternalServerError)
     }
 
-    fmt.Println("Posts retrieved and sent in response")
 }
 
