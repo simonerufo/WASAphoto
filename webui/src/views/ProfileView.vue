@@ -84,6 +84,7 @@ export default {
     },
 
 
+  
     async getUser() {
       const path = `/profiles/${this.id}/profile`;
       console.log(`Fetching user profile from: ${path}`);
@@ -94,7 +95,7 @@ export default {
         if (response.status === 200) {
           console.log('User data:', response.data);
 
-          const { user, photos, followers, following, isFollowing, isBanned } = response.data;
+          const { user, photos = [], followers = 0, following = 0, isFollowing = false, isBanned = false } = response.data;
           this.user = user;
           this.username = user.username;
           this.inputValue = this.username;
@@ -105,12 +106,15 @@ export default {
 
           // Check if the current user is the owner
           this.isOwner = this.currentUserId === user.user_id;
-          this.checkIfFollowing();
-          this.checkIfBanned();
-          // Sort photos by timestamp (newest first)
-          this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+          // Only sort photos if the array has elements
+          if (Array.isArray(photos) && photos.length > 0) {
+            this.posts = photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          } else {
+            this.posts = []; // Handle the case when there are no photos
+          }
+
           this.postsCount = this.posts.length;
-          
 
           console.log('Updated component data:', {
             user: this.user,
@@ -120,12 +124,17 @@ export default {
             posts: this.posts,
             postsCount: this.postsCount
           });
+
+          // Fetch follow and ban status after getting user data
+          await this.checkIfFollowing();
+          await this.checkIfBanned();
         }
       } catch (e) {
         console.error('Failed to fetch user:', e);
         this.errorMessage = 'Failed to fetch user profile. Please try again later.';
       }
     },
+
 
     
 
@@ -239,6 +248,9 @@ export default {
           this.isFollowing = !this.isFollowing;
           this.followersCount += this.isFollowing ? 1 : -1;
           this.errorMessage = '';
+
+          // Reload the user profile to update UI
+          await this.getUser();
         }
       } catch (e) {
         console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
@@ -246,51 +258,8 @@ export default {
       }
     },
 
-    // async toggleBan() {
-    //   const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
-    //   const method = this.isBanned ? 'DELETE' : 'PUT';
-    //   const followPath = `/profiles/${this.currentUserId}/following/${this.id}`;
-    //   const followMethod = 'DELETE';
 
-    //   try {
-    //     // Make the ban request
-    //     const banResponse = await axios({
-    //       method,
-    //       url: path
-    //     });
-    
-    //     if (banResponse.status === (this.isBanned ? 200 : 201)) {
-    //       this.isBanned = !this.isBanned;
-    //       this.errorMessage = '';
 
-    //       // If the user was banned, remove the follow relationship
-    //       if (this.isBanned) {
-    //         try {
-    //           console.log("BANNED");
-    //           const followResponse = await axios({
-    //             method: followMethod,
-    //             url: followPath
-    //           });
-
-    //           if (followResponse.status === 200) {
-    //             console.log("UNFOLLOWED")
-    //             this.isFollowing = false;
-    //             this.followersCount--;
-    //             console.log('Successfully unfollowed the user');
-    //           } else {
-    //             console.warn(`Unexpected response status from unfollow API: ${followResponse.status}`);
-    //           }
-    //         } catch (error) {
-    //           console.error('Error removing follow relationship:', error);
-    //           this.errorMessage = 'Failed to unfollow user after banning.';
-    //         }
-    //       }
-    //     }
-    //   } catch (e) {
-    //     console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e);
-    //     this.errorMessage = `Failed to ${this.isBanned ? 'unban' : 'ban'} user. Please try again later.`;
-    //   }
-    // }
     async toggleBan() {
       
       const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
