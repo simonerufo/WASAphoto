@@ -184,25 +184,22 @@ export default {
     const username = getUsername();
     const userId = getId();
     const comment = this.comments.find(comment => comment.comment_id === commentId); // Find the comment
-
-    // Check if the logged-in user is the author of the comment
-    if (comment.username !== username) {
-      console.log("comment user:",comment.username)
-      console.log("user id:",getUsername())
+    console.log("comment_id:",commentId)
+    // Check if the logged-in user is the author of the comment or the author of the post
+    if (comment.username !== username  && !this.isOwner) {
       alert('You do not have permission to delete this comment');
       return;
     }
-
-    try {
-      const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
-      if (response.status === 200) {
-        // Remove the comment from the list
-        this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
+      try {
+        const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
+        if (response.status === 200) {
+          // Remove the comment from the list
+          this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
+        }
+      } catch (e) {
+        console.error('Failed to remove comment:', e);
+        alert('Failed to remove comment');
       }
-    } catch (e) {
-      console.error('Failed to remove comment:', e);
-      alert('Failed to remove comment');
-    }
   },
 
 
@@ -258,7 +255,7 @@ export default {
     </div>
     <div v-for="comment in comments" :key="comment.comment_id">
       <p><strong>{{ comment.username }} <em> [{{ formatTimestamp(comment.timestamp) }}]: </em></strong> {{ comment.comment_text }} </p>
-      <button v-if="comment.user_id === getID()" @click="removeComment(comment.comment_id)">Remove</button>
+      <button v-if="isOwner || comment.user_id === getID()" @click="removeComment(comment.comment_id)">Remove</button>
     </div>
   </div>
 </template>

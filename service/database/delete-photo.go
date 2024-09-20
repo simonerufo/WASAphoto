@@ -25,7 +25,7 @@ func (db *appdbimpl) GetPhotoIDFromComment(commentID int, userID int) (int, erro
 		AND c.user_id = ? AND c.comment_id = ?`
 
 	var photoID int
-	fmt.Print(commentID, userID)
+	fmt.Print(userID, commentID)
 	err := db.c.QueryRow(QUERY, userID, commentID).Scan(&photoID)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -56,4 +56,24 @@ func (db *appdbimpl) CheckPhotoOwnership(commentID int, userID int) (bool, error
 	}
 
 	return true, nil
+}
+
+func (db *appdbimpl) GetPhotoIDByOwner(commentID int, userID int) (int, error) {
+	QUERY := `
+		SELECT p.photo_id
+		FROM Comment c
+		JOIN Photo p ON c.post_id = p.photo_id
+		WHERE c.comment_id = ? AND p.user_id = ?
+	`
+
+	var photoID int
+	err := db.c.QueryRow(QUERY, commentID, userID).Scan(&photoID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return -1, nil
+		}
+		return photoID, err
+	}
+
+	return photoID, nil
 }

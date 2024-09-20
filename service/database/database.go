@@ -100,6 +100,8 @@ type AppDatabase interface {
 	DeleteComment(user_id int, photo_id int, comment_id int) error
 	//retrieves the photo id from a comment and user id
 	GetPhotoIDFromComment(commentID int, userID int) (int, error)
+	// retrieves the photo id from the comment and user id of the post owner
+	GetPhotoIDByOwner(commentID int, userID int) (int, error)
 	// checks if a specific user owns the photo referred to a specific comment
 	CheckPhotoOwnership(commentID int, userID int) (bool, error)
 	// retrieves the ban list of a user
