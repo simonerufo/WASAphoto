@@ -30,10 +30,27 @@ func (rt _router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	photoID, err := rt.db.GetPhotoIDFromComment(commentID, userID)
+	// check if user owns the photo associated with the given comment ID
+	isOwner, err := rt.db.CheckPhotoOwnership(commentID, userID)
 	if err != nil {
-		http.Error(w, "Error while retrieving the photo id from database", http.StatusInternalServerError)
+		http.Error(w, "Error while checking the owner from database", http.StatusInternalServerError)
 		return
+	}
+
+	var photoID int
+
+	if isOwner {
+		photoID, err = rt.db.GetPhotoIDByOwner(commentID, userID)
+		if err != nil {
+			http.Error(w, "Error while retrieving the photo id from database", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		photoID, err = rt.db.GetPhotoIDFromComment(commentID, userID)
+		if err != nil {
+			http.Error(w, "Error while retrieving the photo id from database", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	// Delete the comment entry from the database
