@@ -1,5 +1,5 @@
 <script>
-import axios,{ getId } from '../services/axios';
+import axios,{ getId , getUsername } from '../services/axios';
 
 export default {
   data() {
@@ -163,12 +163,40 @@ export default {
     }
   },
 
+  // async removeComment(commentId) {
+  //   const userId = this.$route.params.user_id;
+
+  //   try {
+  //     const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
+  //     if (response.status === 200) {
+  //       this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
+  //     }
+  //   } catch (e) {
+  //     console.error('Failed to remove comment:', e);
+  //     alert('Failed to remove comment');
+  //   }
+  // },
+  getID(){
+    getId();
+  },
+
   async removeComment(commentId) {
-    const userId = this.$route.params.user_id;
+    const username = getUsername();
+    const userId = getId();
+    const comment = this.comments.find(comment => comment.comment_id === commentId); // Find the comment
+
+    // Check if the logged-in user is the author of the comment
+    if (comment.username !== username) {
+      console.log("comment user:",comment.username)
+      console.log("user id:",getUsername())
+      alert('You do not have permission to delete this comment');
+      return;
+    }
 
     try {
       const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
       if (response.status === 200) {
+        // Remove the comment from the list
         this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
       }
     } catch (e) {
@@ -176,6 +204,7 @@ export default {
       alert('Failed to remove comment');
     }
   },
+
 
   formatTimestamp(timestamp) {
     const date = new Date(timestamp);
@@ -189,6 +218,7 @@ export default {
     };
     return date.toLocaleDateString("en-US", options);
   },
+
   async getUsername() {
       const userID = this.$route.params.user_id;
       const path = `/profiles/${userID}/profile`;
@@ -228,7 +258,7 @@ export default {
     </div>
     <div v-for="comment in comments" :key="comment.comment_id">
       <p><strong>{{ comment.username }} <em> [{{ formatTimestamp(comment.timestamp) }}]: </em></strong> {{ comment.comment_text }} </p>
-      <button v-if="isOwner" @click="removeComment(comment.comment_id)">Remove</button>
+      <button v-if="comment.user_id === getID()" @click="removeComment(comment.comment_id)">Remove</button>
     </div>
   </div>
 </template>

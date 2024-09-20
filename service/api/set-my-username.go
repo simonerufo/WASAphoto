@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -57,7 +56,6 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 	// checking if new username was already in db
 	taken := rt.db.SearchUsername(userData.Username)
-	fmt.Printf("uD: %s, uDB: %s \n", userData.Username, userDB.Username)
 	if taken {
 		if userDB.Username != userData.Username {
 			http.Error(w, "name already taken", http.StatusBadRequest)
@@ -75,5 +73,4 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 	// printing the response
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "username succesfully updated to: %s\n", userData.Username)
 }

@@ -1,10 +1,9 @@
 package api
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 	"strconv"
-	"encoding/json"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -32,9 +31,9 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	_,err = Auth(w,r)
-	if err != nil{
-		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+	_, err = Auth(w, r)
+	if err != nil {
+		http.Error(w, "Invalid authorization", http.StatusUnauthorized)
 		return
 	}
 
@@ -49,6 +48,4 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	if err != nil {
 		http.Error(w, "error while encoding the json", http.StatusBadRequest)
 	}
-	fmt.Printf("user: %s successfully banned", bannedUser.Username)
 }
-

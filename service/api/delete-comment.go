@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,39 +24,24 @@ func (rt _router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Check if the user is authenticated
-	_,err = Auth(w,r)
-	if err != nil{
-		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+	_, err = Auth(w, r)
+	if err != nil {
+		http.Error(w, "Invalid authorization", http.StatusUnauthorized)
 		return
 	}
 
-	
-	// check if user owns the photo associated with the given comment ID
-	isOwner,err := rt.db.CheckPhotoOwnership(commentID,userID)
-	if err != nil{
-		http.Error(w,"Error while checking the owner from database",http.StatusInternalServerError)
+	photoID, err := rt.db.GetPhotoIDFromComment(commentID, userID)
+	if err != nil {
+		http.Error(w, "Error while retrieving the photo id from database", http.StatusInternalServerError)
 		return
 	}
-
-	if !isOwner {
-		http.Error(w,"Unauthorized to delete the comment", http.StatusUnauthorized)
-		return
-	}
-
-	photoID,err := rt.db.GetPhotoIDFromComment(commentID, userID)
-	if err != nil{
-		http.Error(w,"Error while retrieving the photo id from database", http.StatusInternalServerError)
-		return
-	}
-
 
 	// Delete the comment entry from the database
-	err = rt.db.DeleteComment(userID,photoID,commentID)
+	err = rt.db.DeleteComment(userID, photoID, commentID)
 	if err != nil {
 		http.Error(w, "Error while deleting comment from database", http.StatusInternalServerError)
 		return
 	}
 
-	// Successfully removed the comment
-	fmt.Fprintln(w, "Comment successfully removed!")
+	w.WriteHeader(http.StatusOK)
 }

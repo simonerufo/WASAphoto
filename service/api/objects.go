@@ -1,13 +1,12 @@
 package api
 
 import (
+	"encoding/base64"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
-	"fmt" 	
 	"time"
-	"encoding/base64"
 )
 
 type User struct {
@@ -16,22 +15,21 @@ type User struct {
 }
 
 type UserPhoto struct {
-	PhotoID		int   `json:"photo_id"`
-	UserID      int  `json:"user_id"`
-	Image       string    `json:"image"`       // Base64-encoded image
-	Timestamp   time.Time `json:"timestamp"`   // Date and time of upload
-	LikeCount   int       `json:"likeCount"`   // Number of likes
-	CommentCount int      `json:"commentCount"` // Number of comments
-	Liked       bool      `json:"liked"`       // Whether the photo is liked by the user
-	Caption     string    `json:"caption"`     // Caption for the photo
-	Time        string    `json:"time"`        // Publication time
+	PhotoID      int       `json:"photo_id"`
+	UserID       int       `json:"user_id"`
+	Image        string    `json:"image"`        // Base64-encoded image
+	Timestamp    time.Time `json:"timestamp"`    // Date and time of upload
+	LikeCount    int       `json:"likeCount"`    // Number of likes
+	CommentCount int       `json:"commentCount"` // Number of comments
+	Liked        bool      `json:"liked"`        // Whether the photo is liked by the user
+	Caption      string    `json:"caption"`      // Caption for the photo
+	Time         string    `json:"time"`         // Publication time
 }
 
-
 type Like struct {
-    UserID   int    `json:"user_id"`
-    Username string `json:"username"`
-    PhotoID  int    `json:"photo_id"`
+	UserID   int    `json:"user_id"`
+	Username string `json:"username"`
+	PhotoID  int    `json:"photo_id"`
 }
 
 type Comment struct {
@@ -45,10 +43,10 @@ type CommentRequest struct {
 	CommentText string `json:"comment_text"`
 }
 
-
 func encodeToBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }
+
 // checks if the username is valid
 // func (user User) isNameValid() bool {
 // 	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile
@@ -83,7 +81,7 @@ func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 */
 // func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
 // 	auth := strings.Split(r.Header.Get("Authorization"), " ")
-	
+
 // 	if len(auth) <= 1 {
 // 		return 0, nil
 // 	}
@@ -96,14 +94,11 @@ func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
 // 	return uid, nil
 // }
 
-
-
 func Auth(w http.ResponseWriter, r *http.Request) (int, error) {
 	authHeader := r.Header.Get("Authorization")
 	// Expecting format "Bearer <token>"
 	const bearerPrefix = "Bearer "
 	if !strings.HasPrefix(authHeader, bearerPrefix) {
-		fmt.Printf("Invalid Authorization header format. Expected prefix: '%s'\n", bearerPrefix)
 		http.Error(w, "Invalid Authorization header format", http.StatusBadRequest)
 		return 0, http.ErrAbortHandler
 	}
