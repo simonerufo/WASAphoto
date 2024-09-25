@@ -57,37 +57,56 @@ var PHOTO_TABLE = `CREATE TABLE IF NOT EXISTS Photo(
 	-user_id: identificator of user that wants to post a comment
 	-text : text wrote by user in the comment
 	-timestamp: current timestamp assigned to comment whenever it's created
-*/
-var COMMENT_TABLE = `
-	CREATE TABLE IF NOT EXISTS Comment (
-	comment_id INTEGER AUTO_INCREMENT,
-	post_id INTEGER NOT NULL,
-	owner_id INTEGER NOT NULL,
-	user_id INTEGER NOT NULL,
-	text TEXT NOT NULL,
-	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY(comment_id),
-	FOREIGN KEY(post_id, owner_id) REFERENCES Post(user_id, post_id) ON DELETE CASCADE,
-	FOREIGN KEY(user_id) REFERENCES User(user_id) ON DELETE CASCADE
-);
-`
+// */
+// var COMMENT_TABLE = `
+// 	CREATE TABLE IF NOT EXISTS Comment (
+// 	comment_id INTEGER AUTO_INCREMENT,
+// 	post_id INTEGER NOT NULL,
+// 	owner_id INTEGER NOT NULL,
+// 	user_id INTEGER NOT NULL,
+// 	text TEXT NOT NULL,
+// 	timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+// 	PRIMARY KEY(comment_id),
+// 	FOREIGN KEY(post_id, owner_id) REFERENCES Photo(photo_id) ON DELETE CASCADE,
+// 	FOREIGN KEY(user_id) REFERENCES User(user_id) ON DELETE CASCADE
+// );
+// `
 
-//LIKE
-/*
-	-user_id : identificator of user that wants to like a post
-	-owner_id: identificator of user that's receiving the like
-	-post_id: identificator of post that's receiving the like
-*/
+// //LIKE
+// /*
+// 	-user_id : identificator of user that wants to like a post
+// 	-owner_id: identificator of user that's receiving the like
+// 	-post_id: identificator of post that's receiving the like
+// */
 
-var LIKE_TABLE = `CREATE TABLE IF NOT EXISTS Like(
-	user_id INTEGER NOT NULL,
-	owner_id INTEGER NOT NULL,
-	post_id INTEGER NOT NULL,
-	PRIMARY KEY(post_id,owner_id,user_id),
-	FOREIGN KEY(post_id,owner_id) REFERENCES Post(post_id,user_id)
-		ON DELETE CASCADE,
-	FOREIGN KEY(user_id) REFERENCES Post(user_id)
-		ON DELETE CASCADE
+// var LIKE_TABLE = `CREATE TABLE IF NOT EXISTS Like(
+// 	user_id INTEGER NOT NULL,
+// 	owner_id INTEGER NOT NULL,
+// 	post_id INTEGER NOT NULL,
+// 	PRIMARY KEY(post_id,owner_id,user_id),
+// 	FOREIGN KEY(post_id) REFERENCES Photo(photo_id)
+// 		ON DELETE CASCADE,
+// 	FOREIGN KEY(user_id) REFERENCES Post(user_id)
+// 		ON DELETE CASCADE
+// );`
+
+var COMMENT_TABLE = `CREATE TABLE IF NOT EXISTS Comment (
+    comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Photo(photo_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+);`
+
+var LIKE_TABLE = `CREATE TABLE IF NOT EXISTS Like (
+    user_id INTEGER NOT NULL,
+    owner_id INTEGER NOT NULL,
+    post_id INTEGER NOT NULL,
+    PRIMARY KEY (post_id, owner_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES Photo(photo_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );`
 
 //FOLLOW

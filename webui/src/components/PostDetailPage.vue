@@ -134,6 +134,8 @@ export default {
     try {
       const response = await axios.delete(`/profiles/${userId}/photos/${postId}`);
       if (response.status === 204) {
+        this.likeCount = 0;
+        this.comments = [];
         alert('Post deleted successfully');
         this.$router.push(`/profiles/${userId}/profile`);
       }
