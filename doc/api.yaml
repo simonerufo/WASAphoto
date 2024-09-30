@@ -689,7 +689,7 @@ components:
           description: list of all liked photos
           items: {$ref: "#/components/schemas/PhotoID"}
           minItems: 0
-          maxItems: 10000000
+          maxItems: 10000
       
     Photos:
       title: User photos
@@ -701,7 +701,7 @@ components:
           description: an array of user's photos
           items: {$ref: "#/components/schemas/UserPhoto"}
           minItems: 0
-          maxItems: 10000000
+          maxItems: 10000
     
     PhotoID:
       title: photo id
@@ -725,7 +725,7 @@ components:
               - {$ref: "#/components/schemas/Username"}
               - {$ref: "#/components/schemas/UserID"}
           minItems: 0
-          maxItems: 10000000
+          maxItems: 10000
       
     Banned:
       title: Ban list
@@ -737,10 +737,10 @@ components:
           description: list of users' names and IDs banned by user
           items:
             oneOf:
-              - $ref: "#/components/schemas/Username"
-              - $ref: "#/components/schemas/UserID"
+              - {$ref: "#/components/schemas/Username"}
+              - {$ref: "#/components/schemas/UserID"}
           minItems: 0
-          maxItems: 10000000
+          maxItems: 10000
 
     UserPhoto:
       title: User Photo
@@ -793,7 +793,7 @@ components:
           type: string
           format: byte
           minLength: 1
-          maxLength: 1000000000
+          maxLength: 1000000
            
     Caption:
           description: "description of a photo"
@@ -812,7 +812,7 @@ components:
             description: array of User photos
             items: {$ref: "#/components/schemas/UserPhoto"}
             minItems: 0
-            maxItems: 10000000
+            maxItems: 10000
           
     UserID:
       title: User ID
