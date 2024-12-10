@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
   title: WASAphoto API
   description: |-
@@ -35,7 +35,7 @@ paths:
           description: User log-in action successful
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/UserID"
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
@@ -70,12 +70,12 @@ paths:
         description: the user id of the user that wanted to change his username
         schema: { $ref: "#/components/schemas/UserID" }
         required: true
-          
+
     put:
       tags: ["action"]
       operationId: setMyUsername
       summary: update the username
-      description: setting the username to user with this uid 
+      description: setting the username to user with this uid
       requestBody:
         content:
           application/json:
@@ -86,7 +86,7 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/UserID" }
-        "400": {$ref: "#/components/responses/BadRequest"} 
+        "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
     # get:
@@ -130,7 +130,7 @@ paths:
         description: ID of photo
         schema: { $ref: "#/components/schemas/PhotoID"}
         required: true
-    
+
     delete:
         tags: ["action"]
         operationId: deletePhoto
@@ -141,9 +141,9 @@ paths:
             description: Photo successfully deleted
           "400": {$ref: "#/components/responses/BadRequest"}
           "401": {$ref: "#/components/responses/Unauthorized"}
-          "403": {$ref: "#/components/responses/Forbidden"} 
+          "403": {$ref: "#/components/responses/Forbidden"}
           "500": {$ref: "#/components/responses/InternalServerError"}
-    
+
     get:
       tags: ["action"]
       operationId: getPhoto
@@ -195,7 +195,7 @@ paths:
         description: user's id that is going to be banned/unbanned
         schema: {$ref: "#/components/schemas/UserID"}
         required: true
-    
+
     put:
       tags: ["action"]
       operationId: banUser
@@ -214,7 +214,7 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-    
+
     delete:
       tags: ["action"]
       operationId: unbanUser
@@ -230,7 +230,7 @@ paths:
       operationId: getBan
       summary: get the user who banned another user
       responses:
-        "200": 
+        "200":
           description: user successfully retrieved
           content:
             application/json:
@@ -246,7 +246,7 @@ paths:
         description: user id's profile to be shown
         schema: {$ref: "#/components/schemas/Username"}
         required: true
-    
+
     get:
       tags: ["action"]
       operationId: getUserProfile
@@ -263,7 +263,7 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-  
+
   /profiles/{user_id}/photos:
     parameters:
       - name: user_id
@@ -288,7 +288,7 @@ paths:
         required: true
         content:
           multipart/form-data:
-            schema: 
+            schema:
               $ref: "#/components/schemas/UserPhoto"
       responses:
         "201": {$ref: "#/components/schemas/Success"}
@@ -332,7 +332,7 @@ paths:
         description: photo id's that is receiving a like/comment or deleting it
         schema: {$ref: "#/components/schemas/PhotoID"}
         required: true
-   
+
     put:
       tags: ["action"]
       operationId: likePhoto
@@ -353,7 +353,7 @@ paths:
         "401": {$ref: "#/components/responses/Unauthorized"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-    
+
     delete:
       tags: ["action"]
       operationId: unlikePhoto
@@ -401,7 +401,7 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-   
+
   /profiles/{user_id}/comments/{photo_id}:
     parameters:
       - name: user_id
@@ -414,7 +414,7 @@ paths:
         description: The photo ID on which the comment is made.
         schema: { $ref: "#/components/schemas/PhotoID" }
         required: true
-    
+
     post:
       tags:
         - action
@@ -443,7 +443,7 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-                
+
     delete:
       tags:
         - action
@@ -462,7 +462,7 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-                
+
 
   /profiles/{user_id}/photos/{photo_id}/comments:
     parameters:
@@ -476,7 +476,7 @@ paths:
         description: The photo ID for which comments are being retrieved
         schema: { $ref: "#/components/schemas/PhotoID" }
         required: true
-   
+
     get:
       tags: ["action"]
       operationId: getPhotoComments
@@ -509,7 +509,7 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
-  
+
   /profiles/{user_id}/following/{following_id}:
     parameters:
       - name: user_id
@@ -520,7 +520,7 @@ paths:
         in: path
         required: true
         schema: { $ref: "#/components/schemas/UserID" }
-    
+
     put:
       summary: Follow a user
       description: Follow a user specified by the following_id.
@@ -532,7 +532,7 @@ paths:
               schema: { $ref: "#/components/schemas/Success" }
         "400": {$ref : "#/components/responses/BadRequest"}
         "500": {$ref : "#/components/responses/InternalServerError"}
-    
+
     delete:
       summary: Unfollow a user
       description: Unfollow a user specified by the following_id.
@@ -549,7 +549,7 @@ paths:
         description: The user ID of the profile whose followers are being retrieved
         schema: { $ref: "#/components/schemas/UserID" }
         required: true
-    
+
     get:
       tags: ["action"]
       operationId: getUserFollowers
@@ -572,7 +572,7 @@ paths:
                   - followers
         "400": {$ref : "#/components/responses/BadRequest"}
         "500": {$ref : "#/components/responses/InternalServerError"}
- 
+
   /profiles/{user_id}/following:
     parameters:
       - name: user_id
@@ -580,7 +580,7 @@ paths:
         description: ID of user
         schema: { $ref: "#/components/schemas/UserID"}
         required: true
-    
+
     get:
       summary: Retrieve all users that the user follows
       description: Get a list of users that are followed by the user identified by the user_id.
@@ -609,7 +609,7 @@ paths:
         description: The user's ID whose ban list is to be retrieved
         schema: {$ref: "#/components/schemas/UserID"}
         required: true
-    
+
     get:
       tags: ["action"]
       operationId: getBanList
@@ -636,7 +636,7 @@ components:
   schemas:
 
     CommentID:
-      title: Comment ID 
+      title: Comment ID
       description: id of a comment
       type: object
       properties:
@@ -644,7 +644,7 @@ components:
           description: id of a comment
           type: integer
           example: 58
-        
+
     CommentText:
       title: Comment Text
       description: a string representing a text under a post
@@ -657,7 +657,7 @@ components:
           pattern: '^[^\/\\]{1,64}$'
           maxLength: 100
           minLength: 1
-      
+
     Comment:
       title: Comment
       description: "text added from users to posts"
@@ -677,8 +677,8 @@ components:
           minLength: 20
           maxLength: 20
           readOnly: true
-        
-      
+
+
     Liked:
       title: Liked list
       description: list of all liked photos
@@ -690,7 +690,7 @@ components:
           items: {$ref: "#/components/schemas/PhotoID"}
           minItems: 0
           maxItems: 10000
-      
+
     Photos:
       title: User photos
       description: an array of user's photos
@@ -702,7 +702,7 @@ components:
           items: {$ref: "#/components/schemas/UserPhoto"}
           minItems: 0
           maxItems: 10000
-    
+
     PhotoID:
       title: photo id
       description: "photo identificator"
@@ -711,7 +711,7 @@ components:
         id:
           type: integer
           example: 45
-      
+
     Followed:
       title: Followed list
       description: list of users' names and IDs followed by user
@@ -720,13 +720,13 @@ components:
         user:
           type: array
           description: list of users' names and IDs followed by user
-          items: 
+          items:
             oneOf:
               - {$ref: "#/components/schemas/Username"}
               - {$ref: "#/components/schemas/UserID"}
           minItems: 0
           maxItems: 10000
-      
+
     Banned:
       title: Ban list
       description: list of users' names and IDs banned by user
@@ -786,15 +786,15 @@ components:
           example: "2023-11-21T23:19:59"
           minLength: 19
           maxLength: 19
-          
-    Image: 
+
+    Image:
           title: photo
           description: base 64 image.
           type: string
           format: byte
           minLength: 1
           maxLength: 1000000
-           
+
     Caption:
           description: "description of a photo"
           type: string
@@ -813,7 +813,7 @@ components:
             items: {$ref: "#/components/schemas/UserPhoto"}
             minItems: 0
             maxItems: 10000
-          
+
     UserID:
       title: User ID
       description: "this is the user id"
@@ -824,7 +824,7 @@ components:
           type: integer
           example: 1
 #          readOnly: true
-      
+
     Username:
       title: Username
       description: "this is the user's name"
@@ -837,7 +837,7 @@ components:
           pattern: '^[a-z][a-z0-9]*$'
           minLength: 3
           maxLength: 16
-      
+
     User:
       title: User
       description: "all informations about User"
@@ -848,7 +848,7 @@ components:
         username:
           $ref: "#/components/schemas/Username"
 
-          
+
     Profile:
       title: Profile
       description: "User profile"
@@ -872,8 +872,8 @@ components:
           example: 12
           minimum: 0
           readOnly: true
-    
-    
+
+
     Success:
         title: Success
         description: The succesfull response from server.
@@ -881,7 +881,7 @@ components:
         example: "action successfully completed"
         minLength: 2
         maxLength: 200
-  
+
   responses:
 
     #400
@@ -930,6 +930,6 @@ components:
             type: string
             example: "Internal Server Error"
             minLength: 21
-            maxLength: 30 
+            maxLength: 30
 
-        
+
