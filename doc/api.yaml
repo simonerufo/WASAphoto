@@ -54,11 +54,7 @@ paths:
       operationId: getUserProfileByUsername
       description: Retrieve the profile of a user by their username.
       responses:
-        "200":
-          description: Successful response
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Profile"}
+        "200": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
@@ -81,41 +77,10 @@ paths:
           application/json:
               schema: { $ref: "#/components/schemas/Username" }
       responses:
-        "200":
-          description: username updated successfully
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/UserID" }
+        "200": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
-    # get:
-    #   summary: Get user profile by username
-    #   description: Retrieve the profile of a user by their username.
-    #   tags: ["action"]
-    #   operationId: getMyUsername
-    #   parameters:
-    #     - name: user_id
-    #       in: path
-    #       required: true
-    #       schema: { $ref: "#/components/schemas/Username"}
-    #       description: The user ID of the user making the request
-    #     - name: username
-    #       in: query
-    #       required: true
-    #       schema: { $ref: "#/components/schemas/Username"}
-    #   responses:
-    #     '200':
-    #       description: Successful response
-    #       content:
-    #         application/json:
-    #           schema: { $ref: "#/components/schemas/Profile"}
-    #     '400':
-    #       description: Bad request (e.g., missing or invalid parameters)
-    #     '404':
-    #       description: Profile not found
-    #     '500':
-    #       description: Internal server error
 
 
   /profiles/{user_id}/photos/{photo_id}:
@@ -221,7 +186,7 @@ paths:
       summary: unban a user
       description: remove the target_uid user from user's current_uid banned list
       responses:
-        "201": {$ref: "#/components/schemas/Success"}
+        "201": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
@@ -291,7 +256,7 @@ paths:
             schema:
               $ref: "#/components/schemas/UserPhoto"
       responses:
-        "201": {$ref: "#/components/schemas/Success"}
+        "201": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
@@ -360,7 +325,7 @@ paths:
       summary: remove like from photo
       description: user with current_id removes from Liked list photo id with target_id
       responses:
-        "201": {$ref: "#/components/schemas/Success"}
+        "200": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "401": {$ref: "#/components/responses/Unauthorized"}
         "403": {$ref: "#/components/responses/Forbidden"}
@@ -451,14 +416,7 @@ paths:
       summary: Remove a comment from a photo
       description: Removes a comment from the list of comments on a photo for a user.
       responses:
-        "200":
-          description: Comment removed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommentID'
-              example:
-                comment_id: 7
+        "200": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
@@ -525,11 +483,7 @@ paths:
       summary: Follow a user
       description: Follow a user specified by the following_id.
       responses:
-        "201":
-          description: Upload photo and created post successful.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/schemas/Success" }
+        "200": {$ref : "#/components/responses/Success"}
         "400": {$ref : "#/components/responses/BadRequest"}
         "500": {$ref : "#/components/responses/InternalServerError"}
 
@@ -537,7 +491,7 @@ paths:
       summary: Unfollow a user
       description: Unfollow a user specified by the following_id.
       responses:
-        "200": {$ref: "#/components/schemas/Success"}
+        "200": {$ref: "#/components/responses/Success"}
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
@@ -874,17 +828,20 @@ components:
           readOnly: true
 
 
-    Success:
-        title: Success
-        description: The succesfull response from server.
-        type: string
-        example: "action successfully completed"
-        minLength: 2
-        maxLength: 200
-
   responses:
-
-    #400
+  #200
+    Success:
+      description: The succesfull response from server.
+      content:
+        text/plain:
+          schema:
+            description: Success
+            type: string
+            example: "action successfully completed"
+            minLength: 2
+            maxLength: 200
+    
+  #400
     BadRequest:
       description: The request was not compliant with the documentation (eg. missing fields, etc).
       content:
