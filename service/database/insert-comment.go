@@ -16,7 +16,7 @@ func (db *appdbimpl) InsertComment(userID int, ownerID int, postID int, text str
 	newCommentID := maxCommentID + 1
 
 	// Insert the new comment with the incremented comment_id
-	COMMENT := `INSERT INTO Comment(comment_id, post_id, owner_id, user_id, text)
+	COMMENT := `INSERT INTO Comment(comment_id, post_id, user_id, text, timestamp)
 				VALUES (?, ?, ?, ?, ?)`
 
 	_, err = db.c.Exec(COMMENT, newCommentID, postID, ownerID, userID, text)
@@ -26,4 +26,3 @@ func (db *appdbimpl) InsertComment(userID int, ownerID int, postID int, text str
 
 	return newCommentID, nil
 }
-
