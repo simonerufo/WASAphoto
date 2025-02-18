@@ -488,6 +488,7 @@ paths:
         "500": {$ref : "#/components/responses/InternalServerError"}
 
     delete:
+      operationId: unfollowUser
       summary: Unfollow a user
       description: Unfollow a user specified by the following_id.
       responses:
