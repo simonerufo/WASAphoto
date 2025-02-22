@@ -409,9 +409,8 @@ export default {
 };
 </script>
 
-
 <template>
-  <div class="container profile-page">
+  <div class="container profile-page text-center">
     <div v-if="errorMessage" class="alert alert-danger" role="alert">
       {{ errorMessage }}
     </div>
@@ -419,56 +418,51 @@ export default {
       {{ successMessage }}
     </div>
 
-    <div class="row profile-header mt-4">
-      <div class="col-md-8">
-        <div class="profile-details">
-          <div class="form-group">
-            <input type="text"
-                   id="username"
-                   :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}"
-                   v-model="inputValue"
-                   @click="enableInput"
-                   @blur="onBlur"
-                   @keydown.enter="onEnter">
+    <div class="profile-header mt-4">
+      <div class="profile-details">
+        <div class="form-group">
+          <input type="text"
+                 id="username"
+                 :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}"
+                 v-model="inputValue"
+                 @click="enableInput"
+                 @blur="onBlur"
+                 @keydown.enter="onEnter">
+        </div>
+
+        <template v-if="isOwner">
+          <button v-if="isInputEnabled" class="btn btn-primary" @click="editProfile">Save Username</button>
+          <button v-else class="btn btn-outline-primary" @click="enableInput">Edit Username</button>
+
+          <div class="upload-form mt-4">
+            <input type="file" @change="onFileChange" />
+            <textarea v-model="caption" placeholder="Add a caption..."></textarea>
+            <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
           </div>
+        </template>
 
-          <!-- Conditional rendering based on ownership -->
-          <template v-if="isOwner">
-            <!-- Edit and upload options -->
-            <button v-if="isInputEnabled" class="btn btn-primary" @click="editProfile">Save Username</button>
-            <button v-else class="btn btn-outline-primary" @click="enableInput">Edit Username</button>
+        <template v-else>
+          <button v-if="!isFollowing" class="btn btn-outline-primary follow-btn" @click="toggleFollow">Follow</button>
+          <button v-else class="btn btn-outline-secondary follow-btn" @click="toggleFollow">Unfollow</button>
 
-            <div class="upload-form mt-4">
-              <input type="file" @change="onFileChange" />
-              <textarea v-model="caption" placeholder="Add a caption..."></textarea>
-              <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
-            </div>
-          </template>
+          <button v-if="!isBanned" class="btn btn-outline-primary ban-btn" @click="toggleBan">Ban</button>
+          <button v-else class="btn btn-outline-secondary ban-btn" @click="toggleBan">Unban</button>
+        </template>
 
-          <template v-else>
-            <!-- Follow and Ban buttons -->
-            <button v-if="!isFollowing" class="btn btn-outline-primary follow-btn" @click="toggleFollow">Follow</button>
-            <button v-else class="btn btn-outline-secondary follow-btn" @click="toggleFollow">Unfollow</button>
-
-            <button v-if="!isBanned" class="btn btn-outline-primary ban-btn" @click="toggleBan">Ban</button>
-            <button v-else class="btn btn-outline-secondary ban-btn" @click="toggleBan">Unban</button>
-          </template>
-
-          <div class="stats mt-3">
-            <span class="mr-3">Posts: <strong>{{ postsCount }}</strong></span>
-            <br>
-            <span class="mr-3">Followers: <strong>{{ followersCount }}</strong></span>
-            <br>
-            <span class="mr-3">Following: <strong>{{ followingCount }}</strong></span>
-          </div>
+        <div class="stats mt-3">
+          <span class="mr-3">Posts: <strong>{{ postsCount }}</strong></span>
+          <br>
+          <span class="mr-3">Followers: <strong>{{ followersCount }}</strong></span>
+          <br>
+          <span class="mr-3">Following: <strong>{{ followingCount }}</strong></span>
         </div>
       </div>
     </div>
 
     <div class="tab-content" id="profileTabsContent">
       <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
-        <div class="row mt-4">
-          <div v-for="post in posts" :key="post.photo_id" class="col-md-4 mb-4">
+        <div class="photo-grid mt-4">
+          <div v-for="post in posts" :key="post.photo_id" class="photo-item">
             <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
           </div>
         </div>
@@ -479,170 +473,85 @@ export default {
 
 <style scoped>
 .profile-page {
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: 'Courier New', Courier, monospace;
+  background-color: #000;
+  color: #fff;
   padding: 30px;
+  border-radius: 15px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #F4E1C1;
-  border-radius: 15px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  justify-content: center;
 }
 
 .profile-header {
-  width: 100%;
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  background-color: #111;
   padding: 20px;
-  background-color: #F2A541;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.profile-details {
   width: 100%;
   max-width: 600px;
   text-align: center;
 }
 
-.profile-name-unselected,
-.profile-name-selected {
-  font-size: 22px;
-  font-weight: 700;
-  padding: 12px;
+.profile-details input {
+  background-color: #222;
+  color: #fff;
+  border: 2px solid #444;
+  padding: 10px;
   border-radius: 10px;
-  border: 3px solid #D67F00;
-  display: inline-block;
-  transition: all 0.3s ease;
+  text-align: center;
+  width: 100%;
 }
 
-.profile-name-unselected {
-  background-color: #D67F00;
-  color: #FFF8DC;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+.upload-form textarea {
+  background-color: #222;
+  color: #fff;
+  border: 2px solid #444;
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+  min-height: 100px;
+  resize: none;
 }
 
-.profile-name-selected {
-  background-color: #FFF8DC;
-  color: #D67F00;
-  border: 3px solid #D67F00;
+.btn {
+  background-color: #333;
+  color: #fff;
+  border: 2px solid #555;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: 0.3s;
+  display: block;
+  width: 100%;
+  margin-top: 10px;
 }
 
-.stats {
-  font-size: 16px;
-  color: #3E2723;
-  margin-top: 20px;
+.btn:hover {
+  background-color: #555;
+}
+
+.photo-grid {
   display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
   justify-content: center;
-  gap: 20px;
-  font-style: italic;
 }
 
-.upload-form {
-  width: 100%;
-  max-width: 600px;
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #FFF3E0;
-  border-radius: 15px;
-  border: 2px solid #D67F00;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.upload-form input[type="file"],
-.upload-form textarea,
-.upload-form button {
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 12px;
-  border-radius: 10px;
-  border: 2px solid #D67F00;
-  font-size: 16px;
-  background-color: #FFEBB7;
-}
-
-.upload-form input[type="file"] {
-  background-color: #FFF8DC;
-}
-
-.upload-form button {
-  background-color: #D67F00;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.upload-form button:hover {
-  background-color: #D29E00;
-  transform: scale(1.05);
+.photo-item {
+  flex: 1 1 calc(33.33% - 15px);
+  max-width: calc(33.33% - 15px);
 }
 
 .photo {
   width: 100%;
-  max-width: 350px;
   height: auto;
   border-radius: 10px;
   transition: transform 0.3s ease;
+  border: 3px solid #fff;
 }
 
 .photo:hover {
   transform: scale(1.1);
-}
-
-.follow-btn,
-.ban-btn {
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: 10px;
-  padding: 8px 16px;
-  border: 3px solid #D67F00;
-  transition: all 0.3s ease;
-}
-
-.follow-btn:hover,
-.ban-btn:hover {
-  background-color: #D67F00;
-  color: white;
-  border-color: #D29E00;
-}
-
-.follow-btn {
-  background-color: #FFF8DC;
-}
-
-.ban-btn {
-  background-color: #F28D61;
-}
-
-.ban-btn:hover {
-  background-color: #E5733C;
-}
-
-.alert {
-  width: 100%;
-  max-width: 600px;
-  margin-top: 20px;
-  border-radius: 5px;
-  padding: 15px;
-  font-size: 16px;
-  text-align: center;
-}
-
-.alert-danger {
-  background-color: #FAD0C9;
-  color: #8B0000;
-}
-
-.alert-success {
-  background-color: #C8E6C9;
-  color: #388E3C;
 }
 </style>
 
