@@ -21,38 +21,33 @@ export default {
       caption: '',
       file: null,
       isOwner: false, // Track if the current user is the owner
-      errorMessage: '' // Error message for display
+      errorMessage: '', // Error message for display
+      successMessage: '' // Success message for displaying username change
     };
   },
   methods: {
-    async checkIfFollowing() {
-      // The ID of the profile the current user is visiting
-      const profileUserId = this.id
 
-      // Get the current user's ID from localStorage
-      const currentUserId = getId();
+  async checkIfFollowing() {
+    const profileUserId = this.id;
+    const currentUserId = getId();
 
-      try {
-        // Make a request to fetch the list of users that the current user follows
-        const response = await axios.get(`/profiles/${currentUserId}/following`);
+    try {
+      const response = await axios.get(`/profiles/${currentUserId}/following`);
 
-        if (response.status === 200) {
-          const followedUsers = response.data || [];
-
-          // Extract only the user_ids from the followed users
-          const followedUserIds = followedUsers.map(user => user.user_id);
-
-          // Check if the profileUserId is in the list of followed user_ids
+      if (response.status === 200) {
+        const followedUsers = response.data || [];
+        const followedUserIds = followedUsers.map(user => user.user_id);
+      
           this.isFollowing = followedUserIds.includes(Number(profileUserId));
 
-          console.log(`Is following: ${this.isFollowing}`);
-        } else {
-          console.warn(`Unexpected response status ${response.status}`);
-        }
-      } catch (error) {
-        console.error("Error checking if the user is following the profile:", error);
+        console.log(`Following status for user ${profileUserId}: ${this.isFollowing}`);
+      } else {
+        console.warn(`Unexpected response status ${response.status}`);
       }
-    },
+    } catch (error) {
+      console.error("Error checking if the user is following the profile:", error);
+    }
+  },
 
     async checkIfBanned() {
       const profileUserId = this.id;
@@ -140,6 +135,7 @@ export default {
 
     enableInput() {
       this.isInputEnabled = true;
+      this.successMessage = '';
     },
 
     onBlur() {
@@ -164,11 +160,13 @@ export default {
           this.user.username = this.inputValue;
           localStorage.setItem("username", this.username);
           this.errorMessage = '';
+          this.successMessage = 'Username updated successfully!';
+          this.isInputEnabled = false;
         }
       } catch (e) {
         console.error('Failed to update profile:', e);
-        this.errorMessage = "Failed to update profile: the username must be long 3 to 16 chars";
-        this.inputValue = this.username; // Revert to old username
+        this.errorMessage = "Failed to update profile: the username must be long 3 to 16 chars and must have only lower case chars";
+        this.inputValue = this.username; 
       } finally {
         this.isInputEnabled = false;
       }
@@ -234,77 +232,175 @@ export default {
       }
     },
 
-    async toggleFollow() {
-      const path = `/profiles/${this.currentUserId}/following/${this.id}`;
-      const method = this.isFollowing ? 'DELETE' : 'PUT';
+    // async toggleFollow() {
+    //   const path = `/profiles/${this.currentUserId}/following/${this.id}`;
+    //   const method = this.isFollowing ? 'DELETE' : 'PUT';
 
-      try {
-        const response = await axios({
-          method,
-          url: path
-        });
+    //   try {
+    //     const response = await axios({
+    //       method,
+    //       url: path
+    //     });
 
-        if (response.status === (this.isFollowing ? 200 : 201)) {
-          this.isFollowing = !this.isFollowing;
-          this.followersCount += this.isFollowing ? 1 : -1;
-          this.errorMessage = '';
+    //     if (response.status === (this.isFollowing ? 200 : 201)) {
+    //       this.isFollowing = !this.isFollowing;
+    //       this.followersCount += this.isFollowing ? 1 : -1;
+    //       this.errorMessage = '';
 
-          // Reload the user profile to update UI
-          await this.getUser();
-        }
-      } catch (e) {
-        console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
-        this.errorMessage = `Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user. Please try again later.`;
+    //       // Reload the user profile to update UI
+    //       await this.getUser();
+    //     }
+    //   } catch (e) {
+    //     console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
+    //     this.errorMessage = `Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user. Please try again later.`;
+    //   }
+    // },
+
+  async toggleFollow() {
+    const path = `/profiles/${this.currentUserId}/following/${this.id}`;
+    const method = this.isFollowing ? 'DELETE' : 'PUT';
+
+    try {
+      const response = await axios({
+        method,
+        url: path
+      });
+
+    if (response.status === 201 || response.status === 200) {
+        this.isFollowing = !this.isFollowing;
+    
+        this.followersCount += this.isFollowing ? 1 : -1;
+
+        console.log(`User ${this.isFollowing ? 'followed' : 'unfollowed'} successfully`);
+      } else {
+        console.warn(`Unexpected response status ${response.status}`);
       }
-    },
+    } catch (e) {
+      console.error(`Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user:`, e);
+      this.errorMessage = `Failed to ${this.isFollowing ? 'unfollow' : 'follow'} user. Please try again later.`;
+    }
+  },
 
 
+    // async toggleBan() {
 
-    async toggleBan() {
-      
-      const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
-      const method = this.isBanned ? 'DELETE' : 'PUT';
-      const followPath = `/profiles/${this.id}/following/${this.currentUserId}`;
-      const followMethod = 'DELETE';
+    //   const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
+    //   const method = this.isBanned ? 'DELETE' : 'PUT';
+    //   const followPath = `/profiles/${this.id}/following/${this.currentUserId}`;
+    //   const followMethod = 'DELETE';
 
-      try {
-        // Make the ban request
-        const banResponse = await axios({
-          method,
-          url: path
-        });
-        console.log(banResponse.status);
-        if (banResponse.status === 200) {
-          // Update the banned status immediately
+    //   try {
+    //     // Make the ban request
+    //     console.log(`Ban API Path: ${path}`);
+    //     console.log(`Unfollow API Path: ${followPath}`);
+    //     console.log(`Current User ID: ${this.currentUserId}, Target User ID: ${this.id}`);
+
+    //     const banResponse = await axios({
+    //       method,
+    //       url: path
+    //     });
+    //     console.log(banResponse.status);
+    //     if (banResponse.status === 200) {
+    //       // Update the banned status immediately
           
-          this.isBanned = !this.isBanned;
-          this.errorMessage = '';
+    //       this.isBanned = !this.isBanned;
+    //       this.errorMessage = '';
 
-          // If the user was banned, remove the follow relationship
-          if (this.isBanned) {
-            try {
-              const followResponse = await axios({
-                method: followMethod,
-                url: followPath
-              }); 
-              if (followResponse.status === 200) {
-                // Update the following status and count
-                this.followersCount--;
-                console.log('Successfully unfollowed the user');
-              } else {
-                console.warn(`Unexpected response status from unfollow API: ${followResponse.status}`);
-              }
-            } catch (error) {
-              console.error('Error removing follow relationship:', error);
-              this.errorMessage = 'Failed to unfollow user after banning.';
+    //       // If the user was banned, remove the follow relationship
+    //       if (this.isBanned) {
+    //         try {
+    //           const followResponse = await axios({
+    //             method: followMethod,
+    //             url: followPath
+    //           }); 
+    //           if (followResponse.status === 200) {
+    //             // Update the following status and count
+    //             this.followersCount--;
+    //             console.log('Successfully unfollowed the user');
+    //           } else {
+    //             console.warn(`Unexpected response status from unfollow API: ${followResponse.status}`);
+    //           }
+    //         } catch (error) {
+    //           console.error('Error removing follow relationship:', error);
+    //           this.errorMessage = 'Failed to unfollow user after banning.';
+    //         }
+    //       }
+    //     }
+    //   } catch (e) {
+    //     console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e);
+    //     this.errorMessage = `Failed to ${this.isBanned ? 'unban' : 'ban'} user. Please try again later.`;
+    //   }
+    // }
+  // async toggleBan() {
+  //   const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
+  //   const method = this.isBanned ? 'DELETE' : 'PUT';
+  //   const followPath = `/profiles/${this.id}/following/${this.currentUserId}`;
+  //   const followMethod = 'DELETE';
+
+  //   console.log(`Ban request: ${method} ${path}`);
+  //   console.log(`Unfollow request: ${followMethod} ${followPath}`);
+
+  //   try {
+  //     const banResponse = await axios({ method, url: path });
+
+  //     console.log(`Ban Response Status: ${banResponse.status}`);
+
+  //     if (banResponse.status === 200) {
+  //       this.isBanned = !this.isBanned;
+
+  //     if (this.isBanned) {
+  //         try {
+  //           const followResponse = await axios({ method: followMethod, url: followPath });
+  //           console.log(`Unfollow Response Status: ${followResponse.status}`);
+  //           if (followResponse.status === 200) {
+  //             this.followersCount--;
+  //           }
+  //         } catch (error) {
+  //           console.error('Error removing follow relationship:', error.response?.data || error.message);
+  //         }
+  //       }
+  //     }
+  //   } catch (e) {
+  //     console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e.response?.data || e.message);
+  //   }
+  // }
+  async toggleBan() {
+    const path = `/profiles/${this.currentUserId}/bans/${this.id}`;
+    const method = this.isBanned ? 'DELETE' : 'PUT';
+    const followPath = `/profiles/${this.id}/following/${this.currentUserId}`;
+    const followMethod = 'DELETE';
+
+    console.log(`Ban request: ${method} ${path}`);
+    console.log(`Unfollow request: ${followMethod} ${followPath}`);
+
+    try {
+      const banResponse = await axios({ method, url: path });
+
+      console.log(`Ban Response Status: ${banResponse.status}`);
+
+      if (banResponse.status === 200 || banResponse.status == 204) {
+        console.log("Banned before:", this.isBanned);
+        this.isBanned = !this.isBanned;
+        console.log("Banned after:", this.isBanned);
+
+
+        if (this.isBanned && this.isFollowing) {
+          try {
+            const followResponse = await axios({ method: followMethod, url: followPath });
+            console.log(`Unfollow Response Status: ${followResponse.status}`);
+
+            if (followResponse.status === 200) {
+              this.followersCount--;
             }
+          } catch (error) {
+            console.error('Error removing follow relationship:', error.response?.data || error.message);
           }
         }
-      } catch (e) {
-        console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e);
-        this.errorMessage = `Failed to ${this.isBanned ? 'unban' : 'ban'} user. Please try again later.`;
       }
+    } catch (e) {
+      console.error(`Failed to ${this.isBanned ? 'unban' : 'ban'} user:`, e.response?.data || e.message);
     }
+  }
 
   },
   mounted() {
@@ -316,9 +412,11 @@ export default {
 
 <template>
   <div class="container profile-page">
-    <!-- Display Error Message -->
     <div v-if="errorMessage" class="alert alert-danger" role="alert">
       {{ errorMessage }}
+    </div>
+    <div v-if="successMessage" class="alert alert-success" role="alert">
+      {{ successMessage }}
     </div>
 
     <div class="row profile-header mt-4">
@@ -336,7 +434,10 @@ export default {
 
           <!-- Conditional rendering based on ownership -->
           <template v-if="isOwner">
-            <!-- Upload photo form -->
+            <!-- Edit and upload options -->
+            <button v-if="isInputEnabled" class="btn btn-primary" @click="editProfile">Save Username</button>
+            <button v-else class="btn btn-outline-primary" @click="enableInput">Edit Username</button>
+
             <div class="upload-form mt-4">
               <input type="file" @change="onFileChange" />
               <textarea v-model="caption" placeholder="Add a caption..."></textarea>
@@ -354,11 +455,11 @@ export default {
           </template>
 
           <div class="stats mt-3">
-            <span class="mr-3">posts: <strong>{{ postsCount }}</strong></span>
+            <span class="mr-3">Posts: <strong>{{ postsCount }}</strong></span>
             <br>
-            <span class="mr-3">followers: <strong>{{ followersCount }}</strong></span>
+            <span class="mr-3">Followers: <strong>{{ followersCount }}</strong></span>
             <br>
-            <span class="mr-3">following: <strong>{{ followingCount }}</strong></span>
+            <span class="mr-3">Following: <strong>{{ followingCount }}</strong></span>
           </div>
         </div>
       </div>
@@ -368,128 +469,180 @@ export default {
       <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
         <div class="row mt-4">
           <div v-for="post in posts" :key="post.photo_id" class="col-md-4 mb-4">
-           <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
+            <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
           </div>
-
         </div>
       </div>
     </div>
   </div>
 </template>
 
-
 <style scoped>
 .profile-page {
-  max-width: 800px; /* Container width */
-  margin: 0 auto; /* Center container horizontally */
-  font-family: 'Arial', sans-serif;
-  padding: 20px; /* Padding around the container */
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center content horizontally */
+  align-items: center;
+  background-color: #F4E1C1;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .profile-header {
-  width: 100%; /* Full width of the container */
-  max-width: 800px; /* Ensure it doesn't exceed the container's width */
+  width: 100%;
+  max-width: 800px;
   display: flex;
-  flex-direction: column; /* Stack profile details vertically */
-  align-items: center; /* Center profile details horizontally */
-  gap: 20px; /* Spacing between elements */
-  padding: 10px;
-  border: 1px solid #0033cc;
-  border-radius: 8px;
-  background: #e0e0e0;
-  box-shadow: 2px 2px 5px #888;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background-color: #F2A541;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .profile-details {
-  width: 100%; /* Full width within the profile header */
-  max-width: 600px; /* Limit width for better alignment */
-  text-align: center; /* Center text inside the profile details */
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
 }
 
 .profile-name-unselected,
 .profile-name-selected {
-  font-size: 18px; /* Font size for profile name */
-  font-weight: bold;
-  border: 1px solid #0033cc;
-  padding: 5px;
-  border-radius: 3px;
-  display: inline-block; /* Fit content width */
+  font-size: 22px;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 10px;
+  border: 3px solid #D67F00;
+  display: inline-block;
+  transition: all 0.3s ease;
 }
 
 .profile-name-unselected {
-  background-color: #d0d0d0;
-  color: #000;
+  background-color: #D67F00;
+  color: #FFF8DC;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .profile-name-selected {
-  background-color: #a0a0a0;
-  color: #000;
+  background-color: #FFF8DC;
+  color: #D67F00;
+  border: 3px solid #D67F00;
 }
 
 .stats {
-  font-size: 14px; /* Font size for stats */
-  color: #000;
-  margin-top: 10px;
-  text-align: center; /* Center text inside stats */
+  font-size: 16px;
+  color: #3E2723;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-style: italic;
 }
 
 .upload-form {
-  width: 100%; /* Full width within the profile header */
-  max-width: 600px; /* Limit width for better alignment */
+  width: 100%;
+  max-width: 600px;
   margin-top: 20px;
-  background: #e0e0e0;
-  padding: 10px;
-  border: 1px solid #0033cc;
-  border-radius: 8px;
-  box-shadow: 2px 2px 5px #888;
+  padding: 20px;
+  background-color: #FFF3E0;
+  border-radius: 15px;
+  border: 2px solid #D67F00;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .upload-form input[type="file"],
 .upload-form textarea,
 .upload-form button {
-  display: block;
-  width: calc(100% - 22px); /* Full width minus padding */
-  margin: 0 auto 10px auto; /* Center elements horizontally */
-  border: 1px solid #0033cc;
-  border-radius: 3px;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #D67F00;
+  font-size: 16px;
+  background-color: #FFEBB7;
 }
 
-.upload-form textarea {
-  padding: 5px;
-  background: #fff;
-  color: #000;
+.upload-form input[type="file"] {
+  background-color: #FFF8DC;
 }
 
 .upload-form button {
-  background: #0033cc;
-  color: #fff;
-  border: none;
-  padding: 5px;
+  background-color: #D67F00;
+  color: white;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: bold;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .upload-form button:hover {
-  background: #0055ff;
+  background-color: #D29E00;
+  transform: scale(1.05);
 }
 
 .photo {
-  width: 600px;
-  height: 240px;
-  border: 1px solid #0033cc;
-  border-radius: 3px;
-  transition: filter 0.3s ease;
-  display: block;
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
 }
-
 
 .photo:hover {
-  filter: brightness(1.2);
+  transform: scale(1.1);
+}
+
+.follow-btn,
+.ban-btn {
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 8px 16px;
+  border: 3px solid #D67F00;
+  transition: all 0.3s ease;
+}
+
+.follow-btn:hover,
+.ban-btn:hover {
+  background-color: #D67F00;
+  color: white;
+  border-color: #D29E00;
+}
+
+.follow-btn {
+  background-color: #FFF8DC;
+}
+
+.ban-btn {
+  background-color: #F28D61;
+}
+
+.ban-btn:hover {
+  background-color: #E5733C;
+}
+
+.alert {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 20px;
+  border-radius: 5px;
+  padding: 15px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.alert-danger {
+  background-color: #FAD0C9;
+  color: #8B0000;
+}
+
+.alert-success {
+  background-color: #C8E6C9;
+  color: #388E3C;
 }
 </style>
-
-
 

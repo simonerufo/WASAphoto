@@ -49,7 +49,11 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	// Adding the follow relation into database
 	err = rt.db.FollowUser(current_user.UserID, target_user.UserID)
 	if err != nil {
-		http.Error(w, "error following user", http.StatusInternalServerError)
+		if err.Error() == "user already follows this person" {
+			http.Error(w, "User already follows this person", http.StatusConflict)
+		} else {
+			http.Error(w, "error following user", http.StatusInternalServerError)
+		}
 		return
 	}
 

@@ -8,9 +8,9 @@ export default {
       loading: false,
       currentUsername: null,
       userID: 0,
-      userPhotos: [], // This will hold the photos from the main user
-      followedUsers: [], // List of users followed by the main user
-      followedUsernames: {}, // Mapping of user IDs to usernames
+      userPhotos: [],
+      followedUsers: [],
+      followedUsernames: {},
     };
   },
   methods: {
@@ -18,18 +18,14 @@ export default {
       this.loading = true;
       this.errormsg = null;
       try {
-        // Fetch user information and followed users
         await this.fetchUserInfo();
-        // Fetch user photos after getting the main data
         await this.fetchUserPhotos();
-        // Sort photos by timestamp after fetching
         this.sortPhotosByTimestamp();
       } catch (e) {
         this.errormsg = e.toString();
       }
       this.loading = false;
     },
-
     formatTimestamp(timestamp) {
       const date = new Date(timestamp);
       const options = {
@@ -51,7 +47,7 @@ export default {
       try {
         this.userID = localStorage.getItem("id");
         this.currentUsername = localStorage.getItem("username");
-        await this.fetchFollowedUsers(this.userID); // Fetch followed users
+        await this.fetchFollowedUsers(this.userID);
       } catch (e) {
         this.errormsg = e.toString();
       }
@@ -59,7 +55,6 @@ export default {
     async fetchFollowedUsers(userId) {
       try {
         const response = await axios.get(`/profiles/${userId}/following`);
-        console.log("Followed users:", response.data);
         this.followedUsers = response.data;
       } catch (e) {
         this.errormsg = e.toString();
@@ -77,10 +72,9 @@ export default {
     },
     async fetchUserPhotos() {
       try {
-        this.userPhotos = []; // Clear previous photos
-        this.followedUsernames = {}; // Clear previous usernames
+        this.userPhotos = [];
+        this.followedUsernames = {};
 
-        // Fetch the stream for the main user
         const path = `/profiles/${this.userID}/stream`;
         const response = await axios.get(path);
 
@@ -88,12 +82,10 @@ export default {
           this.userPhotos = response.data.map((photo) => {
             if (photo.image && !photo.image.startsWith("data:image")) {
               photo.image = `data:image/jpeg;base64,${photo.image}`;
-              console.log(photo.image);
             }
             return photo;
           });
 
-          // Fetch usernames for each photo
           for (let photo of this.userPhotos) {
             const username = await this.fetchUsername(photo.user_id);
             this.followedUsernames = {
@@ -112,13 +104,9 @@ export default {
       }
     },
     onImageError(photoId) {
-      console.error(`Failed to load image for photo ID: ${photoId}`);
-      // Use a placeholder image from Bootstrap as filler
       this.userPhotos = this.userPhotos.map((photo) => {
         if (photo.photo_id === photoId) {
-          photo.image =
-            //"https://via.placeholder.com/150?text=No+Image"; // Bootstrap placeholder image
-            "https://loremflickr.com/320/240"
+          photo.image = "https://loremflickr.com/320/240";
         }
         return photo;
       });
@@ -142,7 +130,6 @@ export default {
 
     <div v-if="userPhotos.length > 0" class="photo-grid">
       <div v-for="photo in userPhotos" :key="photo.photo_id" class="photo-card">
-        <!-- RouterLink for the image -->
         <RouterLink :to="`/profiles/${photo.user_id}/photos/${photo.photo_id}`">
           <img
             :src="photo.image"
@@ -151,15 +138,12 @@ export default {
             @error="onImageError(photo.photo_id)"
           />
         </RouterLink>
-        
-        <!-- Photo information -->
+
         <div class="photo-info">
-          <!-- RouterLink for the username -->
           <RouterLink :to="`/profiles/${photo.user_id}/profile`" class="photo-username">
             <strong>{{ followedUsernames[photo.user_id] || "Loading..." }}</strong>
           </RouterLink>
-          
-          <!-- Timestamp and caption -->
+
           <p class="photo-timestamp">
             <strong>Timestamp:</strong> {{ formatTimestamp(photo.timestamp) }}
           </p>
@@ -173,16 +157,18 @@ export default {
   </div>
 </template>
 
-
 <style scoped>
 .stream-page {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  font-family: "Arial", sans-serif;
+  font-family: 'Courier New', Courier, monospace;
   max-width: 800px;
   margin: 0 auto;
+  background-color: #F4E1C1;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .photo-grid {
@@ -195,20 +181,30 @@ export default {
 
 .photo-card {
   width: 300px;
-  background: #e0e0e0;
-  border: 1px solid #0033cc;
-  border-radius: 8px;
-  box-shadow: 2px 2px 5px #888;
-  padding: 10px;
+  background: #FFF8DC;
+  border: 2px solid #D67F00;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding: 15px;
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.photo-card:hover {
+  transform: scale(1.05);
 }
 
 .photo {
   width: 100%;
   height: auto;
   object-fit: cover;
-  border-radius: 5px;
-  border: 1px solid #0033cc;
+  border-radius: 8px;
+  border: 2px solid #D67F00;
+  transition: transform 0.3s ease;
+}
+
+.photo:hover {
+  transform: scale(1.1);
 }
 
 .photo-info {
@@ -219,17 +215,34 @@ export default {
 .photo-timestamp,
 .photo-caption {
   margin: 5px 0;
+  font-style: italic;
+  font-size: 14px;
+  color: #3E2723;
 }
 
 .photo-username {
   display: block;
-  color: #0033cc;
+  color: #D67F00;
   text-decoration: none;
   font-weight: bold;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .photo-username:hover {
+  color: #F2A541;
   text-decoration: underline;
+}
+
+.photo-timestamp,
+.photo-caption {
+  font-size: 12px;
+  color: #8B4513;
+}
+
+.photo-timestamp strong,
+.photo-caption strong {
+  font-weight: 700;
+  color: #3E2723;
 }
 </style>

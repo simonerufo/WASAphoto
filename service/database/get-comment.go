@@ -1,7 +1,8 @@
 package database
-import(
-	"fmt"
+
+import (
 	"database/sql"
+	"fmt"
 )
 
 func (db *appdbimpl) CheckComment(user_id int, photo_id int, comment_id int) (bool, error) {
@@ -21,32 +22,6 @@ func (db *appdbimpl) CheckComment(user_id int, photo_id int, comment_id int) (bo
 	return true, err
 }
 
-
-
-// func (db *appdbimpl) GetCommentsByPhotoID(postID int) ([]Comment, error) {
-// 	QUERY := `SELECT comment_id, user_id, text, timestamp FROM Comment WHERE post_id = ?`
-// 	rows, err := db.c.Query(QUERY, postID)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-
-// 	var comments []Comment
-// 	for rows.Next() {
-// 		var comment Comment
-// 		err := rows.Scan(&comment.Username, &comment.CommentID, &comment.CommentText, &comment.Timestamp)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		comments = append(comments, comment)
-// 	}
-
-// 	if err = rows.Err(); err != nil {
-// 		return nil, err
-// 	}
-
-// 	return comments, nil
-// }
 // GetCommentByID retrieves a comment by its ID from the database
 func (db *appdbimpl) GetCommentByID(commentID int) (Comment, error) {
 	QUERY := `
@@ -95,6 +70,9 @@ func (db *appdbimpl) GetCommentsByPhotoID(postID int) ([]Comment, error) {
 		return nil, fmt.Errorf("error with rows: %w", err)
 	}
 
+	//return [], if None has commented the post yet
+	if len(comments) == 0 {
+		return []Comment{}, nil
+	}
 	return comments, nil
 }
-

@@ -29,16 +29,18 @@ export default {
   },
   methods: {
   async fetchLikeCount(postId) {
-    try {
-      const response = await axios.get(`/photos/${postId}/likes`);
-      if (response.status === 200) {
-        console.log("likes",response.data);
-        this.likeCount = response.data.length;  // Set the like count
+      try {
+        const response = await axios.get(`/photos/${postId}/likes`);
+        if (response.status === 200 && response.data) {
+        console.log("likes", response.data);
+        this.likeCount = Array.isArray(response.data) ? response.data.length : 0;
       } else {
-        console.warn(`Unexpected response status ${response.status}`);
+        console.warn(`Unexpected response or empty data: ${response.status}`);
+        this.likeCount = 0;
       }
     } catch (e) {
       console.error('Failed to fetch like count:', e);
+      this.likeCount = 0;
     }
   },
 
@@ -52,17 +54,18 @@ export default {
 
     try {
       const response = await axios.get(`/photos/${postId}/likes`);
-      if (response.status === 200) {
-        const likes = response.data;
+      if (response.status === 200 && response.data) {
+        const likes = Array.isArray(response.data) ? response.data : [];
         const liked = likes.map(user => user.user_id);
         this.isLiked = liked.includes(Number(userId)); // Check if current user ID is in the list of likes
         console.log(this.isLiked);
         console.log(liked);
       } else {
-        console.warn(`Unexpected response status ${response.status}`);
+        this.isLiked = false;
       }
     } catch (e) {
       console.error('Failed to check if photo is liked:', e);
+      this.isLiked = false;
     }
   },
 
@@ -85,12 +88,13 @@ export default {
     try {
       const response = await axios.get(`/profiles/${userId}/photos/${postId}/comments`);
       if (response.status === 200) {
-        this.comments = response.data || [];
+        this.comments = Array.isArray(response.data) ? response.data : [];
       } else {
-        console.warn(`Unexpected response status ${response.status}`);
+        this.comments = [];
       }
     } catch (e) {
       console.error('Failed to fetch comments:', e);
+      this.comments = [];
     }
   },
 
@@ -242,7 +246,7 @@ export default {
 <template>
   <div class="post-details">
     <div v-if="post">
-      <img :src="post.image" alt="Post image" />
+      <img :src="post.image" alt="Post image" class="post-image" />
       <p><strong>{{ owner }}:</strong> {{ post.caption }}</p>
       <p>Posted on: {{ formatTimestamp(post.timestamp) }}</p>
       <button @click="toggleLikePhoto">
@@ -255,89 +259,88 @@ export default {
       <textarea v-model="commentText" placeholder="Add a comment"></textarea>
       <button @click="addComment">Post Comment</button>
     </div>
-    <div v-for="comment in comments" :key="comment.comment_id">
+    <div v-for="comment in comments" :key="comment.comment_id" class="comment">
       <p><strong>{{ comment.username }} <em> [{{ formatTimestamp(comment.timestamp) }}]: </em></strong> {{ comment.comment_text }} </p>
       <button v-if="isOwner || comment.user_id === getID()" @click="removeComment(comment.comment_id)">Remove</button>
     </div>
   </div>
 </template>
 
-
 <style scoped>
+
 .post-details {
-  max-width: 800px; /* Container width */
-  margin: 0 auto; /* Center container horizontally */
+  max-width: 800px; /* Larghezza massima del contenitore */
+  margin: 0 auto; /* Centrare il contenitore orizzontalmente */
   padding: 20px;
-  background-color: #d0d0d0; /* Light gray background color */
-  border: 1px solid #a0a0a0; /* Subtle border for classic look */
-  border-radius: 5px;
-  font-family: 'Arial', sans-serif;
+  background-color: #fffbe1; /* Giallo chiaro vintage per lo sfondo */
+  border: 2px solid #f8a300; /* Arancione per il bordo */
+  border-radius: 10px; /* Angoli arrotondati per il contenitore */
+  font-family: 'Courier New', Courier, monospace; /* Font retro */
   text-align: center;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2); /* Ombra per effetto 3D */
 }
 
 .post-details h1 {
   font-size: 24px;
-  color: #000;
+  color: #f8a300; /* Arancione caldo */
   margin-bottom: 20px;
 }
 
 .photo-container {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: auto;
   margin-bottom: 20px;
 }
 
 .post-details img {
-  max-width: 400px;  /* Maximum width */
-  min-width: 200px;  /* Minimum width */
-  max-height: 300px; /* Maximum height */
-  min-height: 150px; /* Minimum height */
-  width: 100%; /* Ensure photo scales with the container */
-  height: auto; /* Maintain aspect ratio */
-  object-fit: cover; /* Ensures image fills the box, cropping if necessary */
-  border: 1px solid #0033cc;
-  border-radius: 3px;
+  max-width: 400px;
+  min-width: 200px;
+  max-height: 300px;
+  min-height: 150px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border: 2px solid #f8a300; /* Bordo arancione intorno all'immagine */
+  border-radius: 5px;
   transition: filter 0.3s ease;
 }
 
-.post-details p {
-  font-size: 16px;
-  color: #000;
-}
-
 button {
-  background-color: #0033cc; /* Classic blue button color */
-  color: #fff;
-  border: 1px solid #002a80; /* Darker blue border */
-  border-radius: 3px;
+  background-color: #f8a300; /* Arancione per i pulsanti */
+  color: white;
+  border: 1px solid #ff6f00; /* Arancione più scuro per il bordo */
+  border-radius: 5px;
   padding: 10px;
   cursor: pointer;
   font-size: 16px;
-  margin: 5px;
-  transition: background-color 0.3s; /* Smooth transition on hover */
+  margin: 10px;
+  transition: background-color 0.3s ease;
+  font-family: 'Courier New', Courier, monospace; /* Font retro */
 }
 
 button:hover {
-  background-color: #0055ff; /* Lighter blue on hover */
+  background-color: #ffcc00; /* Giallo per hover */
+  color: #000; /* Colore del testo cambia a nero */
 }
 
 textarea {
   width: 100%;
   height: 100px;
-  padding: 5px;
-  border: 1px solid #a0a0a0;
-  border-radius: 3px;
-  background-color: #fff;
+  padding: 8px;
+  border: 2px solid #f8a300;
+  border-radius: 5px;
+  background-color: #fffbe1; /* Giallo chiaro per la textarea */
   color: #000;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .comment {
-  background-color: #e0e0e0; /* Slightly lighter gray for comments */
-  border: 1px solid #a0a0a0;
-  border-radius: 3px;
+  background-color: #fffbe1; /* Giallo chiaro per i commenti */
+  border: 1px solid #f8a300;
+  border-radius: 5px;
   padding: 10px;
   margin-top: 10px;
   text-align: left;
@@ -345,14 +348,18 @@ textarea {
 
 .comment p {
   margin: 0;
+  color: #f8a300; /* Arancione per il testo dei commenti */
 }
 
 .comment button {
-  background-color: #cc0000; /* Red color for remove button */
-  border: 1px solid #990000; /* Darker red border */
+  background-color: #ff6f00; /* Arancione scuro per il pulsante di rimozione */
+  border: 1px solid #e65100;
+  color: white;
 }
 
 .comment button:hover {
-  background-color: #ff0000; /* Brighter red on hover */
+  background-color: #ff3d00; /* Arancione chiaro su hover */
 }
 </style>
+
+

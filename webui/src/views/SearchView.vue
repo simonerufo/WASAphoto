@@ -1,5 +1,5 @@
 <script>
-import axios,{getId} from "../services/axios.js";
+import axios, { getId } from "../services/axios.js";
 
 export default {
   data() {
@@ -67,7 +67,6 @@ export default {
 
       this.loading = false;
     },
-
   },
   mounted() {
     this.currentUsername = localStorage.getItem("username");
@@ -75,21 +74,19 @@ export default {
 };
 </script>
 
-
-
 <template>
-  <div class="stream-page">
+  <div class="search-page">
     <div class="search-container">
       <input
         v-model="searchUsername"
-        placeholder="Enter username"
+        placeholder="Search for a user..."
         class="search-input"
       />
       <button @click="searchUsers" class="search-button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
+          width="20"
+          height="20"
           fill="currentColor"
           class="bi bi-search"
           viewBox="0 0 16 16"
@@ -103,48 +100,112 @@ export default {
 
     <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
-    <div v-if="loading">Loading...</div>
+    <div v-if="loading" class="loading-indicator">
+      <div class="spinner"></div> Loading...
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* Centering the container */
-.search-container {
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+/* Container Styling */
+.search-page {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  min-height: 100vh;
+  background-color: #fafafa;
 }
 
-/* Styling the search input */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Input Styling */
 .search-input {
-  width: 300px; /* Increased width for the search bar */
-  padding: 10px; /* Padding inside the input */
-  border: 2px solid #0033cc; /* Consistent border color */
-  border-radius: 5px 0 0 5px; /* Rounded corners on the left side */
-  font-size: 16px; /* Larger font size */
+  flex-grow: 1;
+  padding: 14px;
+  font-size: 16px;
+  border: 2px solid #d1d1d1;
+  border-radius: 50px;
   outline: none;
+  background-color: #fff;
+  transition: all 0.3s ease;
 }
 
-/* Styling the search button */
+.search-input:focus {
+  border-color: #2a9d8f;
+  box-shadow: 0 0 8px rgba(42, 157, 143, 0.4);
+}
+
+/* Button Styling */
 .search-button {
-  padding: 10px;
-  background-color: #0033cc; /* Blue background */
-  border: 2px solid #0033cc; /* Matching border color */
-  border-radius: 0 5px 5px 0; /* Rounded corners on the right side */
+  background-color: #2a9d8f;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 12px;
   cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .search-button svg {
-  fill: #fff; /* White color for the search icon */
+  width: 20px;
+  height: 20px;
 }
 
-/* Adjusting hover effects */
 .search-button:hover {
-  background-color: #0055ff;
+  background-color: #264653;
 }
 
+/* Error Message */
+.error-msg {
+  margin-top: 15px;
+  color: #e76f51;
+  font-size: 14px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Loading indicator */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2a9d8f;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>

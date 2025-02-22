@@ -1,11 +1,12 @@
 package api
 
-import(
+import (
 	"encoding/json"
 	"net/http"
 	"strconv"
 
-	"github.com/julienschmidt/httprouter")
+	"github.com/julienschmidt/httprouter"
+)
 
 func (rt _router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Retrieve parameters from the URL
@@ -40,8 +41,11 @@ func (rt _router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps ht
 		return
 	}
 
+	// send [] in response if nobody commented yet
 	if len(comments) == 0 {
-		http.Error(w, "No comments found for this photo.", http.StatusNotFound)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode([]Comment{})
 		return
 	}
 

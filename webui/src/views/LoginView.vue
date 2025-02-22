@@ -59,76 +59,6 @@ export default {
   </div>
 </template>
 
-<!-- <style scoped>
-/* Wrapper styling to center the login-container */
-.center-wrapper {
-  display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  height: 100vh; /* Full height of the viewport */
-  width: 100vw; /* Full width of the viewport */
-  background-color: #f0f0f0; /* Optional: Add a background color for better visibility */
-  position: fixed; /* Ensure it stays centered */
-  top: 0;
-  left: 0;
-}
-
-/* Form container styling */
-.login-container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 300px;
-}
-
-/* Header styling */
-.login-container h2 {
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 1.5rem;
-  color: #333;
-}
-
-/* Form group styling */
-.login-container .form-group {
-  margin-bottom: 15px;
-}
-
-.login-container label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #333;
-}
-
-/* Input styling */
-.login-container input.form-control {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-/* Button styling */
-.login-container button.btn-primary {
-  width: 100%;
-  padding: 10px;
-  background-color: #4CAF50; /* Green background */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s; /* Smooth transition on hover */
-}
-
-/* Button hover effect */
-.login-container button.btn-primary:hover {
-  background-color: #45a049; /* Darker green on hover */
-}
-</style> -->
 <style scoped>
 /* Wrapper styling to center the login-container */
 .center-wrapper {
@@ -151,6 +81,7 @@ export default {
   border-radius: 4px; /* Rounded corners */
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for 3D effect */
   width: 300px;
+  font-family: 'Courier New', Courier, monospace; /* Retro font */
 }
 
 /* Header styling */
@@ -159,6 +90,8 @@ export default {
   text-align: center;
   font-size: 1.5rem;
   color: #0033cc; /* Blue text to match Windows XP color scheme */
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Retro text shadow effect */
 }
 
 /* Form group styling */
@@ -171,6 +104,7 @@ export default {
   margin-bottom: 5px;
   font-weight: bold;
   color: #000000; /* Black text for labels */
+  font-size: 14px;
 }
 
 /* Input styling */
@@ -181,6 +115,7 @@ export default {
   border-radius: 4px; /* Rounded corners */
   background-color: #f0f0f0; /* Light grey background inside input */
   box-sizing: border-box;
+  font-family: 'Courier New', Courier, monospace; /* Retro font inside input */
 }
 
 /* Button styling */
@@ -194,10 +129,12 @@ export default {
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s; /* Smooth transition on hover */
+  font-family: 'Courier New', Courier, monospace; /* Retro font for button */
 }
 
 /* Button hover effect */
 .login-container button.btn-primary:hover {
   background-color: #002a80; /* Darker blue on hover */
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.2); /* Subtle shadow on hover */
 }
 </style>
