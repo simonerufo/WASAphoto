@@ -136,16 +136,21 @@ export default {
     }
 
     try {
+      for (const comment of this.comments) {
+        const commentId = comment.comment_id; 
+        await this.removeComment(commentId);
+    }
+
       const response = await axios.delete(`/profiles/${userId}/photos/${postId}`);
       if (response.status === 204) {
         this.likeCount = 0;
         this.comments = [];
-        alert('Post deleted successfully');
+        alert('Post and associated comments deleted successfully');
         this.$router.push(`/profiles/${userId}/profile`);
       }
     } catch (e) {
-      console.error('Failed to delete post:', e);
-      alert('Failed to delete post');
+      console.error('Failed to delete post or comments:', e);
+      alert('Failed to delete post or comments');
     }
   },
 
@@ -169,19 +174,6 @@ export default {
     }
   },
 
-  // async removeComment(commentId) {
-  //   const userId = this.$route.params.user_id;
-
-  //   try {
-  //     const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
-  //     if (response.status === 200) {
-  //       this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
-  //     }
-  //   } catch (e) {
-  //     console.error('Failed to remove comment:', e);
-  //     alert('Failed to remove comment');
-  //   }
-  // },
   getID(){
     getId();
   },
@@ -199,7 +191,6 @@ export default {
       try {
         const response = await axios.delete(`/profiles/${userId}/comments/${commentId}`);
         if (response.status === 200) {
-          // Remove the comment from the list
           this.comments = this.comments.filter(comment => comment.comment_id !== commentId);
         }
       } catch (e) {
