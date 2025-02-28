@@ -1,12 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
-	"time"
 	"strconv"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -20,9 +20,9 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Auth check
-	_,err = Auth(w,r)
-	if err != nil{
-		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+	_, err = Auth(w, r)
+	if err != nil {
+		http.Error(w, "Invalid authorization", http.StatusUnauthorized)
 		return
 	}
 
@@ -65,18 +65,17 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-
 	// Create UserPhoto response
 	response := UserPhoto{
-		PhotoID:     photoID,
-		UserID:      userID,
-		Image:       fmt.Sprintf("data:image/jpeg;base64,%s", encodeToBase64(imageData)), // Assuming image is JPEG
-		Timestamp:   time.Now(),
-		LikeCount:   0, 
+		PhotoID:      photoID,
+		UserID:       userID,
+		Image:        fmt.Sprintf("data:image/jpeg;base64,%s", encodeToBase64(imageData)), // Assuming image is JPEG
+		Timestamp:    time.Now(),
+		LikeCount:    0,
 		CommentCount: 0,
-		Liked:       false, 
-		Caption:     caption,
-		Time:        time.Now().Format(time.RFC3339),
+		Liked:        false,
+		Caption:      caption,
+		Time:         time.Now().Format(time.RFC3339),
 	}
 
 	// Set response headers and write JSON response

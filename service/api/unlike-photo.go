@@ -23,9 +23,9 @@ func (rt _router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Check if the user is authenticated
-	_,err = Auth(w,r)
-	if err != nil{
-		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+	_, err = Auth(w, r)
+	if err != nil {
+		http.Error(w, "Invalid authorization", http.StatusUnauthorized)
 		return
 	}
 

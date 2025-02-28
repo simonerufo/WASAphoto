@@ -70,7 +70,7 @@ func (db *appdbimpl) GetCommentsByPhotoID(postID int) ([]Comment, error) {
 		return nil, fmt.Errorf("error with rows: %w", err)
 	}
 
-	//return [], if None has commented the post yet
+	// return [], if None has commented the post yet
 	if len(comments) == 0 {
 		return []Comment{}, nil
 	}

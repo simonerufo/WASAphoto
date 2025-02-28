@@ -40,9 +40,9 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Check if the user is authorized to perform this action
-	_,err = Auth(w,r)
-	if err != nil{
-		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+	_, err = Auth(w, r)
+	if err != nil {
+		http.Error(w, "Invalid authorization", http.StatusUnauthorized)
 		return
 	}
 
@@ -56,4 +56,3 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	// Return success response
 	w.WriteHeader(http.StatusNoContent)
 }
-

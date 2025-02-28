@@ -38,67 +38,65 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	//GetName() (string, error)
-	//SetName(name string) error
 
-	//insert user in user table
+	// insert user in user table
 	InsertUser(username string) error
-	//search user from user table
+	// search user from user table
 	SearchUsername(username string) bool
-	//get user from user table
+	// get user from user table
 	GetUserByName(username string) (User, error)
 	GetUserByID(id int) (User, error)
-	//update username in user table
+	// update username in user table
 	UpdateName(user User) error
-	//add user follow relation
+	// add user follow relation
 	FollowUser(following_id int, followed_id int) error
-	//remove a user follow relation
+	// remove a user follow relation
 	UnfollowUser(following_id int, followed_id int) error
-	//checks if a user banned another user
+	// checks if a user banned another user
 	GetBan(banning_id int, banned_id int) (bool, error)
-	//remove a user ban relation
+	// remove a user ban relation
 	UnbanUser(banning_id int, banned_id int) error
-	//checks if a user followed another user
+	// checks if a user followed another user
 	GetFollow(following_id int, followed_id int) (bool, error)
-	//retrieves all users that followed the user with userID
+	// retrieves all users that followed the user with userID
 	GetFollowersForUser(userID int) ([]User, error)
-	//retrieves all followed user by using his userID
+	// retrieves all followed user by using his userID
 	GetFollowingForUser(userID int) ([]User, error)
-	//ban a user adding him in db
+	// ban a user adding him in db
 	BanUser(banning_id int, banned_id int) error
-	//getting from db user profile using id
+	// getting from db user profile using id
 	GetUserProfileByID(profileID int) (Profile, error)
-	//getting from db user profile using username
+	// getting from db user profile using username
 	GetUserProfileByUsername(username string) (Profile, error)
-	//retrieving the user stream
+	// retrieving the user stream
 	GetStream(user_id int) ([]Photo, error)
-	//uploading a photo(post) into db
+	// uploading a photo(post) into db
 	InsertPhoto(userID int, caption string, photo []byte) (int, error)
-	//checks if a photo exists in db
+	// checks if a photo exists in db
 	CheckPhoto(user_id int, photo_id int) (bool, error)
-	//gets a photo from db
+	// gets a photo from db
 	GetPhoto(userID int, photoID int) (*Photo, error)
-	//gets the owner of a photo by using his corresponding photo id
+	// gets the owner of a photo by using his corresponding photo id
 	GetPhotoOwner(photoID int) (int, error)
-	//deletes a photo from db
+	// deletes a photo from db
 	DeletePhoto(user_id int, photo_id int) error
-	//insert an entry into like table
+	// insert an entry into like table
 	InsertLike(user_id int, owner_id int, post_id int) error
-	//delete an entry from like table
+	// delete an entry from like table
 	DeleteLike(user_id int, owner_id int, post_id int) error
-	//Get all likes related to a photo
+	// Get all likes related to a photo
 	GetLikesForPhoto(photoID int) ([]Like, error)
-	//insert an entry into comment table
+	// insert an entry into comment table
 	InsertComment(user_id int, owner_id int, photo_id int, text string) (int, error)
-	//check if a comment exists in comment table
+	// check if a comment exists in comment table
 	CheckComment(user_id int, photo_id int, comment_id int) (bool, error)
-	//Getting all comments referred to a photo
+	// Getting all comments referred to a photo
 	GetCommentsByPhotoID(postID int) ([]Comment, error)
-	//Get a comment using his id
+	// Get a comment using his id
 	GetCommentByID(commentID int) (Comment, error)
-	//delete a comment from comments table
+	// delete a comment from comments table
 	DeleteComment(user_id int, photo_id int, comment_id int) error
-	//retrieves the photo id from a comment and user id
+	// retrieves the photo id from a comment and user id
 	GetPhotoIDFromComment(commentID int, userID int) (int, error)
 	// retrieves the photo id from the comment and user id of the post owner
 	GetPhotoIDByOwner(commentID int, userID int) (int, error)

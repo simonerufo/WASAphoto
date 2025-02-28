@@ -60,7 +60,6 @@ func (rt _router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	//w.WriteHeader(http.StatusOK)
 
 	err = json.NewEncoder(w).Encode(commentRes)
 	if err != nil {

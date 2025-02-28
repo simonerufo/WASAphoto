@@ -1,6 +1,8 @@
 package database
 
-import("fmt")
+import (
+	"fmt"
+)
 
 // GetBan checks if a user (banning id) banned another user (banned id)
 func (db *appdbimpl) GetBan(banning_id int, banned_id int) (bool, error) {
@@ -24,7 +26,7 @@ func (db *appdbimpl) GetBanList(userID int) ([]int, error) {
 
 	rows, err := db.c.Query(query, userID)
 	if err != nil {
-		
+
 		return nil, fmt.Errorf("error while executing the query: %w", err)
 	}
 	defer rows.Close()
@@ -37,8 +39,7 @@ func (db *appdbimpl) GetBanList(userID int) ([]int, error) {
 		bannedUserIDs = append(bannedUserIDs, bannedID)
 	}
 
-	if err := rows.Err(); 
-	err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("error : %w", err)
 	}
 

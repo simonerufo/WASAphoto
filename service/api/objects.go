@@ -62,38 +62,6 @@ func validUsername(username string) bool {
 	return rex.MatchString(username)
 }
 
-/*
-// check if user is authorized
-func isAuth(w http.ResponseWriter, r *http.Request, token int) bool {
-	//getting the Authorization Header from the http request and cast it to int
-	auth, err := strconv.Atoi(r.Header.Get("Authorization"))
-	if err != nil {
-		http.Error(w, "cannot convert properly Authorization header", http.StatusBadRequest)
-		return false
-	}
-
-	if token != auth {
-		http.Error(w, "not authorized", http.StatusBadRequest)
-		return false
-	}
-	return true
-}
-*/
-// func isAuth(w http.ResponseWriter, r *http.Request, id ...int) (int, error) {
-// 	auth := strings.Split(r.Header.Get("Authorization"), " ")
-
-// 	if len(auth) <= 1 {
-// 		return 0, nil
-// 	}
-// 	uid, err := strconv.Atoi(auth[1])
-// 	fmt.Printf("auth:%d\n",uid)
-// 	if err != nil || (len(id) > 0 && uid != id[0]) {
-// 		http.Error(w, "Unauthorized token", http.StatusUnauthorized)
-// 		return 0, err
-// 	}
-// 	return uid, nil
-// }
-
 func Auth(w http.ResponseWriter, r *http.Request) (int, error) {
 	authHeader := r.Header.Get("Authorization")
 	// Expecting format "Bearer <token>"

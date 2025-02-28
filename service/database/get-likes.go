@@ -42,7 +42,7 @@ func (db *appdbimpl) GetLikesForPhoto(photoID int) ([]Like, error) {
 		return nil, err
 	}
 
-	//Return [] if no one liked the post
+	// Return [] if no one liked the post
 	if likes == nil {
 		return []Like{}, nil
 	}

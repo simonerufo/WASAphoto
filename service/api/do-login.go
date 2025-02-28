@@ -8,17 +8,17 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-/*
-	func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-		var userData User
-		// decoding user data from body request
-		err := json.NewDecoder(r.Body).Decode(&userData)
-		if err != nil {
-			http.Error(w, "Error decoding json", http.StatusBadRequest)
-			return
-		}
+// func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+// 	var userData User
+// 	// decoding user data from body request
+// 	err := json.NewDecoder(r.Body).Decode(&userData)
+// 	if err != nil {
+// 		http.Error(w, "Error decoding json", http.StatusBadRequest)
+// 		return
+// 	}
 
-		/* similar to java syntax
+/*
+	 similar to java syntax
 		if !userData.isNameValid() {
 			http.Error(w, "invalid username", http.StatusBadRequest)
 			return

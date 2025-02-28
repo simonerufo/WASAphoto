@@ -21,9 +21,9 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	_,err = Auth(w,r)
-	if err != nil{
-		http.Error(w,"Invalid authorization",http.StatusUnauthorized)
+	_, err = Auth(w, r)
+	if err != nil {
+		http.Error(w, "Invalid authorization", http.StatusUnauthorized)
 		return
 	}
 
@@ -56,5 +56,3 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	w.WriteHeader(http.StatusNoContent)
 }
-
-
