@@ -33,7 +33,7 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"log"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -122,48 +122,52 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tablesNumber int
 	err := db.QueryRow(`SELECT count(name) FROM sqlite_master WHERE type='table';`).Scan(&tablesNumber)
-	/*if errors.Is(err, sql.ErrNoRows) {
-	sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-	_, err = db.Exec(sqlStmt)*/
 	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
+		log.Printf("error creating database structure: %v", err)
+		return nil, err
 	}
-	//}
+
 	if tablesNumber != 6 {
-		//USER_TABLE
+		// USER_TABLE
 		_, err = db.Exec(USER_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (USER): %w", err)
+			log.Printf("error creating database structure (USER): %v", err)
+			return nil, err
 		}
 
-		//POST_TABLE
+		// PHOTO_TABLE
 		_, err = db.Exec(PHOTO_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (PHOTO): %w", err)
+			log.Printf("error creating database structure (PHOTO): %v", err)
+			return nil, err
 		}
 
-		//LIKE_TABLE
+		// LIKE_TABLE
 		_, err = db.Exec(LIKE_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (LIKE): %w", err)
+			log.Printf("error creating database structure (LIKE): %v", err)
+			return nil, err
 		}
 
-		//COMMENT_TABLE
+		// COMMENT_TABLE
 		_, err = db.Exec(COMMENT_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (COMMENT): %w", err)
+			log.Printf("error creating database structure (COMMENT): %v", err)
+			return nil, err
 		}
 
-		//FOLLOW_TABLE
+		// FOLLOW_TABLE
 		_, err = db.Exec(FOLLOW_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (FOLLOW): %w", err)
+			log.Printf("error creating database structure (FOLLOW): %v", err)
+			return nil, err
 		}
 
-		//BAN_TABLE
+		// BAN_TABLE
 		_, err = db.Exec(BAN_TABLE)
 		if err != nil {
-			return nil, fmt.Errorf("error creating database structure (BAN): %w", err)
+			log.Printf("error creating database structure (BAN): %v", err)
+			return nil, err
 		}
 	}
 

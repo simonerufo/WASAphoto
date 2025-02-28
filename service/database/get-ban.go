@@ -1,7 +1,8 @@
 package database
 
 import (
-	"fmt"
+	"errors"
+	"log"
 )
 
 // GetBan checks if a user (banning id) banned another user (banned id)
@@ -26,21 +27,23 @@ func (db *appdbimpl) GetBanList(userID int) ([]int, error) {
 
 	rows, err := db.c.Query(query, userID)
 	if err != nil {
-
-		return nil, fmt.Errorf("error while executing the query: %w", err)
+		log.Printf("error while executing the query: %v", err)
+		return nil, errors.New("failed to execute query to retrieve ban list")
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var bannedID int
 		if err := rows.Scan(&bannedID); err != nil {
-			return nil, fmt.Errorf("error while retrieving user ids from table: %w", err)
+			log.Printf("error while retrieving user IDs from table: %v", err)
+			return nil, errors.New("failed to retrieve user IDs from ban table")
 		}
 		bannedUserIDs = append(bannedUserIDs, bannedID)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error : %w", err)
+		log.Printf("error iterating over rows: %v", err)
+		return nil, errors.New("error occurred while processing ban list")
 	}
 
 	return bannedUserIDs, nil

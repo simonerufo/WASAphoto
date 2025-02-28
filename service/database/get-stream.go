@@ -2,7 +2,7 @@ package database
 
 import (
 	"encoding/base64"
-	"fmt"
+	"log"
 )
 
 func (db *appdbimpl) GetStream(userID int) ([]Photo, error) {
@@ -22,7 +22,7 @@ func (db *appdbimpl) GetStream(userID int) ([]Photo, error) {
 
 	rows, err := db.c.Query(GETPostsFollowed, userID)
 	if err != nil {
-		fmt.Printf("error while executing query: %v\n", err)
+		log.Printf("Error while executing query for userID %d: %v", userID, err)
 		return posts, err
 	}
 	defer rows.Close()
@@ -33,19 +33,19 @@ func (db *appdbimpl) GetStream(userID int) ([]Photo, error) {
 
 		// Scan the basic post data into the Photo struct
 		if err := rows.Scan(&post.PhotoID, &post.UserID, &imageData, &post.Caption, &post.Timestamp); err != nil {
-			fmt.Printf("error while iterating over table: %v\n", err)
+			log.Printf("Error while scanning row for userID %d: %v", userID, err)
 			return posts, err
 		}
 
 		// Convert image data to base64-encoded string
-		post.Image = fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(imageData))
+		post.Image = "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(imageData)
 
 		// Add the post to the slice
 		posts = append(posts, post)
 	}
 
 	if err = rows.Err(); err != nil {
-		fmt.Printf("Error during rows iteration: %v\n", err)
+		log.Printf("Error during rows iteration for userID %d: %v", userID, err)
 		return posts, err
 	}
 

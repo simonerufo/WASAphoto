@@ -1,7 +1,7 @@
 package database
 
 import (
-	"fmt"
+	"log"
 )
 
 // InsertPhoto inserts a new photo into the Photo table with a manually managed photo_id and returns the photo ID.
@@ -10,8 +10,10 @@ func (db *appdbimpl) InsertPhoto(userID int, caption string, photo []byte) (int,
 	var maxID int
 	err := db.c.QueryRow(`SELECT COALESCE(MAX(photo_id), 0) FROM Photo`).Scan(&maxID)
 	if err != nil {
-		return 0, fmt.Errorf("error fetching max photo_id: %w", err)
+		log.Printf("Error fetching max photo_id: %v", err)
+		return 0, err
 	}
+
 	// Increment the ID
 	newPhotoID := maxID + 1
 
@@ -21,9 +23,11 @@ func (db *appdbimpl) InsertPhoto(userID int, caption string, photo []byte) (int,
 
 	_, err = db.c.Exec(UPLOAD, newPhotoID, userID, caption, photo)
 	if err != nil {
-		return 0, fmt.Errorf("error inserting photo: %w", err)
+		log.Printf("Error inserting photo (userID: %d, caption: %s): %v", userID, caption, err)
+		return 0, err
 	}
 
+	log.Printf("Successfully inserted photo (photoID: %d, userID: %d)", newPhotoID, userID)
 	// Return the new photo ID
 	return newPhotoID, nil
 }
