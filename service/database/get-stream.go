@@ -15,12 +15,14 @@ func (db *appdbimpl) GetStream(userID int) ([]Photo, error) {
 							Photo.photo, 
 							Photo.caption, 
 							Photo.timestamp
-						 FROM Photo
-						 JOIN Follow ON Photo.user_id = Follow.followed_id
-						 WHERE Follow.following_id = ?
-						 ORDER BY Photo.timestamp DESC`
+					 FROM Photo
+					 JOIN Follow ON Follow.followed_id = Photo.user_id
+					 LEFT JOIN Ban ON Ban.banning_id = Photo.user_id AND Ban.banned_id = ?
+					 WHERE Follow.following_id = ?
+					 AND Ban.banning_id IS NULL
+					 ORDER BY Photo.timestamp DESC`
 
-	rows, err := db.c.Query(GETPostsFollowed, userID)
+	rows, err := db.c.Query(GETPostsFollowed, userID, userID)
 	if err != nil {
 		log.Printf("Error while executing query for userID %d: %v", userID, err)
 		return posts, err

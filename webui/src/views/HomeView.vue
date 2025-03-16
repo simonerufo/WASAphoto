@@ -47,6 +47,7 @@ export default {
       try {
         this.userID = localStorage.getItem("id");
         this.currentUsername = localStorage.getItem("username");
+        console.log(this.userID);
         await this.fetchFollowedUsers(this.userID);
       } catch (e) {
         this.errormsg = e.toString();
@@ -54,12 +55,25 @@ export default {
     },
     async fetchFollowedUsers(userId) {
       try {
+        console.log("userID");
+        console.log(userId);
         const response = await axios.get(`/profiles/${userId}/following`);
         this.followedUsers = response.data;
       } catch (e) {
         this.errormsg = e.toString();
       }
     },
+    async fetchBlockedUsers() {
+      try {
+       const response = await axios.get(`/profiles/${this.userID}/ban`);
+       console.log(response.data.blockedUsers);
+       return response.data.blockedUsers || []; // Assumendo che l'API restituisca un array di ID utente
+     } catch (e) {
+       console.error("Errore nel recuperare gli utenti bloccati:", e);
+       return []; // In caso di errore, restituisce un array vuoto
+    }
+  },
+
     async fetchUsername(userID) {
       let path = `/profiles/${userID}/profile`;
       try {
@@ -70,39 +84,78 @@ export default {
         return "Unknown";
       }
     },
-    async fetchUserPhotos() {
-      try {
-        this.userPhotos = [];
-        this.followedUsernames = {};
+    // async fetchUserPhotos() {
+    //   try {
+    //     this.userPhotos = [];
+    //     this.followedUsernames = {};
 
-        const path = `/profiles/${this.userID}/stream`;
-        const response = await axios.get(path);
+    //     const path = `/profiles/${this.userID}/stream`;
+    //     const response = await axios.get(path);
 
-        if (response.data) {
-          this.userPhotos = response.data.map((photo) => {
-            if (photo.image && !photo.image.startsWith("data:image")) {
-              photo.image = `data:image/jpeg;base64,${photo.image}`;
-            }
-            return photo;
-          });
+    //     if (response.data) {
+    //       this.userPhotos = response.data.map((photo) => {
+    //         if (photo.image && !photo.image.startsWith("data:image")) {
+    //           photo.image = `data:image/jpeg;base64,${photo.image}`;
+    //         }
+    //         return photo;
+    //       });
 
-          for (let photo of this.userPhotos) {
-            const username = await this.fetchUsername(photo.user_id);
-            this.followedUsernames = {
-              ...this.followedUsernames,
-              [photo.user_id]: username,
-            };
+    //       for (let photo of this.userPhotos) {
+    //         const username = await this.fetchUsername(photo.user_id);
+    //         this.followedUsernames = {
+    //           ...this.followedUsernames,
+    //           [photo.user_id]: username,
+    //         };
+    //       }
+    //     } else {
+    //       console.warn(
+    //         `Unexpected data format for the main user ${this.currentUsername}:`,
+    //         response.data
+    //       );
+    //     }
+    //   } catch (e) {
+    //     this.errormsg = e.toString();
+    //   }
+    // },
+    
+  async fetchUserPhotos() {
+    try {
+      this.userPhotos = [];
+      this.followedUsernames = {};
+
+      const path = `/profiles/${this.userID}/stream`;
+      const response = await axios.get(path);
+
+      if (response.data) {
+        let allPhotos = response.data.map((photo) => {
+          if (photo.image && !photo.image.startsWith("data:image")) {
+            photo.image = `data:image/jpeg;base64,${photo.image}`;
           }
-        } else {
-          console.warn(
-            `Unexpected data format for the main user ${this.currentUsername}:`,
-            response.data
-          );
+          return photo;
+        });
+
+        const blockedUsers = await this.fetchBlockedUsers();
+
+        this.userPhotos = allPhotos.filter((photo) => !blockedUsers.includes(photo.user_id));
+
+        for (let photo of this.userPhotos) {
+          const username = await this.fetchUsername(photo.user_id);
+          this.followedUsernames = {
+            ...this.followedUsernames,
+            [photo.user_id]: username,
+          };
         }
-      } catch (e) {
-        this.errormsg = e.toString();
+      } else {
+        console.warn(
+          `Unexpected data format for the main user ${this.currentUsername}:`,
+          response.data
+        );
       }
-    },
+    } catch (e) {
+      this.errormsg = e.toString();
+    }
+  },
+
     onImageError(photoId) {
       this.userPhotos = this.userPhotos.map((photo) => {
         if (photo.photo_id === photoId) {

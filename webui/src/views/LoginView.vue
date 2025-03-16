@@ -1,5 +1,4 @@
 <script>
-import { Auth } from '../services/axios';
 
 export default {
   data() {
@@ -10,9 +9,9 @@ export default {
     }
   },
   methods: {
+
     async login() {
       try {
-        // Validate username
         if (!this.usernameValidation.test(this.username)) {
           alert("Invalid username: it must start with letters and contain only lowercase letters and numbers.");
           return;
@@ -22,19 +21,17 @@ export default {
           return;
         }
 
-        // Make the login request
         let response = await this.$axios.post('/session', {
           "username": this.username,
         });
-        
+
         this.id = parseInt(response.data);
-        localStorage.id = this.id;
-        localStorage.username = this.username;
-        this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.id;
+        localStorage.setItem("id", this.id);
+        localStorage.setItem("username", this.username);
+
         this.$router.push("/home");
 
       } catch (e) {
-        // Handle unexpected errors
         console.error('Login failed:', e);
         alert('Login failed. Please try again.');
       }
