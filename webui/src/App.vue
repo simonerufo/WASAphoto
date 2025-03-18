@@ -1,5 +1,8 @@
 <script>
 import { RouterLink, RouterView } from 'vue-router'
+import { getId } from './services/axios';
+import { getUsername } from './services/axios';
+import { ref } from 'vue';
 
 export default {
   data() {
@@ -24,12 +27,14 @@ export default {
   },
   methods: {
     updateUserData() {
-      this.logged = localStorage.getItem("id")
-      this.username = localStorage.getItem("username")
+      
+      this.logged = getId();
+      this.username = getUsername();
       if (this.logged) {
-        this.link = `/profiles/${this.logged}/profile`
-      }
+          this.link = `/profiles/${this.logged}/profile`;
+        }
     },
+
     logout() {
       localStorage.removeItem("id");
       localStorage.removeItem("username");
@@ -37,6 +42,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <template>

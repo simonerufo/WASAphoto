@@ -1,5 +1,5 @@
 <script>
-import axios, { getId } from '../services/axios'; // Adjust the path if needed
+import axios, { getId } from '../services/axios'; 
 
 export default {
   data() {
@@ -24,6 +24,7 @@ export default {
       errorMessage: '', // Error message for display
       successMessage: '', // Success message for displaying username change
       banlist: [], // Array contenente la lista degli utenti bannati
+      banlistUsernames: {},
       isBanlistVisible: false // Controlla la visibilità della banlist inline
     };
   },
@@ -251,18 +252,16 @@ export default {
       }
     },
 
-    // Metodo toggle per mostrare/nascondere la banlist inline
     async toggleBanlist() {
-      // Se la banlist è già visibile, nascondila
       if (this.isBanlistVisible) {
         this.isBanlistVisible = false;
         return;
       }
       try {
-        // Assicurati che l'endpoint restituisca un array di oggetti contenenti user_id e username
         const response = await axios.get(`/profiles/${this.id}/ban`);
         if (response.status === 200) {
           this.banlist = response.data.banned_user_ids;
+          console.log(this.banlist)
           if (!this.banlist || this.banlist.length === 0) {
             alert("Banlist is empty.");
             this.isBanlistVisible = false;
@@ -278,10 +277,12 @@ export default {
 
     async removeBan(bannedUserId) {
       try {
+        console.log(bannedUserId);
         const response = await axios.delete(`/profiles/${this.currentUserId}/bans/${bannedUserId}`);
         if (response.status === 200 || response.status === 204) {
-          this.banlist.banned_user_ids = this.banlist.banned_user_ids.filter(user => user.user_id !== bannedUserId);
+          this.banlist = this.banlist.filter(user => user !== bannedUserId);
           console.log(`Removed user ${bannedUserId} from banlist.`);
+          console.log(this.banlist)
           if (this.banlist.length === 0) {
             this.isBanlistVisible = false;
             alert("Banlist is now empty.");
@@ -291,8 +292,32 @@ export default {
         console.error('Error removing ban:', error);
         this.errorMessage = 'Failed to remove ban. Please try again later.';
       }
-    }
+    },
+
+    async fetchUsername(userID) {
+      let path = `/profiles/${userID}/profile`;
+      try {
+        let response = await axios.get(path);
+        return response.data.user.username;
+      } catch (error) {
+        console.error(error);
+        return "Unknown";
+      }
+    },
   },
+    watch: {
+    banlist: {
+      handler(newBanlist) {
+        if (newBanlist){
+          newBanlist.forEach(async banned => {
+            const username = await this.fetchUsername(banned);
+            this.banlistUsernames[banned] = username;
+          });
+        }
+      },
+      deep: true
+    }
+},
   mounted() {
     this.getUser();
   }
@@ -312,6 +337,7 @@ export default {
         <div class="form-group">
           <input type="text"
                  id="username"
+                 :disabled="!isOwner" 
                  :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}"
                  v-model="inputValue"
                  @click="enableInput"
@@ -321,16 +347,21 @@ export default {
         <template v-if="isOwner">
           <button v-if="isInputEnabled" class="btn btn-primary" @click="editProfile">Save Username</button>
           <button v-else class="btn btn-outline-primary" @click="enableInput">Edit Username</button>
-          <!-- Bottone toggle per mostrare/nascondere la banlist -->
+          
           <button class="btn btn-outline-secondary" @click="toggleBanlist">
             Show Banlist
           </button>
-          <!-- La banlist viene visualizzata inline sotto il bottone -->
+       
           <div v-if="isBanlistVisible" class="banlist-container">
             <ul>
-              <li v-for="banned in banlist" :key="banned.user_id">
-                {{ banned.username }} 
-                <button class="btn btn-danger btn-sm" @click="removeBan(banned.user_id)">Remove</button>
+              <li v-for="banned in banlist" :key="banned">
+                <div>
+                  <strong>{{ banlistUsernames[banned] }}</strong>
+                </div>
+          
+                <div>
+                  <button class="btn btn-danger btn-sm" @click="removeBan(banned)">Remove</button>
+                </div>  
               </li>
             </ul>
           </div>

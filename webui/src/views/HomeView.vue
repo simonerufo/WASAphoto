@@ -84,39 +84,7 @@ export default {
         return "Unknown";
       }
     },
-    // async fetchUserPhotos() {
-    //   try {
-    //     this.userPhotos = [];
-    //     this.followedUsernames = {};
 
-    //     const path = `/profiles/${this.userID}/stream`;
-    //     const response = await axios.get(path);
-
-    //     if (response.data) {
-    //       this.userPhotos = response.data.map((photo) => {
-    //         if (photo.image && !photo.image.startsWith("data:image")) {
-    //           photo.image = `data:image/jpeg;base64,${photo.image}`;
-    //         }
-    //         return photo;
-    //       });
-
-    //       for (let photo of this.userPhotos) {
-    //         const username = await this.fetchUsername(photo.user_id);
-    //         this.followedUsernames = {
-    //           ...this.followedUsernames,
-    //           [photo.user_id]: username,
-    //         };
-    //       }
-    //     } else {
-    //       console.warn(
-    //         `Unexpected data format for the main user ${this.currentUsername}:`,
-    //         response.data
-    //       );
-    //     }
-    //   } catch (e) {
-    //     this.errormsg = e.toString();
-    //   }
-    // },
     
   async fetchUserPhotos() {
     try {
