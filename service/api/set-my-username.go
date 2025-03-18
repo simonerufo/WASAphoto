@@ -8,9 +8,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-/*
-updates the username using a PUT request to the server
-*/
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var userData User
@@ -58,7 +55,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	taken := rt.db.SearchUsername(userData.Username)
 	if taken {
 		if userDB.Username != userData.Username {
-			http.Error(w, "name already taken", http.StatusBadRequest)
+			http.Error(w, "Username already in use.", http.StatusBadRequest)
 			return
 		}
 	}

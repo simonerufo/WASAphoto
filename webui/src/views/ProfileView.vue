@@ -141,9 +141,18 @@ export default {
         }
       } catch (e) {
         console.error('Failed to update profile:', e);
-        this.errorMessage = "Failed to update profile: the username must be long 3 to 16 chars and must have only lower case chars";
-        this.inputValue = this.username; 
-      } finally {
+        if (e.response && e.response.data) {
+          const errorText = e.response.data.toLowerCase();
+          if (errorText.includes("Username already in use.")) {
+          this.errorMessage = "Username already in use.";
+          } else {
+          this.errorMessage = e.response.data;
+        }
+      } else {
+        this.errorMessage = "Failed to update profile: please try again later.";
+    }
+    this.inputValue = this.username;
+    } finally {
         this.isInputEnabled = false;
       }
     },
