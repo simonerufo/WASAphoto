@@ -8,7 +8,7 @@ export default {
       username: null,
       inputValue: '',
       id: this.$route.params.user_id,
-      currentUserId: Number(getId()), // Store the current user ID
+      currentUserId: Number(getId()), 
       isFollowing: false,
       isBanned: false,
       postsCount: 0,
@@ -20,12 +20,13 @@ export default {
       posts: [],
       caption: '',
       file: null,
-      isOwner: false, // Track if the current user is the owner
-      errorMessage: '', // Error message for display
-      successMessage: '', // Success message for displaying username change
-      banlist: [], // Array contenente la lista degli utenti bannati
+      isOwner: false,
+      amIBanned: false, 
+      errorMessage: '', 
+      successMessage: '', 
+      banlist: [], 
       banlistUsernames: {},
-      isBanlistVisible: false // Controlla la visibilità della banlist inline
+      isBanlistVisible: false 
     };
   },
   methods: {
@@ -54,14 +55,12 @@ export default {
         const response = await axios.get(`/profiles/${currentUserId}/ban`);
         if (response.status === 200) {
           const bannedUserIDs = response.data.banned_user_ids;
-          console.log("Response Data:", bannedUserIDs);
           if (Array.isArray(bannedUserIDs)) {
             this.isBanned = bannedUserIDs.some(bannedId => Number(bannedId) === Number(profileUserId));
           } else {
             console.warn("bannedUserIDs is not an array:", bannedUserIDs);
             this.isBanned = false;
           }
-          console.log("isBanned:", this.isBanned);
         } else {
           console.warn(`Unexpected response status ${response.status}`);
         }
@@ -71,13 +70,13 @@ export default {
     },
 
     async getUser() {
+      await this.isUserBanned();
       const path = `/profiles/${this.id}/profile`;
       console.log(`Fetching user profile from: ${path}`);
       try {
         const response = await axios.get(path);
         console.log(`Response status: ${response.status}`);
         if (response.status === 200) {
-          console.log('User data:', response.data);
           const { user, photos = [], followers = 0, following = 0, isFollowing = false, isBanned = false } = response.data;
           this.user = user;
           this.username = user.username;
@@ -86,7 +85,6 @@ export default {
           this.followingCount = following;
           this.isFollowing = isFollowing;
           this.isBanned = isBanned;
-          // Check if the current user is the owner
           this.isOwner = this.currentUserId === user.user_id;
           this.posts = Array.isArray(photos) && photos.length > 0 
                       ? photos.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
@@ -100,7 +98,6 @@ export default {
             posts: this.posts,
             postsCount: this.postsCount
           });
-          // Fetch follow and ban status after getting user data
           await this.checkIfFollowing();
           await this.checkIfBanned();
         }
@@ -303,6 +300,23 @@ export default {
       }
     },
 
+    async isUserBanned(){
+      try{
+        const response = await axios.get(`/profiles/${this.id}/bans/${this.currentUserId}`)
+        if(response.status === 200 && response.data && response.data.is_banned === true){
+          this.amIBanned = true;
+          this.errorMessage = "You are banned from this user";
+        }
+        else{
+          this.amIBanned = false;
+          this.errorMessage = "";
+        }
+      } catch(e){
+        console.error("Error while ban checking",e);
+        this.errorMessage = "Error while ban checking";
+      }
+    },
+
     async fetchUsername(userID) {
       let path = `/profiles/${userID}/profile`;
       try {
@@ -333,73 +347,84 @@ export default {
 };
 </script>
 
+
 <template>
   <div class="container profile-page text-center">
-    <div v-if="errorMessage" class="alert alert-danger" role="alert">
-      {{ errorMessage }}
-    </div>
-    <div v-if="successMessage" class="alert alert-success" role="alert">
-      {{ successMessage }}
-    </div>
-    <div class="profile-header mt-4">
-      <div class="profile-details">
-        <div class="form-group">
-          <input type="text"
-                 id="username"
-                 :disabled="!isOwner" 
-                 :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}"
-                 v-model="inputValue"
-                 @click="enableInput"
-                 @blur="onBlur"
-                 @keydown.enter="onEnter">
-        </div>
-        <template v-if="isOwner">
-          <button v-if="isInputEnabled" class="btn btn-primary" @click="editProfile">Save Username</button>
-          <button v-else class="btn btn-outline-primary" @click="enableInput">Edit Username</button>
-          
-          <button class="btn btn-outline-secondary" @click="toggleBanlist">
-            Show Banlist
-          </button>
-       
-          <div v-if="isBanlistVisible" class="banlist-container">
-            <ul>
-              <li v-for="banned in banlist" :key="banned">
-                <div>
-                  <strong>{{ banlistUsernames[banned] }}</strong>
-                </div>
-          
-                <div>
-                  <button class="btn btn-danger btn-sm" @click="removeBan(banned)">Remove</button>
-                </div>  
-              </li>
-            </ul>
-          </div>
-          <div class="upload-form mt-4">
-            <input type="file" @change="onFileChange" />
-            <textarea v-model="caption" placeholder="Add a caption..."></textarea>
-            <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
-          </div>
-        </template>
-        <template v-else>
-          <button v-if="!isFollowing" class="btn btn-outline-primary follow-btn" @click="toggleFollow">Follow</button>
-          <button v-else class="btn btn-outline-secondary follow-btn" @click="toggleFollow">Unfollow</button>
-          <button v-if="!isBanned" class="btn btn-outline-primary ban-btn" @click="toggleBan">Ban</button>
-          <button v-else class="btn btn-outline-secondary ban-btn" @click="toggleBan">Unban</button>
-        </template>
-        <div class="stats mt-3">
-          <span class="mr-3">Posts: <strong>{{ postsCount }}</strong></span>
-          <br>
-          <span class="mr-3">Followers: <strong>{{ followersCount }}</strong></span>
-          <br>
-          <span class="mr-3">Following: <strong>{{ followingCount }}</strong></span>
-        </div>
+
+    <div v-if="amIBanned">
+      <div class="alert alert-danger" role="alert">
+        {{ errorMessage }}
       </div>
     </div>
-    <div class="tab-content" id="profileTabsContent">
-      <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
-        <div class="photo-grid mt-4">
-          <div v-for="post in posts" :key="post.photo_id" class="photo-item">
-            <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
+    
+
+    <div v-else>
+      <div v-if="errorMessage" class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+      </div>
+      <div v-if="successMessage" class="alert alert-success" role="alert">
+        {{ successMessage }}
+      </div>
+      <div class="profile-header mt-4">
+        <div class="profile-details">
+          <div class="form-group">
+            <input type="text"
+                   id="username"
+                   :disabled="!isOwner" 
+                   :class="{'profile-name-unselected': !isInputEnabled, 'profile-name-selected': isInputEnabled}"
+                   v-model="inputValue"
+                   @click="enableInput"
+                   @blur="onBlur"
+                   @keydown.enter="onEnter">
+          </div>
+          <template v-if="isOwner">
+            <button v-if="isInputEnabled" class="btn btn-primary" @click="editProfile">Save Username</button>
+            <button v-else class="btn btn-outline-primary" @click="enableInput">Edit Username</button>
+            
+            <button class="btn btn-outline-secondary" @click="toggleBanlist">
+              Show Banlist
+            </button>
+         
+            <div v-if="isBanlistVisible" class="banlist-container">
+              <ul>
+                <li v-for="banned in banlist" :key="banned">
+                  <div>
+                    <strong>{{ banlistUsernames[banned] }}</strong>
+                  </div>
+            
+                  <div>
+                    <button class="btn btn-danger btn-sm" @click="removeBan(banned)">Remove</button>
+                  </div>  
+                </li>
+              </ul>
+            </div>
+            <div class="upload-form mt-4">
+              <input type="file" @change="onFileChange" />
+              <textarea v-model="caption" placeholder="Add a caption..."></textarea>
+              <button class="btn btn-primary" @click="uploadPhoto">Upload Photo</button>
+            </div>
+          </template>
+          <template v-else>
+            <button v-if="!isFollowing" class="btn btn-outline-primary follow-btn" @click="toggleFollow">Follow</button>
+            <button v-else class="btn btn-outline-secondary follow-btn" @click="toggleFollow">Unfollow</button>
+            <button v-if="!isBanned" class="btn btn-outline-primary ban-btn" @click="toggleBan">Ban</button>
+            <button v-else class="btn btn-outline-secondary ban-btn" @click="toggleBan">Unban</button>
+          </template>
+          <div class="stats mt-3">
+            <span class="mr-3">Posts: <strong>{{ postsCount }}</strong></span>
+            <br>
+            <span class="mr-3">Followers: <strong>{{ followersCount }}</strong></span>
+            <br>
+            <span class="mr-3">Following: <strong>{{ followingCount }}</strong></span>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content" id="profileTabsContent">
+        <div class="tab-pane fade show active" id="posts" role="tabpanel" aria-labelledby="posts-tab">
+          <div class="photo-grid mt-4">
+            <div v-for="post in posts" :key="post.photo_id" class="photo-item">
+              <img :src="post.image" class="img-fluid photo" :alt="post.caption" @click="toggleModal(post)">
+            </div>
           </div>
         </div>
       </div>

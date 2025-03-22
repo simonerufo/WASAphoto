@@ -7,6 +7,7 @@ export default {
       owner: null,
       post: null,
       likeCount: 0,
+      likesId: [],
       isLiked: false,
       commentText: '',
       comments: [],
@@ -32,7 +33,7 @@ export default {
       try {
         const response = await axios.get(`/photos/${postId}/likes`);
         if (response.status === 200 && response.data) {
-        console.log("likes", response.data);
+        this.likesId = response.data.map(item => item.user_id);
         this.likeCount = Array.isArray(response.data) ? response.data.length : 0;
       } else {
         console.warn(`Unexpected response or empty data: ${response.status}`);
@@ -50,16 +51,14 @@ export default {
 
   async checkIfLikedPhoto() {
     const postId = this.$route.params.photo_id;
-    const userId = getId(); // Get the current user ID
+    const userId = getId();
 
     try {
       const response = await axios.get(`/photos/${postId}/likes`);
       if (response.status === 200 && response.data) {
         const likes = Array.isArray(response.data) ? response.data : [];
         const liked = likes.map(user => user.user_id);
-        this.isLiked = liked.includes(Number(userId)); // Check if current user ID is in the list of likes
-        console.log(this.isLiked);
-        console.log(liked);
+        this.isLiked = liked.includes(Number(userId)); 
       } else {
         this.isLiked = false;
       }
@@ -76,8 +75,8 @@ export default {
         const postData = response.data;
         this.post = postData;
         console.log(this.post.image);
-        this.checkIfLikedPhoto(); // Check if the photo is liked by the current user
-        await this.fetchLikeCount(postId); // Fetch the like count
+        this.checkIfLikedPhoto(); 
+        await this.fetchLikeCount(postId);
       }
     } catch (e) {
       console.error('Failed to fetch post details:', e);
@@ -108,6 +107,7 @@ export default {
         if (response.status === 200) {
           this.likeCount -= 1;
           this.isLiked = false;
+          this.likesId.filter(id => id != userId);
           console.log("Unliked");
         }
       } else {
@@ -115,10 +115,10 @@ export default {
         if (response.status === 204) {
           this.likeCount += 1;
           this.isLiked = true;
+          this.likesId.push(userId);
           console.log("liked");
         }
       }
-      // Update like count after liking/unliking
       await this.fetchLikeCount(postId);
     } catch (e) {
       console.error('Failed to like/unlike post:', e);
@@ -139,19 +139,33 @@ export default {
       for (const comment of this.comments) {
         const commentId = comment.comment_id; 
         await this.removeComment(commentId);
-    }
-
+      }
+      
+      if (this.likesId){ 
+        for (const LikerId of this.likesId){
+          const response = await axios.delete(`/profiles/${LikerId}/likes/${postId}`);
+          if (response.status === 200){
+            this.likeCount -= 1;
+            this.isLiked = false;
+            this.likesId.filter(id => id !== userId);
+            console.log("Unliked");
+          } 
+        }
+      }
       const response = await axios.delete(`/profiles/${userId}/photos/${postId}`);
       if (response.status === 204) {
         this.likeCount = 0;
         this.comments = [];
-        alert('Post and associated comments deleted successfully');
         this.$router.push(`/profiles/${userId}/profile`);
       }
     } catch (e) {
       console.error('Failed to delete post or comments:', e);
       alert('Failed to delete post or comments');
     }
+
+
+      
+
   },
 
   async addComment() {
