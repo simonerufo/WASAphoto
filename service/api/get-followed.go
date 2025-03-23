@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) GetFollowing(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getFollowing(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Retrieve user ID from parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

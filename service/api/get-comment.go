@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt _router) GetPhotoComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt _router) getPhotoComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Retrieve parameters from the URL
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) GetPhotoLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getPhotoLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Retrieve photo ID from parameters
 	photoID, err := strconv.Atoi(ps.ByName("photo_id"))
 	if err != nil {

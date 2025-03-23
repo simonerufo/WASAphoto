@@ -8,7 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) GetBanList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getBanList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Extract user_id from request parameters
 	userID, err := strconv.Atoi(ps.ByName("user_id"))
 	if err != nil {
@@ -36,7 +36,7 @@ func (rt *_router) GetBanList(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 }
 
-func (rt *_router) GetBan(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) getBan(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userIDStr := ps.ByName("user_id")       // Extract user_id from the request
 	targetUIDStr := ps.ByName("target_uid") // Extract target_uid from the request
 

@@ -131,22 +131,22 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
-    put:
-      tags: ["action"]
-      operationId: followUser
-      summary: add new user to followed list
-      description: todo
-      requestBody:
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/User"}
-      responses:
-        "200":
-          description: user successfully added to followed list
-          content:
-            application/json:
-              schema: {$ref: "#/components/schemas/Followed"}
-              example: {username: Marco, user_id: 128}
+    # put:
+    #   tags: ["action"]
+    #   operationId: followUser
+    #   summary: add new user to followed list
+    #   description: todo
+    #   requestBody:
+    #     content:
+    #       application/json:
+    #         schema: {$ref: "#/components/schemas/User"}
+    #   responses:
+    #     "200":
+    #       description: user successfully added to followed list
+    #       content:
+    #         application/json:
+    #           schema: {$ref: "#/components/schemas/Followed"}
+    #           example: {username: Marco, user_id: 128}
 
   /profiles/{user_id}/bans/{target_uid}:
     parameters:
@@ -480,6 +480,7 @@ paths:
         schema: { $ref: "#/components/schemas/UserID" }
 
     put:
+      operationId: followUser
       summary: Follow a user
       description: Follow a user specified by the following_id.
       responses:
