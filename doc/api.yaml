@@ -437,7 +437,7 @@ paths:
 
     get:
       tags: ["action"]
-      operationId: getPhotoComments
+      operationId: getComments
       summary: Retrieve all comments for a photo
       description: Get all comments associated with a specific photo owned by a user
       responses:
@@ -508,7 +508,7 @@ paths:
 
     get:
       tags: ["action"]
-      operationId: getUserFollowers
+      operationId: getFollowers
       summary: Retrieve all followers of a user
       description: Get all followers associated with a specific user
       responses:
@@ -538,6 +538,7 @@ paths:
         required: true
 
     get:
+      operationId: getFollowing
       summary: Retrieve all users that the user follows
       description: Get a list of users that are followed by the user identified by the user_id.
       responses:

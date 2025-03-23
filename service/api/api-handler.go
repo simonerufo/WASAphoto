@@ -22,11 +22,11 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/profiles/:user_id/photos/:photo_id", rt.deletePhoto)
 	// photo likes
 	rt.router.PUT("/profiles/:user_id/likes/:photo_id", rt.likePhoto)
-	rt.router.GET("/photos/:photo_id/likes", rt.getPhotoLikes)
+	rt.router.GET("/photos/:photo_id/likes", rt.getLikes)
 	rt.router.DELETE("/profiles/:user_id/likes/:photo_id", rt.unlikePhoto)
 	// photo comments
 	rt.router.POST("/profiles/:user_id/comments/:photo_id", rt.commentPhoto)
-	rt.router.GET("/profiles/:user_id/photos/:photo_id/comments", rt.getPhotoComments)
+	rt.router.GET("/profiles/:user_id/photos/:photo_id/comments", rt.getComments)
 	rt.router.DELETE("/profiles/:user_id/comments/:photo_id", rt.uncommentPhoto)
 	// follow
 	rt.router.PUT("/profiles/:user_id/following/:following_id", rt.followUser)
