@@ -87,6 +87,7 @@ export default {
     try {
       const response = await axios.get(`/profiles/${userId}/photos/${postId}/comments`);
       if (response.status === 200) {
+        console.log("Comments:"+JSON.stringify(response.data,null,2));
         this.comments = Array.isArray(response.data) ? response.data : [];
       } else {
         this.comments = [];
@@ -179,6 +180,7 @@ export default {
 
       if (response.status === 200) {
         const newComment = response.data;
+        console.log("Comment"+JSON.stringify(response.data,null,2))
         this.comments.push(newComment);
         this.commentText = '';
       }

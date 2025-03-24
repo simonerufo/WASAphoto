@@ -451,6 +451,7 @@ export default {
   width: 100%;
   max-width: 600px;
   text-align: center;
+  margin: 0 auto;
 }
 .profile-details input {
   background-color: #222;

@@ -1,6 +1,9 @@
 package database
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 func (db *appdbimpl) InsertComment(userID int, ownerID int, postID int, text string) (int, error) {
 	// Retrieve the current maximum comment_id from the Comment table
@@ -18,7 +21,7 @@ func (db *appdbimpl) InsertComment(userID int, ownerID int, postID int, text str
 	COMMENT := `INSERT INTO Comment(comment_id, post_id, user_id, text, timestamp)
 				VALUES (?, ?, ?, ?, ?)`
 
-	_, err = db.c.Exec(COMMENT, newCommentID, postID, ownerID, userID, text)
+	_, err = db.c.Exec(COMMENT, newCommentID, postID, ownerID, text, time.Now().UTC())
 	if err != nil {
 		log.Printf("Error inserting comment (userID: %d, ownerID: %d, postID: %d): %v", userID, ownerID, postID, err)
 		return 0, err
