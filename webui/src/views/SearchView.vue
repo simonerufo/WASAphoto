@@ -26,7 +26,7 @@ export default {
         const currentUserId = getId();
 
         // Get the user profile by username to get their ID
-        const profileResponse = await axios.get("/profile", {
+        const profileResponse = await axios.get("/profiles", {
           params: { username: this.searchUsername },
         });
 
