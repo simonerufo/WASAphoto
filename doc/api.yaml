@@ -83,6 +83,7 @@ paths:
         "500": {$ref: "#/components/responses/InternalServerError"}
 
 
+
   /profiles/{user_id}/photos/{photo_id}:
     parameters:
       - name: user_id
@@ -229,7 +230,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
-  /profiles/{user_id}/photos:
+  /profiles/{user_id}/profile/photos:
     parameters:
       - name: user_id
         in: path
