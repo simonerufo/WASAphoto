@@ -65,7 +65,7 @@ export default {
     },
     async fetchBlockedUsers() {
       try {
-       const response = await axios.get(`/profiles/${this.userID}/ban`);
+       const response = await axios.get(`/profiles/${this.userID}/banlist`);
        console.log(response.data.blockedUsers);
        return response.data.blockedUsers || []; // Assumendo che l'API restituisca un array di ID utente
      } catch (e) {

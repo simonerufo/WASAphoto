@@ -13,6 +13,8 @@ security:
   - bearerAuth: []
 
 paths:
+
+#doLogin
   /session:
     post:
       tags: ["login"]
@@ -41,6 +43,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#getProfileByUsername
   /profile:
     parameters:
       - name: username
@@ -51,7 +54,7 @@ paths:
     get:
       summary: Get user profile by username
       tags: ["action"]
-      operationId: getUserProfileByUsername
+      operationId: getProfileByUsername
       description: Retrieve the profile of a user by their username.
       responses:
         "200": {$ref: "#/components/responses/Success"}
@@ -59,6 +62,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#setMyUsername
   /profiles/{user_id}/username:
     parameters:
       - name: user_id
@@ -83,7 +87,8 @@ paths:
         "500": {$ref: "#/components/responses/InternalServerError"}
 
 
-
+#getPhoto
+#deletePhoto
   /profiles/{user_id}/photos/{photo_id}:
     parameters:
       - name: user_id
@@ -132,23 +137,9 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
-    # put:
-    #   tags: ["action"]
-    #   operationId: followUser
-    #   summary: add new user to followed list
-    #   description: todo
-    #   requestBody:
-    #     content:
-    #       application/json:
-    #         schema: {$ref: "#/components/schemas/User"}
-    #   responses:
-    #     "200":
-    #       description: user successfully added to followed list
-    #       content:
-    #         application/json:
-    #           schema: {$ref: "#/components/schemas/Followed"}
-    #           example: {username: Marco, user_id: 128}
-
+#banUser
+#unbanUser
+#getUser
   /profiles/{user_id}/bans/{target_uid}:
     parameters:
       - name: user_id
@@ -205,6 +196,7 @@ paths:
         "404": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#getUserProfile
   /profiles/{user_id}/profile:
     parameters:
       - name: user_id
@@ -230,6 +222,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#uploadPhoto
   /profiles/{user_id}/profile/photos:
     parameters:
       - name: user_id
@@ -262,6 +255,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#getMyStream
   /profiles/{user_id}/stream:
     parameters:
       - name: user_id
@@ -286,6 +280,8 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#likePhoto
+#unlikePhoto
   /profiles/{user_id}/likes/{photo_id}:
     parameters:
       - name: user_id
@@ -332,6 +328,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#getLikes
   /photos/{photo_id}/likes:
     parameters:
       - name: photo_id
@@ -368,6 +365,8 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#commentPhoto
+#uncommentPhoto
   /profiles/{user_id}/comments/{photo_id}:
     parameters:
       - name: user_id
@@ -423,6 +422,7 @@ paths:
         "500": {$ref: "#/components/responses/InternalServerError"}
 
 
+#getComments
   /profiles/{user_id}/photos/{photo_id}/comments:
     parameters:
       - name: user_id
@@ -468,7 +468,8 @@ paths:
         "400": {$ref: "#/components/responses/BadRequest"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
-
+#followUser
+#unfollowUser
   /profiles/{user_id}/following/{following_id}:
     parameters:
       - name: user_id
@@ -499,6 +500,7 @@ paths:
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
 
+#getFollowers
   /profiles/{user_id}/followers:
     parameters:
       - name: user_id
@@ -530,6 +532,7 @@ paths:
         "400": {$ref : "#/components/responses/BadRequest"}
         "500": {$ref : "#/components/responses/InternalServerError"}
 
+#getFollowing
   /profiles/{user_id}/following:
     parameters:
       - name: user_id
@@ -560,7 +563,8 @@ paths:
         "400": {$ref : "#/components/responses/BadRequest"}
         "500": {$ref : "#/components/responses/InternalServerError"}
 
-  /profiles/{user_id}/ban:
+#getBanlist
+  /profiles/{user_id}/banlist:
     parameters:
       - name: user_id
         in: path

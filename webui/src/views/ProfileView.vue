@@ -52,7 +52,7 @@ export default {
       const profileUserId = this.id;
       const currentUserId = getId();
       try {
-        const response = await axios.get(`/profiles/${currentUserId}/ban`);
+        const response = await axios.get(`/profiles/${currentUserId}/banlist`);
         if (response.status === 200) {
           const bannedUserIDs = response.data.banned_user_ids;
           if (Array.isArray(bannedUserIDs)) {
@@ -264,7 +264,7 @@ export default {
         return;
       }
       try {
-        const response = await axios.get(`/profiles/${this.id}/ban`);
+        const response = await axios.get(`/profiles/${this.id}/banlist`);
         if (response.status === 200) {
           this.banlist = response.data.banned_user_ids;
           console.log(this.banlist)
