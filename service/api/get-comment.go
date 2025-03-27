@@ -45,7 +45,10 @@ func (rt _router) getComments(w http.ResponseWriter, r *http.Request, ps httprou
 	if len(comments) == 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode([]Comment{})
+		if err := json.NewEncoder(w).Encode([]Comment{}); err != nil {
+			http.Error(w, "failed to encode response", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 

@@ -8,7 +8,7 @@ import (
 func (db *appdbimpl) GetStream(userID int) ([]Photo, error) {
 	var posts []Photo
 
-	// SQL query to get the posts from followed users
+	// query to get the posts from followed users
 	GETPostsFollowed := `SELECT 
 							Photo.photo_id, 
 							Photo.user_id, 

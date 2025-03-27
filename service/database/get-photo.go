@@ -44,6 +44,7 @@ func (db *appdbimpl) GetPhoto(userID int, photoID int) (*Photo, error) {
 	return &photo, nil
 }
 
+// checkPhoto checks if a certain photo_id associated to an user_id exists
 func (db *appdbimpl) CheckPhoto(user_id int, photo_id int) (bool, error) {
 	CHECK := `SELECT COUNT(*) FROM Photo WHERE user_id = ? AND photo_id = ?`
 

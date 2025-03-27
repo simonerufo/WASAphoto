@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// checkComments returns true if at least one comment is found on post
 func (db *appdbimpl) CheckComment(user_id int, photo_id int, comment_id int) (bool, error) {
 	CHECK := ` SELECT COUNT(*) AS comment_count FROM Comment WHERE owner_id = ? 
 				AND post_id = ? AND comment_id = ?`
@@ -78,7 +79,7 @@ func (db *appdbimpl) GetCommentsByPhotoID(postID int) ([]Comment, error) {
 		return nil, errors.New("error occurred while processing comments")
 	}
 
-	// return empty slice instead of nil if there are no comments
+	// return empty slice if there are no comments
 	if len(comments) == 0 {
 		return []Comment{}, nil
 	}
