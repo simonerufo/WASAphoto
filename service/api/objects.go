@@ -47,16 +47,6 @@ func encodeToBase64(data []byte) string {
 	return base64.StdEncoding.EncodeToString(data)
 }
 
-// checks if the username is valid
-// func (user User) isNameValid() bool {
-// 	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile
-// 	if !rex.MatchString(user.Username) {
-// 		return false
-// 	}
-// 	return true
-// }
-
-// checks if the username is valid
 func validUsername(username string) bool {
 	rex := regexp.MustCompile(`^[a-z0-9]{3,13}$`) //regex to compile
 	return rex.MatchString(username)
