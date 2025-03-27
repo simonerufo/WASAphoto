@@ -29,7 +29,6 @@ paths:
 # /profiles/:user_id/followers (deprecato?)
 # /profiles/:user_id/following OK
 # /profiles/:user_id/banlist OK
-# /home (?)
 
 
 #doLogin
@@ -379,6 +378,8 @@ paths:
                           $ref: "#/components/schemas/UserID"
                         username:
                           $ref: "#/components/schemas/Username"
+                    minItems: 0
+                    maxItems: 999
         "400": {$ref: "#/components/responses/BadRequest"}
         "403": {$ref: "#/components/responses/Forbidden"}
         "500": {$ref: "#/components/responses/InternalServerError"}
@@ -471,6 +472,8 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Comment"
+                    minItems: 0
+                    maxItems: 999
                 required:
                   - comments
               example:
@@ -576,6 +579,8 @@ paths:
                     description: A list of followers for the user
                     items:
                       $ref: "#/components/schemas/User"
+                    minItems: 0
+                    maxItems: 999
                 required:
                   - followers
         "400": {$ref : "#/components/responses/BadRequest"}
