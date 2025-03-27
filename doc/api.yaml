@@ -13,6 +13,19 @@ security:
   - bearerAuth: []
 
 paths:
+# /session k
+# /profiles k
+# /profiles/:user_id/username k
+# /profiles/:user_id/photos/:photo_id k
+# /profiles/:user_id/bans/:target_uid k
+# /profiles/:user_id/profile k
+# /profiles/:user_id/profile/photo k
+# /profiles/:user_id/stream k
+# /photos/:photo_id/likes k
+# /profiles/:user_id/comments/:photo_id
+#
+
+
 
 #doLogin
   /session:
@@ -139,7 +152,7 @@ paths:
 
 #banUser
 #unbanUser
-#getUser
+#getBan
   /profiles/{user_id}/bans/{target_uid}:
     parameters:
       - name: user_id
@@ -223,7 +236,7 @@ paths:
         "500": {$ref: "#/components/responses/InternalServerError"}
 
 #uploadPhoto
-  /profiles/{user_id}/profile/photos:
+  /profiles/{user_id}/profile/photo:
     parameters:
       - name: user_id
         in: path
