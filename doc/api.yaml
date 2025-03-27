@@ -13,18 +13,23 @@ security:
   - bearerAuth: []
 
 paths:
-# /session k
-# /profiles k
-# /profiles/:user_id/username k
-# /profiles/:user_id/photos/:photo_id k
-# /profiles/:user_id/bans/:target_uid k
-# /profiles/:user_id/profile k
-# /profiles/:user_id/profile/photo k
-# /profiles/:user_id/stream k
-# /photos/:photo_id/likes k
-# /profiles/:user_id/comments/:photo_id
-#
-
+# /session OK
+# /profiles OK
+# /profiles/:user_id/username OK
+# /profiles/:user_id/photos/:photo_id OK
+# /profiles/:user_id/bans/:target_uid OK
+# /profiles/:user_id/profile OK
+# /profiles/:user_id/profile/photo OK
+# /profiles/:user_id/stream OK
+# /profiles/:user_id/likes/:photos_id OK
+# /photos/:photo_id/likes OK
+# /profiles/:user_id/comments/:photo_id OK
+# /profiles/:user_id/photos/:photo_id/comments OK
+# /profiles/:user_id/following/:following_id OK
+# /profiles/:user_id/followers (deprecato?)
+# /profiles/:user_id/following OK
+# /profiles/:user_id/banlist OK
+# /home (?)
 
 
 #doLogin
@@ -514,36 +519,36 @@ paths:
         "500": {$ref: "#/components/responses/InternalServerError"}
 
 #getFollowers
-  /profiles/{user_id}/followers:
-    parameters:
-      - name: user_id
-        in: path
-        description: The user ID of the profile whose followers are being retrieved
-        schema: { $ref: "#/components/schemas/UserID" }
-        required: true
+  # /profiles/{user_id}/followers:
+  #   parameters:
+  #     - name: user_id
+  #       in: path
+  #       description: The user ID of the profile whose followers are being retrieved
+  #       schema: { $ref: "#/components/schemas/UserID" }
+  #       required: true
 
-    get:
-      tags: ["action"]
-      operationId: getFollowers
-      summary: Retrieve all followers of a user
-      description: Get all followers associated with a specific user
-      responses:
-        "200":
-          description: List of followers for the specified user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  followers:
-                    type: array
-                    description: A list of followers for the user
-                    items:
-                      $ref: "#/components/schemas/User"
-                required:
-                  - followers
-        "400": {$ref : "#/components/responses/BadRequest"}
-        "500": {$ref : "#/components/responses/InternalServerError"}
+  #   get:
+  #     tags: ["action"]
+  #     operationId: getFollowers
+  #     summary: Retrieve all followers of a user
+  #     description: Get all followers associated with a specific user
+  #     responses:
+  #       "200":
+  #         description: List of followers for the specified user
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 followers:
+  #                   type: array
+  #                   description: A list of followers for the user
+  #                   items:
+  #                     $ref: "#/components/schemas/User"
+  #               required:
+  #                 - followers
+  #       "400": {$ref : "#/components/responses/BadRequest"}
+  #       "500": {$ref : "#/components/responses/InternalServerError"}
 
 #getFollowing
   /profiles/{user_id}/following:

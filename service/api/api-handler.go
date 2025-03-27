@@ -31,7 +31,7 @@ func (rt *_router) Handler() http.Handler {
 	// follow
 	rt.router.PUT("/profiles/:user_id/following/:following_id", rt.followUser)
 	rt.router.DELETE("/profiles/:user_id/following/:following_id", rt.unfollowUser)
-	rt.router.GET("/profiles/:user_id/followers", rt.getFollowers)
+	// rt.router.GET("/profiles/:user_id/followers", rt.getFollowers)
 	rt.router.GET("/profiles/:user_id/following", rt.getFollowing)
 	// ban
 	rt.router.PUT("/profiles/:user_id/bans/:target_uid", rt.banUser)
