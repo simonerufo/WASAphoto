@@ -10,6 +10,13 @@ import (
 )
 
 func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// Retrieve usrr ID from parameters
+	userID, err := strconv.Atoi(ps.ByName("user_id"))
+	if err != nil {
+		http.Error(w, "Error while fetching photo ID from parameters", http.StatusBadRequest)
+		return
+	}
+
 	// Retrieve photo ID from parameters
 	photoID, err := strconv.Atoi(ps.ByName("photo_id"))
 	if err != nil {
@@ -18,7 +25,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	// Retrieve the list of likes for the specified photo
-	likes, err := rt.db.GetLikesForPhoto(photoID)
+	likes, err := rt.db.GetLikesForPhoto(userID, photoID)
 	if err != nil {
 		if strings.Contains(err.Error(), "does not exist") {
 			http.Error(w, "Photo not found", http.StatusNotFound)

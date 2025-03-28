@@ -183,7 +183,7 @@ export default {
       formData.append('image', this.file);
       formData.append('caption', this.caption);
       try {
-        const response = await axios.post(`/profiles/${this.id}/profile/photo`, formData, {
+        const response = await axios.post(`/profiles/${this.id}/photos`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

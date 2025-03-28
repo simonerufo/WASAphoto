@@ -29,9 +29,9 @@ export default {
     }
   },
   methods: {
-  async fetchLikeCount(postId) {
+  async fetchLikeCount(userID,postId) {
       try {
-        const response = await axios.get(`/photos/${postId}/likes`);
+        const response = await axios.get(`/profiles/${userID}/photos/${postId}/likes`);
         if (response.status === 200 && response.data) {
         this.likesId = response.data.map(item => item.user_id);
         this.likeCount = Array.isArray(response.data) ? response.data.length : 0;
@@ -54,7 +54,7 @@ export default {
     const userId = getId();
 
     try {
-      const response = await axios.get(`/photos/${postId}/likes`);
+      const response = await axios.get(`/profiles/${userId}/photos/${postId}/likes`);
       if (response.status === 200 && response.data) {
         const likes = Array.isArray(response.data) ? response.data : [];
         const liked = likes.map(user => user.user_id);
@@ -76,7 +76,7 @@ export default {
         this.post = postData;
         console.log(this.post.image);
         this.checkIfLikedPhoto(); 
-        await this.fetchLikeCount(postId);
+        await this.fetchLikeCount(userId,postId);
       }
     } catch (e) {
       console.error('Failed to fetch post details:', e);
@@ -120,7 +120,7 @@ export default {
           console.log("liked");
         }
       }
-      await this.fetchLikeCount(postId);
+      await this.fetchLikeCount(userId,postId);
     } catch (e) {
       console.error('Failed to like/unlike post:', e);
       alert('Failed to like/unlike post');

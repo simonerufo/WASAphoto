@@ -85,7 +85,7 @@ type AppDatabase interface {
 	// delete an entry from like table
 	DeleteLike(user_id int, owner_id int, post_id int) error
 	// Get all likes related to a photo
-	GetLikesForPhoto(photoID int) ([]Like, error)
+	GetLikesForPhoto(userID int, photoID int) ([]Like, error)
 	// insert an entry into comment table
 	InsertComment(user_id int, owner_id int, photo_id int, text string) (int, error)
 	// check if a comment exists in comment table

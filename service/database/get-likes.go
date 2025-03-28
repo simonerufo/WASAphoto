@@ -9,7 +9,7 @@ type Like struct {
 }
 
 // GetLikesForPhoto retrieves all likes for a given photo ID
-func (db *appdbimpl) GetLikesForPhoto(photoID int) ([]Like, error) {
+func (db *appdbimpl) GetLikesForPhoto(userID int, photoID int) ([]Like, error) {
 	query := `
         SELECT l.user_id, u.username, l.post_id AS photo_id
         FROM Like l

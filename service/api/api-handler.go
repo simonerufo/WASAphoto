@@ -17,12 +17,12 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/profiles", rt.getProfileByUsername)
 	rt.router.GET("/profiles/:user_id/profile", rt.getUserProfile)
 	// photo utility
-	rt.router.POST("/profiles/:user_id/profile/photo", rt.uploadPhoto)
+	rt.router.POST("/profiles/:user_id/photos", rt.uploadPhoto)
 	rt.router.GET("/profiles/:user_id/photos/:photo_id", rt.getPhoto)
 	rt.router.DELETE("/profiles/:user_id/photos/:photo_id", rt.deletePhoto)
 	// photo likes
 	rt.router.PUT("/profiles/:user_id/likes/:photo_id", rt.likePhoto)
-	rt.router.GET("/photos/:photo_id/likes", rt.getLikes)
+	rt.router.GET("/profiles/:user_id/photos/:photo_id/likes", rt.getLikes)
 	rt.router.DELETE("/profiles/:user_id/likes/:photo_id", rt.unlikePhoto)
 	// photo comments
 	rt.router.POST("/profiles/:user_id/comments/:photo_id", rt.commentPhoto)
